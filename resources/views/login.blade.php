@@ -56,48 +56,50 @@
                     <h4 class="ml-2 text-bg mb-0"><strong>{{ config('app.name') }}</strong></h2>
                 </div>
                 <div class="row w-100 justify-content-center">
-                    <div class="card card-login mb-3">
-                        <div class="card-body">
-                            <form action="#" flog>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <div class="input-group input-group--inline">
-                                        <div class="input-group-addon">
-                                            <i class="material-icons">account_circle</i>
+                    <div class="col-12 col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form action="#" flog>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <div class="input-group input-group--inline">
+                                            <div class="input-group-addon">
+                                                <i class="material-icons">account_circle</i>
+                                            </div>
+                                            <input type="text" class="form-control" name="email"
+                                                placeholder="Votre email" required>
                                         </div>
-                                        <input type="text" class="form-control" name="email"
-                                            placeholder="Votre email" required>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="d-flex">
-                                        <label>Mot de passe</label>
-                                        <span class="ml-auto">
-                                            <a href="#">
-                                                J'ai oublié mon mot de passe
-                                            </a>
+                                    <div class="form-group">
+                                        <div class="d-flex">
+                                            <label>Mot de passe</label>
+                                            <span class="ml-auto">
+                                                <a href="#">
+                                                    J'ai oublié mon mot de passe
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div class="input-group input-group--inline">
+                                            <div class="input-group-addon">
+                                                <i class="material-icons">lock_outline</i>
+                                            </div>
+                                            <input type="password" class="form-control" name="password"
+                                                placeholder="Votre mot de passe" required>
+                                        </div>
+                                    </div>
+                                    <div id="rep" class="alert p-2" style="display: none"></div>
+                                    <button type="submit"
+                                        class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
+                                        <span loader class="dots-loader" style="display:none;">
+                                            <span></span><span></span><span></span>
                                         </span>
-                                    </div>
-                                    <div class="input-group input-group--inline">
-                                        <div class="input-group-addon">
-                                            <i class="material-icons">lock_outline</i>
-                                        </div>
-                                        <input type="password" class="form-control" name="password"
-                                            placeholder="Votre mot de passe" required>
-                                    </div>
-                                </div>
-                                <div id="rep" class="alert p-2" style="display: none"></div>
-                                <button type="submit"
-                                    class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
-                                    <span loader class="dots-loader" style="display:none;">
-                                        <span></span><span></span><span></span>
-                                    </span>
-                                    <span text>
-                                        <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
-                                        Connexion
-                                    </span>
-                                </button>
-                            </form>
+                                        <span text>
+                                            <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
+                                            Connexion
+                                        </span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -145,5 +147,5 @@
         });
     </script>
 </body>
- 
+
 </html>

@@ -114,6 +114,7 @@
     <script>
         $(function() {
             'use strict';
+            
             $('[flog]').on('submit', function(e) {
                 e.preventDefault();
                 var form = $(this);

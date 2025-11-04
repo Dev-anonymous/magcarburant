@@ -142,7 +142,6 @@
                     $('[text]', btn).show();
                 })
             });
-
         });
     </script>
 </body>

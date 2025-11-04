@@ -113,7 +113,7 @@
     <script src="{{ asset('assets/js/jq.js') }}"></script>
     <script>
         $(function() {
-            'use strict';
+            'use strict'; 
 
             $('[flog]').on('submit', function(e) {
                 e.preventDefault();

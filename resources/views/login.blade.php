@@ -86,8 +86,12 @@
                                             <input type="password" class="form-control" name="password"
                                                 placeholder="Votre mot de passe" required>
                                         </div>
+                                        <div class="custom-control custom-checkbox mt-3">
+                                            <input type="checkbox" name="remember" class="custom-control-input" id="customCheck1">
+                                            <label class="custom-control-label" for="customCheck1">Rester connecté</label>
+                                        </div>
                                     </div>
-                                    <div id="rep" class="alert p-2" style="display: none"></div>
+                                    <x-alert />
                                     <button type="submit"
                                         class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
                                         <span loader class="dots-loader" style="display:none;">
@@ -129,14 +133,31 @@
                 $('[text]', btn).hide();
 
                 $.ajax({
-                    url: '/api/login',
+                    url: '{{ route('api.login') }}',
                     method: 'POST',
                     data: data,
-                    success: function(response) {
-
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    error: function(xhr) {
-
+                    success: function(resp) {
+                        var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                        rep.html(mess).stop().removeClass().addClass(
+                                'p-1 text-center alert alert-success')
+                            .show();
+                        localStorage.setItem('_token', resp.token);
+                        setInterval(() => {
+                            $(':input', form).attr('disabled', true);
+                        }, 800);
+                        setInterval(() => {
+                            location.reload();
+                        }, 3000);
+                    },
+                    error: function(xhr, a, b) {
+                        var resp = xhr.responseJSON;
+                        var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                        rep.html(mess).stop().removeClass().addClass(
+                                'p-1 text-center alert alert-danger')
+                            .show();
                     },
                 }).always(function() {
                     $(':input', form).attr('disabled', false);

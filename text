@@ -1,0 +1,6 @@
+SELECT p.nom AS produit, t.libelle AS type_prix, v.montant
+FROM valeurs_prix v
+JOIN produits p ON v.id_produit = p.id_produit
+JOIN type_prix t ON v.id_type = t.id_type
+ORDER BY p.nom, t.libelle;
+

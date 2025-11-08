@@ -12,6 +12,7 @@ class SudoWebController extends Controller
     }
     function provider()
     {
+        // defaultdata();
         return view('sudo.provider');
     }
 }

@@ -34,5 +34,32 @@
                 }
             });
         });
+
+        $.ajaxSetup({
+            headers: {
+                // 'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Authorization': 'Bearer ' + localStorage.getItem('_token'),
+                'Accept': 'application/json'
+            }
+        });
+
+
+        $('[logout]').on('click', function(e) {
+            e.preventDefault();
+            var btn = $(this);
+            btn.children().hide();
+            $('[loader]', btn).show();
+
+            $.ajax({
+                url: '{{ route('api.logout') }}',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'accept': 'application/json'
+                },
+            }).always(function() {
+                location.reload();
+            })
+        });
     })();
 </script>

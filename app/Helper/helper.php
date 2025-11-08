@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Entity;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 function nnow()
 {
@@ -30,9 +34,27 @@ function defaultdata()
         ['AUTHENTIX', 'AUTHENTIX']
     ];
 
-    foreach($entities as $el){
-        
+    DB::beginTransaction();
+    foreach ($entities as $el) {
+        $e = Entity::firstOrNew(['shortname' => $el[0]]);
+        if (!$e->exists) {
+            $email = strtolower($el[0]) . "@email.com";
+            $u = User::where(['email' => $email])->firstOrNew();
+            if (!$u->exists) {
+                $u->name = $el[0];
+                $u->email = $email;
+                $u->password = Hash::make('mdp@123');
+                $u->user_role = 'provider';
+                $u->save();
+            }
+
+            $e->longname =  $el[1];
+            $e->users_id = $u->id;
+            $e->save();
+        }
     }
+
+    DB::commit();
 }
 
 function userimg()

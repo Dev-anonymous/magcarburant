@@ -51,10 +51,11 @@ class AuthController extends Controller
     public function logout(Request $r)
     {
         if (Auth::check()) {
-            /** @var \App\Models\User $user **/
-            $user = auth()->user();
             Auth::guard('web')->logout();
         }
-        return redirect(route('app.login'));
+        if (request()->wantsJson()) {
+            return response(['message' => "logged out"]);
+        }
+        return redirect(route('login'));
     }
 }

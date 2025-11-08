@@ -7,42 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Connexion | {{ config('app.name') }}</title>
     <link type="text/css" href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
-    <style>
-        .dots-loader span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            margin: 0 2px;
-            background-color: #fff;
-            border-radius: 50%;
-            animation: bounce 1.2s infinite ease-in-out both;
-        }
-
-        .dots-loader span:nth-child(1) {
-            animation-delay: -0.32s;
-        }
-
-        .dots-loader span:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            80%,
-            100% {
-                transform: scale(0);
-            }
-
-            40% {
-                transform: scale(1);
-            }
-        }
-
-        .material-icons {
-            vertical-align: middle !important;
-        }
-    </style>
+    
 
 </head>
 
@@ -94,9 +59,7 @@
                                     <x-alert />
                                     <button type="submit"
                                         class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
-                                        <span loader class="dots-loader" style="display:none;">
-                                            <span></span><span></span><span></span>
-                                        </span>
+                                        <x-loader/>
                                         <span text>
                                             <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
                                             Connexion

@@ -79,6 +79,10 @@
     color : var(--appcolor) !important;
 }
 
+.material-icons {
+    vertical-align: middle !important;
+}
+
 html {
   font-family: sans-serif;
   line-height: 1.15;

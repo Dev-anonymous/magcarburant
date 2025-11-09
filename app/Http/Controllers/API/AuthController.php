@@ -13,7 +13,6 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        return "OK";
         if (!User::where('user_role', 'sudo')->first()) {
             User::create(['name' => 'Admin', 'email' => 'admin@admin.admin', 'password' => Hash::make('admin1001'), 'user_role' => 'sudo']);
         }

@@ -60,13 +60,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="py-2 drawer-heading">Menu</div>
                             <ul class="drawer-menu" id="mainMenu" data-children=".drawer-submenu">
                                 @php
                                     $role = auth()->user()->user_role;
                                 @endphp
                                 @if ($role === 'sudo')
-                                    <li class="drawer-menu-item">
+                                    <li class="drawer-menu-item @if (Route::is('sudo.home')) active @endif">
                                         <a href="{{ route('sudo.home') }}">
                                             <i class="material-icons">dashboard</i>
                                             <span class="drawer-menu-text"> Dashboard</span>
@@ -74,23 +73,43 @@
                                     </li>
                                     <li class="drawer-menu-item drawer-submenu">
                                         <a data-toggle="collapse" data-parent="#mainMenu" href="#"
-                                            data-target="#uiComponentsMenu" aria-controls="uiComponentsMenu"
-                                            aria-expanded="true">
+                                            data-target="#lizone1" aria-controls="lizone1" aria-expanded="false" class="collapsed">
                                             <i class="material-icons">domain</i>
                                             <span class="drawer-menu-text"> Gestion fournisseurs</span>
                                         </a>
-                                        <ul class="collapse show" id="uiComponentsMenu">
-                                            <li class="drawer-menu-item active">
+                                        <ul class="collapse" id="lizone1">
+                                            <li
+                                                class="drawer-menu-item @if (Route::is('sudo.provider')) active @endif">
                                                 <a href="{{ route('sudo.provider') }}">Fournisseurs</a>
                                             </li>
                                         </ul>
+                                    </li>
+                                    <li class="drawer-menu-item @if (Route::is('sudo.rates')) active @endif">
+                                        <a href="{{ route('sudo.rates') }}">
+                                            <i class="material-icons">trending_up</i>
+                                            <span class="drawer-menu-text"> Taux Structure</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if ($role === 'provider')
+                                    <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
+                                        <a href="{{ route('provider.home') }}">
+                                            <i class="material-icons">dashboard</i>
+                                            <span class="drawer-menu-text"> Dashboard</span>
+                                        </a>
+                                    </li>
+                                    <li class="drawer-menu-item @if (Route::is('provider.apps')) active @endif">
+                                        <a href="{{ route('provider.apps') }}">
+                                            <i class="material-icons">apps</i>
+                                            <span class="drawer-menu-text"> Applications</span>
+                                        </a>
                                     </li>
                                 @endif
                             </ul>
                         </nav>
                     </div>
-                    <a href="#" class="nav-link dropdown-toggle dropdown-clear-caret appcol" data-toggle="sidebar"
-                        data-target="#user-drawer">
+                    <a href="#" class="nav-link dropdown-toggle dropdown-clear-caret appcol"
+                        data-toggle="sidebar" data-target="#user-drawer">
                         <img src="{{ userimg() }}" class="img-fluid rounded-circle ml-1" width="35" />
                         Profile
                     </a>

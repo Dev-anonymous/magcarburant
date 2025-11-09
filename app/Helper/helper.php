@@ -60,10 +60,18 @@ function defaultdata()
 function userimg()
 {
     if (Auth::check()) {
-        $role = auth()->user()->user_role;
-        if ($role == 'sudo') {
-            return asset('assets/images/avatar.png');
+        $user = auth()->user();
+        $role = $user->user_role;
+        $i = 'assets/images/avatar.png';
+        if ($role === 'sudo') {
+            return asset($i);
+        }
+        if ($role === 'provider') {
+            $e = $user->entities()->first()?->logo;
+            if ($e) {
+                $i  = "storage/$e";
+            }
+            return asset($i);
         }
     }
 }
-

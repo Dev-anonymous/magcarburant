@@ -114,7 +114,7 @@ class EntityController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Vous créé le fournisseur $user->name avec succès !",
+                'message' => "Vous avez créé le fournisseur $user->name avec succès !",
             ], 201);
         }
     }
@@ -155,7 +155,7 @@ class EntityController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Vous supprimé le fournisseur $user->name avec succès !",
+            'message' => "Vous avez supprimé le fournisseur $user->name avec succès !",
         ], 200);
     }
 }

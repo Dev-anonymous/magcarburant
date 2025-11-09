@@ -8,7 +8,7 @@
             <div class="m-2">
                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                     <i class="material-icons md-24">add_circle_outline</i>
-                    Ajouter un fournisseur
+                    Nouveau fournisseur
                 </button>
             </div>
         </div>
@@ -149,18 +149,23 @@
                         </div>
                         <x-alert />
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-dismiss="modal">
-                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
-                            NON
-                        </button>
-                        <button type="submit" class="btn btn-danger d-flex align-items-center justify-content-center">
-                            <x-loader />
-                            <span text>
-                                <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
-                                OUI JE CONFIRME
-                            </span>
-                        </button>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -168,46 +173,6 @@
     </div>
 @endsection
 @section('script')
-    <style>
-        .custom-card {
-            position: relative;
-            background: #fff;
-            border-radius: 6px;
-            overflow: visible;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-        }
-
-        .custom-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-        }
-
-        .card-img img {
-            width: auto;
-            max-width: 100%;
-            height: 100px;
-            object-fit: contain;
-            border-radius: 4px;
-        }
-
-        .card-caption {
-            padding: 15px;
-        }
-
-        .card-caption h4 {
-            margin-top: 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .card-caption p {
-            margin: 5px 0 0;
-            color: #777;
-            font-size: 13px;
-        }
-    </style>
     <script>
         $(function() {
 
@@ -224,10 +189,11 @@
                     success: function(data) {
                         $('span[nb]').html(data.length);
                         var t = '';
+                        var url = '{{ route('sudo.provider') }}';
                         data.forEach(e => {
                             t += `
                             <div class="col-md-3 col-sm-4">
-                                <div class="custom-card">
+                                <div class="carte d-block" style="cursor:pointer;" onclick="if (!event.target.closest('.dropdown')) location.assign('${url}?item=${e.shortname}')">
                                     <div class="text-right p-2">
                                         <div class="dropdown">
                                             <a
@@ -242,7 +208,6 @@
                                                 >more_vert</i
                                                 >
                                             </a>
-
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item" href="#" bedit data="${JSON.stringify(e).replace(/"/g, '&quot;')}">
                                                     <i class="material-icons md-14 align-middle">edit</i>

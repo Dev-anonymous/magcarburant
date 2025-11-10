@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.purchases', ['']) }}')">
+                    oonclick="location.assign('{{ route('provider.purchases', ['']) }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -47,14 +47,14 @@
                         <div class="text-center">
                             <a href="{{ route('sudo.provider', ['tx' => $entity->shortname]) }}">Taux réels</a>
                             <span>|</span>
-                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
+                            <a hrefr="{{ route('sudo.provider') }}">Structures des prix</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.sales') }}')">
+                    oonclick="location.assign('{{ route('provider.sales') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -68,7 +68,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
-                    onclick="location.assign('{{ route('provider.home') }}')">
+                    oonclick="location.assign('{{ route('provider.home') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path

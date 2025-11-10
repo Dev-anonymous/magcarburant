@@ -14,7 +14,7 @@ class SudoWebController extends Controller
 
     function provider()
     {
-        // defaultdata();
+        defaultdata();
         $item = request('item');
         if ($item) {
             $entity = Entity::where('shortname', $item)->first();

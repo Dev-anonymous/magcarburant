@@ -34,7 +34,7 @@
                         <div class="text-center">
                             <a href="{{ route('provider.rates') }}">Taux réels</a>
                             <span>|</span>
-                            <a rhref="{{ route('provider.prices') }}">Structures des prix</a>
+                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
                         </div>
                     </div>
                 </div>

@@ -163,7 +163,7 @@ class RateController extends Controller
                 if ($validated['from'] !== $dateAttendue) {
                     return response()->json([
                         'success' => false,
-                        'message' => "La date de début doit être le lendemain de la dernière date de fin ({$dernierTaux->to}).",
+                        'message' => "La date de début doit être le lendemain de la dernière date de fin ({$dernierTaux->to->format('d-m-Y')}) du taux encours.",
                     ], 422);
                 }
             }

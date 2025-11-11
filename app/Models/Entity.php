@@ -19,10 +19,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $logo
  * 
  * @property User $user
- * @property Collection|Fuelprice[] $fuelprices
  * @property Collection|Purchase[] $purchases
  * @property Collection|Rate[] $rates
  * @property Collection|Sale[] $sales
+ * @property Collection|Structureprice[] $structureprices
  *
  * @package App\Models
  */
@@ -47,11 +47,6 @@ class Entity extends Model
 		return $this->belongsTo(User::class, 'users_id');
 	}
 
-	public function fuelprices()
-	{
-		return $this->hasMany(Fuelprice::class);
-	}
-
 	public function purchases()
 	{
 		return $this->hasMany(Purchase::class);
@@ -65,5 +60,10 @@ class Entity extends Model
 	public function sales()
 	{
 		return $this->hasMany(Sale::class);
+	}
+
+	public function structureprices()
+	{
+		return $this->hasMany(Structureprice::class);
 	}
 }

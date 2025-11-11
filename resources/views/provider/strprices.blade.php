@@ -37,16 +37,19 @@
                                     <thead>
                                         <tr>
                                             <th></th>
-                                            @foreach ($zone->fuelprices->pluck('fuel.fuel')->unique() as $fuelName)
+                                            <th></th>
+                                            @foreach ($zone->fuelPrices->pluck('fuel.fuel')->unique() as $fuelName)
                                                 <th>{{ $fuelName }}</th>
                                             @endforeach
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($zone->fuelprices->pluck('label.label')->unique() as $labelName)
+                                        @foreach ($zone->fuelPrices->pluck('label')->unique('id') as $label)
                                             <tr>
-                                                <td>{{ $labelName }}</td>
-                                                @foreach ($zone->fuelprices->where('label.label', $labelName) as $price)
+                                                <td>{{ $label->tag }}</td>
+                                                <td>{{ $label->label }}</td>
+
+                                                @foreach ($zone->fuelPrices->where('label_id', $label->id) as $price)
                                                     <td>{{ $price->price ?? '-' }}</td>
                                                 @endforeach
                                             </tr>
@@ -55,6 +58,7 @@
                                 </table>
                             @endforeach
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -142,6 +146,13 @@
 @section('script')
     <x-datatable />
     <x-flatpickr />
+
+    <style>
+        .table td,
+        .table th {
+            padding: 4px !important;
+        }
+    </style>
 
     <script>
         flatpickr(".flatpickr", {

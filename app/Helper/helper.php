@@ -72,7 +72,7 @@ function defaultdata()
     $labels = [
         'A' => 'PMF Commerciale (PMFC)',
         'B' => 'Frais & Services SOCIR',
-        'C' => 'Charges d\'exploitation SEP, Strock de sécurité 7 stratégique',
+        'C' => 'Charges d\'exploitation SEP, Strock de sécurité & stratégique',
         'D' => 'Frais de mise en place SEP',
         'E' => 'Stock de sécurité',
         'F' => 'Stock stratégique',

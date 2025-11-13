@@ -21,45 +21,71 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title font-weight-bold">
-                            Structure
-                            {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? '' : " au {$structure->to->format('d-m-Y')}") }}
-
-                        </h4>
-                    </div>
-                    <div class="py-4">
-                        <div class="table-responsive p-3">
-                            @foreach ($zones as $zone)
-                                <h5 class="text-center">ZONE {{ $zone->zone }}</h5>
-                                <table class="table table-striped table-bordered table-hover" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th></th>
-                                            @foreach ($zone->fuelPrices->pluck('fuel.fuel')->unique() as $fuelName)
-                                                <th>{{ $fuelName }}</th>
-                                            @endforeach
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($zone->fuelPrices->pluck('label')->unique('id') as $label)
+                <div class="bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="text-muted font-weight-bold">
+                        Structure
+                        {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? ' à maintenant' : " au {$structure->to->format('d-m-Y')}") }}
+                    </h4>
+                </div>
+                <div class="py-4">
+                    @foreach ($zones as $zone)
+                        <div class="carte">
+                            <div class="w-100">
+                                <div class="table-responsive p-1">
+                                    <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
+                                        Vous pouvez maintenant modifier les prix
+                                    </p>
+                                    <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
+                                    <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
+                                    <table class="table table-striped table-bordered table-hover" style="width:100%">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $label->tag }}</td>
-                                                <td>{{ $label->label }}</td>
-
-                                                @foreach ($zone->fuelPrices->where('label_id', $label->id) as $price)
-                                                    <td>{{ $price->price ?? '-' }}</td>
+                                                <th></th>
+                                                <th></th>
+                                                @foreach ($fuels as $fuel)
+                                                    <th>{{ $fuel->fuel }}</th>
                                                 @endforeach
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            @endforeach
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($labels as $label)
+                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'H')
+                                                @php
+                                                    $noedit = in_array($label->tag, noteditable());
+                                                @endphp
+                                                <tr tag="{{ $label->tag }}"
+                                                    class="@if ($noedit) noneditable font-weight-bold @endif">
+                                                    <td>{{ $label->tag }}</td>
+                                                    <td>{{ $label->label }}</td>
+                                                    @foreach ($fuels as $fuel)
+                                                        @php
+                                                            $price = optional(
+                                                                $fuelprices[$zone->id][$fuel->id][$label->id] ?? null,
+                                                            )->first();
+                                                        @endphp
+                                                        <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
+                                                            data-fuelprice-id="{{ $price->id }}"
+                                                            data-zone="{{ $zone->zone }}" data-label="{{ $label->label }}"
+                                                            data-tag="{{ $label->tag }}">
+                                                            {{ $price->amount }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @if (empty($structure->to))
+                                    <div class="p-2 text-right">
+                                        <button class="btn btn-sm btn- btn-edit-table">
+                                            <i class="material-icons md-18">edit</i>
+                                            Modifier les prix
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -67,80 +93,7 @@
     </div>
 @endsection
 @section('modals')
-    <div class="modal fade" id="mdladd" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Nouvelle structure</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form class="was-validated" fadd>
-                    <div class="modal-body">
-                        <div class="mb-2">
-                            <label class="mb-0" for="dv1">Date validité du </label>
-                            <input type="text" class="form-control flatpickr" id="dv1" required name="from">
-                        </div>
-                        <x-alert />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-dismiss="modal">
-                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
-                            Fermer
-                        </button>
-                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
-                            <x-loader />
-                            <span text>
-                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
-                                Valider
-                            </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="mdledit" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Modification structure</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form class="was-validated" fedit>
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="action" value="update">
-                    <div class="modal-body">
-                        <div class="mb-2">
-                            <label class="mb-0" for="dv1">Date validité du </label>
-                            <input type="text" class="form-control" id="dv1" required name="from">
-                        </div>
-                        <div class="mb-2">
-                            <label class="mb-0">Date validité au </label>
-                            <input type="text" class="form-control" name="to" required>
-                        </div>
-                        <x-alert />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-dismiss="modal">
-                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
-                            Fermer
-                        </button>
-                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
-                            <x-loader />
-                            <span text>
-                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
-                                Valider
-                            </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @section('script')
@@ -152,125 +105,148 @@
         .table th {
             padding: 4px !important;
         }
+
+        .noneditable td {
+            border-top: 2px solid #ccc !important;
+            border-bottom: 2px solid #ccc !important;
+        }
     </style>
 
     <script>
-        flatpickr(".flatpickr", {
-            maxDate: "today",
-            locale: {
-                firstDayOfWeek: 1
-            }
-        });
+        $('.btn-edit-table').on('click', function() {
+            let card = $(this).closest('.carte');
+            card.find('.editable-price').attr('contenteditable', 'true');
+            card.find('.editable-price').css('background-color', '#fff8c4');
 
-        var dtObj = $('#table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: '{{ route('structureprice.index') }}',
-            order: [
-                [0, "desc"]
-            ],
-            columnDefs: [{
-                targets: 0,
-                width: '1%'
-            }, {
-                targets: 4,
-                width: '1%'
-            }],
-            columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
-                    data: 'name',
-                    name: 'name'
-                },
-                {
-                    data: 'from',
-                    name: 'from'
-                },
-                {
-                    data: 'to',
-                    name: 'to'
-                },
-                {
-                    data: 'view',
-                    name: 'view',
-                    orderable: false,
-                    searchable: false,
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false,
-                },
-            ]
-        }).on('draw.dt', function(e, settings, data, xhr) {
-            $('[bedit]').off('click').click(function() {
-                var data = JSON.parse($(this).attr('data'));
-                var mdl = $('#mdledit');
-                var form = $('[fedit]', mdl);
-                $('[name="id"]', form).val(data.id);
-                $('[name="from"]', form).val(data.from);
-                $('[name="to"]', form).val(data.to);
-                $('[name="cdf_usd"]', form).val(data.cdf_usd);
-                $('[name="usd_cdf"]', form).val(data.usd_cdf);
-                mdl.modal('show');
+            var info = card.find('[info]');
+
+            $('html, body').stop().animate({
+                scrollTop: card.offset().top - 10
+            }, 800, function() {
+                info.stop().fadeIn();
+                setTimeout(() => {
+                    info.fadeOut();
+                }, 5000);
             });
         });
-        $('#mdledit').on('shown.bs.modal', function() {
-            $('[name="from"], [name="to"]', this).each(function() {
-                if (this._flatpickr) {
-                    this._flatpickr.destroy();
-                }
-                flatpickr(this, {
-                    maxDate: "today",
-                    locale: {
-                        firstDayOfWeek: 1
+
+        const formulas = {
+            D: "C-E-F",
+            K: "A+B+C+G+H+I+J+L",
+            S: "P+Q+R",
+            T: "O+R",
+            U: "S+T",
+            V: "A+K+M+U",
+            // W: "V*1000",
+        };
+
+        function getRowValues(tag, table) {
+            return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => parseFloat($(td).text()) || 0).get();
+        }
+
+        function setRowValues(tag, values, table) {
+            const row = $(`tr[tag="${tag}"] td`, table).slice(2);
+            row.each(function(i) {
+                $(this).text(values[i].toFixed(2));
+            });
+        }
+
+        function calculate() {
+            $('.carte').each(function(i, carte) {
+                var table = $('table', $(carte));
+                const rows = {}; // stocke toutes les lignes lues
+                // Lire toutes les lignes de A à Z (ou celles existantes)
+                $('tbody tr', table).each(function() {
+                    const tag = $(this).attr('tag');
+                    rows[tag] = getRowValues(tag, table);
+                });
+
+                // Parcourir les formules
+                Object.keys(formulas).forEach(tag => {
+                    const formula = formulas[tag]; // ex: "C-A-B"
+                    const operators = formula.match(/[\+\-\*\/]/g) || []; // ["-", "-"]
+                    const operands = formula.split(/[\+\-\*\/]/); // ["C","A","B"]
+
+                    // Calculer cellule par cellule
+                    const length = rows[operands[0]].length;
+                    const result = [];
+                    for (let i = 0; i < length; i++) {
+                        let value = parseFloat(rows[operands[0]][i]) || 0;
+
+                        for (let j = 1; j < operands.length; j++) {
+                            const op = operators[j - 1];
+                            var val = parseFloat(rows[operands[j]][i]) || 0;
+
+                            if (op === "+") value += val;
+                            else if (op === "-") value -= val;
+                            else if (op === "*") value *= val;
+                            else if (op === "/") value /= val;
+                        }
+                        result.push(value);
                     }
+                    setRowValues(tag, result, table);
+                    rows[tag] = result; // mise à jour pour les formules suivantes
+                    $(`tr[tag="${tag}"]`, table).attr('title', `${tag}=${formula}`).off('tooltip')
+                        .tooltip();
                 });
             });
-        });
 
-        $('[fadd],[fedit]').on('submit', function(e) {
-            e.preventDefault();
-            var form = $(this);
-            var btn = $(':submit', form);
-            var rep = $('#rep', form);
-            var data = form.serialize();
-            rep.hide();
-            $(':input', form).attr('disabled', true);
-            $('[loader]', btn).show();
-            $('[text]', btn).hide();
+        }
+        calculate();
+
+        $('.carte table td[contenteditable="true"]').on('input', calculate);
+
+        $('.editable-price').on('blur', function() {
+            let td = $(this);
+            let price = td.text().trim();
+            let fuelpriceId = td.data('fuelprice-id');
+            let zoneName = td.data('zone');
+            let labelName = td.data('label');
+            let tag = td.data('tag');
+
+            function isNumeric(value) {
+                return value !== null && value !== '' && !isNaN(value);
+            }
+            if (!price) {
+                td.css('background-color', '#fff8c4');
+                return;
+            }
+
+            if (!isNumeric(price)) {
+                td.css('background-color', '#ffb3b3');
+                alert(`Valeur "${price}" est invalide sur la zone ${zoneName}, [${tag}] ${labelName}`);
+                return;
+            }
+
+            calculate();
+
+            td.css('background-color', 'lightblue');
+            td.css('opacity', '0.5');
 
             $.ajax({
-                url: '{{ route('structureprice.store') }}',
-                method: 'POST',
-                data: data,
-                success: function(resp) {
-                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
-                    rep.html(mess).stop().removeClass().addClass(
-                            'p-1 m-0 alert alert-success')
-                        .show();
-                    dtObj.ajax.reload(null, false);
-                    form[0].reset();
-                    setTimeout(() => {
-                        rep.hide();
-                        $('#mdladd').modal('hide');
-                    }, 10000);
+                url: `{{ route('fuelprice.index') }}/${fuelpriceId}`,
+                type: 'PUT',
+                data: {
+                    price
                 },
-                error: function(xhr, a, b) {
-                    var resp = xhr.responseJSON;
-                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
-                    rep.html(mess).stop().removeClass().addClass(
-                            'p-1 m-0 alert alert-danger')
-                        .show();
+                success: function(response) {
+                    td.css({
+                        'background-color': '#54ee78',
+                        'opacity': '1'
+                    });
+                    setTimeout(() => td.css('background-color', '#fff8c4'), 2000);
                 },
-            }).always(function() {
-                $(':input', form).attr('disabled', false);
-                $('[loader]', btn).hide();
-                $('[text]', btn).show();
-            })
+                error: function(err) {
+                    td.css({
+                        'background-color': '#ffb3b3',
+                        'opacity': '1'
+                    });
+                    var m = err.responseJSON?.message;
+                    alert(
+                        `Erreur enregistrement sur la zone ${zoneName}, [${tag}] ${labelName} ${m? ": "+m : ''}`
+                    );
+                }
+            });
         });
     </script>
 @endsection

@@ -15,6 +15,10 @@ function nnow()
     return now('Africa/Lubumbashi');
 }
 
+function noteditable()
+{
+    return ['D', 'K', 'S', 'T', 'U', 'V', 'W'];
+}
 function defaultdata()
 {
     $entities = [
@@ -63,7 +67,7 @@ function defaultdata()
         $z->save();
     }
 
-    $fuels = ['ESSENCE', 'PETROLE', 'GASOILE', 'FOMI'];
+    $fuels = ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'];
     foreach ($fuels as $e) {
         $z = Fuel::firstOrNew(['fuel' => $e]);
         $z->save();
@@ -88,11 +92,11 @@ function defaultdata()
         'P' => 'Droits de douane',
         'Q' => 'Droits de consommation (25%, 15%, 0% du PMFF)',
         'R' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
-        'S' => 'Fiscalité 1',
+        'S' => 'Total Fiscalité 1',
         'T' => 'TVA nette à l\'intérieur (TVA Ir=TVAV-TVAI)',
-        'U' => 'Fiscalité 2',
+        'U' => 'Total Fiscalité 2',
         'V' => 'Prix de référence réel (M3)',
-        'W' => 'Prix de référence à appliquer',
+        'W' => 'Prix de référence à appliquer (L)',
     ];
 
     foreach ($labels as $t => $l) {

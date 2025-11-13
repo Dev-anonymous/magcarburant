@@ -239,7 +239,7 @@
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdladd').modal('hide');
+                        $('#mdladd,#mdledit').modal('hide');
                     }, 10000);
                 },
                 error: function(xhr, a, b) {

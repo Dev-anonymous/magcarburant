@@ -61,9 +61,16 @@ class ProviderWebController extends Controller
                 }
                 Fuelprice::insert($rowsToInsert);
             }
-            if($structure){
-                $zones = Zone::with(['fuelprices.fuel', 'fuelprices.label'])->get();
-                return view('provider.strprices', compact('structure', 'zones'));
+            if ($structure) {
+                $zones = Zone::all();
+                $fuels = Fuel::all();
+                $labels = Label::all();
+
+                $fuelprices = Fuelprice::where('structureprice_id', $structure->id)
+                    ->get()
+                    ->groupBy(['zone_id', 'fuel_id', 'label_id']);
+
+                return view('provider.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
             }
         }
         return view('provider.prices');

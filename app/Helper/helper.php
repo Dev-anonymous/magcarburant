@@ -2,6 +2,7 @@
 
 use App\Models\Entity;
 use App\Models\Fuel;
+use App\Models\Fuelprice;
 use App\Models\Label;
 use App\Models\Structureprice;
 use App\Models\User;
@@ -106,6 +107,36 @@ function defaultdata()
     }
 
     DB::commit();
+}
+
+function initfuelprice(Structureprice $structure)
+{
+    if ($structure && !$structure->fuelprices()->exists()) {
+        $zones  = Zone::all()->keyBy('zone');     // ex: ['OUEST' => ZoneObj, 'EST' => ...]
+        $fuels  = Fuel::all()->keyBy('fuel');     // ex: ['essence' => FuelObj, ...]
+        $labels = Label::all()->keyBy('tag');     // ex: ['A' => LabelObj, 'B' => LabelObj, ...]
+
+        $rowsToInsert = [];
+        foreach ($zones as $zoneName => $zone) {
+            foreach ($fuels as $fuelName => $fuel) {
+                foreach ($labels as $labelTag => $label) {
+                    if ($zoneName !== 'OUEST' && $labelTag === 'H') {
+                        continue;
+                    }
+
+                    $rowsToInsert[] = [
+                        'structureprice_id' => $structure->id,
+                        'zone_id'           => $zone->id,
+                        'fuel_id'           => $fuel->id,
+                        'label_id'          => $label->id,
+                        'amount'            => null,
+                        'currency'        => null,
+                    ];
+                }
+            }
+        }
+        Fuelprice::insert($rowsToInsert);
+    }
 }
 
 function userimg()

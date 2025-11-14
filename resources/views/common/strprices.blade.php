@@ -4,7 +4,9 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Voies et Structures des prix</h2>
+                <h2 class="font-weight-bold">Voies et Structures des prix
+                    | {{ $structure->entity->shortname }}
+                </h2>
                 <p class="lead small m-0">Gestion des structures des prix</p>
             </div>
             <div class="m-2">
@@ -76,12 +78,14 @@
                                     </table>
                                 </div>
                                 @if (empty($structure->to))
-                                    <div class="p-2 text-right">
-                                        <button class="btn btn-sm btn- btn-edit-table">
-                                            <i class="material-icons md-18">edit</i>
-                                            Modifier les prix
-                                        </button>
-                                    </div>
+                                    @if (auth()->user()->user_role == 'provider')
+                                        <div class="p-2 text-right">
+                                            <button class="btn btn-sm btn- btn-edit-table">
+                                                <i class="material-icons md-18">edit</i>
+                                                Modifier les prix
+                                            </button>
+                                        </div>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -134,10 +138,10 @@
             D: "C-E-F",
             K: "A+B+C+G+H+I+J+L",
             S: "P+Q+R",
-            T: "O+R",
+            T: "O-R",
             U: "S+T",
             V: "A+K+M+U",
-            // W: "V*1000",
+            W: "V*1000",
         };
 
         function getRowValues(tag, table) {
@@ -167,15 +171,22 @@
                     const operators = formula.match(/[\+\-\*\/]/g) || []; // ["-", "-"]
                     const operands = formula.split(/[\+\-\*\/]/); // ["C","A","B"]
 
-                    // Calculer cellule par cellule
                     const length = rows[operands[0]].length;
                     const result = [];
                     for (let i = 0; i < length; i++) {
-                        let value = parseFloat(rows[operands[0]][i]) || 0;
+                        let value = rows[operands[0]] ?
+                            parseFloat(rows[operands[0]][i]) || 0 :
+                            parseFloat(operands[0]) || 0;
 
                         for (let j = 1; j < operands.length; j++) {
                             const op = operators[j - 1];
-                            var val = parseFloat(rows[operands[j]][i]) || 0;
+                            const val = rows[operands[j]] ?
+                                parseFloat(rows[operands[j]][i]) || 0 :
+                                parseFloat(operands[j]) || 0;
+
+                            if (!rows[operands[j]]) {
+                                // console.log(rows, '---', operands, '---', j, operands[j], '==');
+                            }
 
                             if (op === "+") value += val;
                             else if (op === "-") value -= val;
@@ -184,13 +195,13 @@
                         }
                         result.push(value);
                     }
+
                     setRowValues(tag, result, table);
                     rows[tag] = result; // mise à jour pour les formules suivantes
                     $(`tr[tag="${tag}"]`, table).attr('title', `${tag}=${formula}`).off('tooltip')
                         .tooltip();
                 });
             });
-
         }
         calculate();
 

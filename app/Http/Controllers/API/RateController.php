@@ -18,13 +18,14 @@ class RateController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $type = request('type');
         if ($user->user_role === 'provider') {
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
             $rates = $entity->rates;
         } else if ($user->user_role === 'sudo') {
             $entity = Entity::find(request('entity_id'));
-            if (request('type') == 'structure') {
+            if ($type == 'structure') {
                 // admin structure rate
                 $rates = Rate::where('type', 'structure');
             } else {
@@ -47,7 +48,7 @@ class RateController extends Controller
                 $t .= "<span>1 USD = $row->usd_cdf CDF</span>";
                 return $t;
             })
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($user, $type) {
                 if (!$row->to) {
                     $data = e(json_encode([
                         'id' => $row->id,
@@ -78,7 +79,9 @@ class RateController extends Controller
                             </div>
                         </div>
                     DATA;
-                    return $t;
+                    if ($user->user_role === 'provider' || ($type == 'structure' && $user->user_role == 'sudo')) {
+                        return $t;
+                    }
                 }
             })
             ->rawColumns(['action', 'rate'])
@@ -97,7 +100,7 @@ class RateController extends Controller
                 'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
-                'from.required' => 'Veuillez renseigner la Date validité initiale.',
+                'from.required' => 'Veuillez renseigner la date validité initiale.',
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
                 'to.before_or_equal' => 'La date de fin ne peut pas être supérieure à la date actuelle.',
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
@@ -184,7 +187,7 @@ class RateController extends Controller
                 'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
-                'from.required' => 'Veuillez renseigner la Date validité initiale.',
+                'from.required' => 'Veuillez renseigner la date validité initiale.',
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);

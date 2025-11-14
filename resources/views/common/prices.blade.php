@@ -4,7 +4,9 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Structures des prix</h2>
+                <h2 class="font-weight-bold">Structures des prix @isset($entity)
+                        | {{ $entity->shortname }}
+                    @endisset </h2>
                 <p class="lead small m-0">Gestion des structures des prix</p>
             </div>
             <div class="m-2">
@@ -26,12 +28,14 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des structures des prix
                         </h4>
-                        <div class="">
-                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                                <i class="material-icons md-24">add_circle_outline</i>
-                                Nouvelle structure
-                            </button>
-                        </div>
+                        @if (auth()->user()->user_role === 'provider')
+                            <div class="">
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                    <i class="material-icons md-24">add_circle_outline</i>
+                                    Nouvelle structure
+                                </button>
+                            </div>
+                        @endif
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
@@ -112,6 +116,10 @@
                             <label class="mb-0">Date validité au </label>
                             <input type="text" class="form-control" name="to" required>
                         </div>
+                        <p class="m-0 text-danger">
+                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les prix de la
+                            structure, rassurez-vous donc de configurer les prix avant de renseigner la date de clôture
+                        </p>
                         <x-alert />
                     </div>
                     <div class="modal-footer">
@@ -126,6 +134,42 @@
                                 Valider
                             </span>
                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mdldel" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fdel>
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="mb-2 text-center">
+                            <h3 class="text-danger">
+                                Voulez-vous supprimer la structure <span shortname></span> et toutes ses informations ?
+                            </h3>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -148,7 +192,12 @@
         var dtObj = $('#table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '{{ route('structureprice.index') }}',
+            ajax: {
+                url: '{{ route('structureprice.index') }}',
+                data: function(d) {
+                    d.entity_id = '{{ @$entity->id }}'
+                }
+            },
             order: [
                 [0, "desc"]
             ],
@@ -200,6 +249,14 @@
                 $('[name="usd_cdf"]', form).val(data.usd_cdf);
                 mdl.modal('show');
             });
+            $('[bdel]').off('click').click(function() {
+                var data = JSON.parse($(this).attr('data'));
+                var mdl = $('#mdldel');
+                var form = $('[fdel]', mdl);
+                $('[name="id"]', form).val(data.id);
+                $('[shortname]', form).html(data.name);
+                mdl.modal('show');
+            });
         });
         $('#mdledit').on('shown.bs.modal', function() {
             $('[name="from"], [name="to"]', this).each(function() {
@@ -247,6 +304,45 @@
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(
                             'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            })
+        });
+
+        $('[fdel]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var id = $('[name="id"]', form).val();
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('structureprice.index') }}/' + id,
+                method: 'delete',
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    setTimeout(() => {
+                        rep.hide();
+                        $('#mdldel').modal('hide');
+                    }, 3000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-danger')
                         .show();
                 },
             }).always(function() {

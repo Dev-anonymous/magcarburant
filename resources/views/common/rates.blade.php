@@ -4,17 +4,17 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux Réels</h2>
+                <h2 class="font-weight-bold">Taux Réels | {{ $entity->shortname }} </h2>
                 <p class="lead small m-0">Gestion des taux réels</p>
             </div>
             <div class="m-2">
-                <a href="{{ route('provider.apps') }}" class="btn btn-sm btn-light d-flex align-items-center">
+                <button onclick="history.back()" class="btn btn-sm btn-light d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px"
                         fill="#000">
                         <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
                     </svg>
                     Applications
-                </a>
+                </button>
             </div>
         </div>
         <hr />
@@ -26,12 +26,14 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
-                        <div class="">
-                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                                <i class="material-icons md-24">add_circle_outline</i>
-                                Nouveau taux
-                            </button>
-                        </div>
+                        @if (auth()->user()->user_role === 'provider')
+                            <div class="">
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                    <i class="material-icons md-24">add_circle_outline</i>
+                                    Nouveau taux
+                                </button>
+                            </div>
+                        @endif
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
@@ -135,7 +137,11 @@
                             <label class="mb-0">Date validité au (optionnel)</label>
                             <input type="text" class="form-control" name="to">
                         </div>
-                        <div class="mb-2">
+                        <p class="m-0 text-danger">
+                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les taux,
+                            rassurez-vous donc de configurer les taux avant de renseigner la date de clôture
+                        </p>
+                        <div class="mb-2 mt-2">
                             <div class="input-group">
                                 <div class="input-group-append">
                                     <div class="input-group-text">1 CDF = </div>
@@ -181,7 +187,7 @@
 @endsection
 
 @section('script')
-    <x-datatable/>
+    <x-datatable />
     <x-flatpickr />
 
     <script>
@@ -195,7 +201,12 @@
         var dtObj = $('#table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '{{ route('rate.index') }}',
+            ajax: {
+                url: '{{ route('rate.index') }}',
+                data: function(d) {
+                    d.entity_id = '{{ $entity->id }}'
+                }
+            },
             order: [
                 [0, "desc"]
             ],

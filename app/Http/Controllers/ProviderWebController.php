@@ -25,7 +25,9 @@ class ProviderWebController extends Controller
 
     function rates()
     {
-        return view('provider.rates');
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+        return view('common.rates', compact('entity'));
     }
     function prices()
     {
@@ -34,33 +36,8 @@ class ProviderWebController extends Controller
         if ($st) {
             $entity = auth()->user()->entities()->first();
             $structure = $entity?->structureprices()->find($st);
+            initfuelprice($structure);
 
-            if ($structure && !$structure->fuelprices()->exists()) {
-                $zones  = Zone::all()->keyBy('zone');     // ex: ['OUEST' => ZoneObj, 'EST' => ...]
-                $fuels  = Fuel::all()->keyBy('fuel');     // ex: ['essence' => FuelObj, ...]
-                $labels = Label::all()->keyBy('tag');     // ex: ['A' => LabelObj, 'B' => LabelObj, ...]
-
-                $rowsToInsert = [];
-                foreach ($zones as $zoneName => $zone) {
-                    foreach ($fuels as $fuelName => $fuel) {
-                        foreach ($labels as $labelTag => $label) {
-                            if ($zoneName !== 'OUEST' && $labelTag === 'H') {
-                                continue;
-                            }
-
-                            $rowsToInsert[] = [
-                                'structureprice_id' => $structure->id,
-                                'zone_id'           => $zone->id,
-                                'fuel_id'           => $fuel->id,
-                                'label_id'          => $label->id,
-                                'amount'            => null,
-                                'currency'        => null,
-                            ];
-                        }
-                    }
-                }
-                Fuelprice::insert($rowsToInsert);
-            }
             if ($structure) {
                 $zones = Zone::all();
                 $fuels = Fuel::all();
@@ -70,9 +47,9 @@ class ProviderWebController extends Controller
                     ->get()
                     ->groupBy(['zone_id', 'fuel_id', 'label_id']);
 
-                return view('provider.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
+                return view('common.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
             }
         }
-        return view('provider.prices');
+        return view('common.prices');
     }
 }

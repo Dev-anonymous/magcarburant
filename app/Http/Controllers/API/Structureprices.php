@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Entity;
 use App\Models\Structureprice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,9 +18,13 @@ class Structureprices extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if($user->user_role !== 'provider', 403, "No permission");
+        abort_if(!in_array($user->user_role, ['sudo', 'provider']), 403, "No permission");
 
-        $entity = $user->entities()->first();
+        if ($user->user_role == 'provider') {
+            $entity = $user->entities()->first();
+        } else {
+            $entity = Entity::find(request('entity_id'));
+        }
         abort_if(!$entity, 422, "No entity");
         $structureprices = $entity->structureprices;
 
@@ -31,45 +36,61 @@ class Structureprices extends Controller
             ->editColumn('to', function ($row) {
                 return $row->to?->format('d-m-Y') ?? '-';
             })
-            ->addColumn('view', function ($row) {
-                $href = route('provider.prices', ['st' => $row->id]);
+            ->addColumn('view', function ($row) use ($user) {
+                if ($user->user_role == 'provider') {
+                    $href = route('provider.prices', ['st' => $row->id]);
+                } else {
+                    $href = route('sudo.provider', ['st' => $row->id]);
+                }
                 $t = "<a class='dropdown-item' href='$href'>
-                                    <i class='material-icons md-14 align-middle'>settings</i>
-                                    <span class='align-middle'>Voir la structure</span>
-                                </a>";
+                        <i class='material-icons md-14 align-middle'>settings</i>
+                        <span class='align-middle'>Voies et Structures</span>
+                    </a>";
                 return $t;
             })
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($user) {
+                $eb = "";
+                $data = e(json_encode([
+                    'id' => $row->id,
+                    'name' => $row->name,
+                    'from' => $row->from->format('Y-m-d'),
+                    'to' => $row->to?->format('Y-m-d'),
+                    'cdf_usd' => $row->cdf_usd,
+                    'usd_cdf' => $row->usd_cdf,
+                ]));
                 if (!$row->to) {
-                    $data = e(json_encode([
-                        'id' => $row->id,
-                        'from' => $row->from->format('Y-m-d'),
-                        'to' => $row->to?->format('Y-m-d'),
-                        'cdf_usd' => $row->cdf_usd,
-                        'usd_cdf' => $row->usd_cdf,
-                    ]));
-                    $t = <<<DATA
-                        <div class="dropdown">
-                            <a
-                                class="btn btn-white btn-sm"
-                                href="#"
-                                role="button"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false"
+                    $eb = "
+                        <a class='dropdown-item' href='#' bedit data='$data'>
+                            <i class='material-icons md-14 align-middle'>edit</i>
+                            <span class='align-middle'>Modifier</span>
+                        </a>
+                    ";
+                }
+                $t = <<<DATA
+                    <div class="dropdown">
+                        <a
+                            class="btn btn-white btn-sm"
+                            href="#"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        >
+                            <i class="material-icons md-18 align-middle"
+                            >more_vert</i
                             >
-                                <i class="material-icons md-18 align-middle"
-                                >more_vert</i
-                                >
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            $eb
+                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
+                                <i class="material-icons md-14 align-middle">delete</i>
+                                <span class="align-middle">Supprimer</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#" bedit data='$data'>
-                                    <i class="material-icons md-14 align-middle">edit</i>
-                                    <span class="align-middle">Modifier</span>
-                                </a>
-                            </div>
                         </div>
-                    DATA;
+                    </div>
+                DATA;
+
+                if ($user->user_role == 'provider') {
                     return $t;
                 }
             })
@@ -135,7 +156,7 @@ class Structureprices extends Controller
                 }
             }
 
-            if(request('to')){
+            if (request('to')) {
                 //
                 dd('?????');
             }
@@ -153,7 +174,7 @@ class Structureprices extends Controller
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
             ], [
-                'from.required' => 'Veuillez renseigner la Date validité initiale.',
+                'from.required' => 'Veuillez renseigner la date de début.',
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
             ]);
 
@@ -215,6 +236,24 @@ class Structureprices extends Controller
      */
     public function destroy(Structureprice $structureprice)
     {
-        //
+        $user = auth()->user();
+        abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
+
+        if ($structureprice->to) {
+            $str = Structureprice::where('from', '>', $structureprice->to)->where('entity_id', $structureprice->entity->id)->first();
+            if ($str) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci.",
+                ], 422);
+            }
+        }
+
+        $structureprice->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Vous avez supprimé la structure $structureprice->name avec succès !",
+        ], 200);
     }
 }

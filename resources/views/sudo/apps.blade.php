@@ -47,7 +47,7 @@
                         <div class="text-center">
                             <a href="{{ route('sudo.provider', ['tx' => $entity->shortname]) }}">Taux réels</a>
                             <span>|</span>
-                            <a hrefr="{{ route('sudo.provider') }}">Structures des prix</a>
+                            <a href="{{ route('sudo.provider', ['price' => $entity->shortname]) }}">Structures des prix</a>
                         </div>
                     </div>
                 </div>

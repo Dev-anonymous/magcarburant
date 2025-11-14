@@ -176,10 +176,13 @@
     <script>
         $(function() {
 
-            document.querySelector('.custom-file-input').addEventListener('change', function(e) {
-                var fileName = e.target.files[0] ? e.target.files[0].name : 'Choisir un logo';
-                e.target.nextElementSibling.textContent = fileName;
-            });
+            document.querySelectorAll('.custom-file-input')
+                .forEach(element => {
+                    element.addEventListener('change', function(e) {
+                        var fileName = e.target.files[0] ? e.target.files[0].name : 'Choisir un logo';
+                        e.target.nextElementSibling.textContent = fileName;
+                    });
+                });
 
             function loaddata() {
                 var ldr = $('[dataloader]');

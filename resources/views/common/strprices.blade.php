@@ -56,7 +56,7 @@
                                                     $noedit = in_array($label->tag, noteditable());
                                                 @endphp
                                                 <tr tag="{{ $label->tag }}"
-                                                    class="@if ($noedit) noneditable font-weight-bold @endif">
+                                                    class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
                                                     <td>{{ $label->tag }}</td>
                                                     <td>{{ $label->label }}</td>
                                                     @foreach ($fuels as $fuel)

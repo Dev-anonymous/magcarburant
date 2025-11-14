@@ -31,7 +31,6 @@ class ProviderWebController extends Controller
     }
     function prices()
     {
-        defaultdata();
         $st = request('st');
         if ($st) {
             $entity = auth()->user()->entities()->first();

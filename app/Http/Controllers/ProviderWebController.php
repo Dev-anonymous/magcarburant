@@ -23,21 +23,28 @@ class ProviderWebController extends Controller
         return view('provider.apps', compact('entity'));
     }
 
-    function rates()
+    function accounting()
     {
-        $user = auth()->user();
-        $entity = $user->entities()->first();
-        return view('common.rates', compact('entity'));
-    }
-    function prices()
-    {
-        $st = request('st');
-        if ($st) {
-            $entity = auth()->user()->entities()->first();
-            $structure = $entity?->structureprices()->find($st);
-            initfuelprice($structure);
+        $item = request('item');
+        if ($item == 'rtx') {
+            $user = auth()->user();
+            $entity = $user->entities()->first();
+            return view('common.rates', compact('entity'));
+        }
 
+        $item = request('item');
+        if ($item == 'stx') {
+            $user = auth()->user();
+            $entity = $user->entities()->first();
+            return view('provider.structrates', compact('entity'));
+        }
+
+        $stx = request('stx');
+        if ($stx) {
+            $entity = auth()->user()->entities()->first();
+            $structure = $entity?->structureprices()->find($stx);
             if ($structure) {
+                initfuelprice($structure);
                 $zones = Zone::all();
                 $fuels = Fuel::all();
                 $labels = Label::all();
@@ -49,6 +56,6 @@ class ProviderWebController extends Controller
                 return view('common.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
             }
         }
-        return view('common.prices');
+        return view('common.structprices');
     }
 }

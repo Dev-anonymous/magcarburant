@@ -32,17 +32,15 @@ Route::middleware('auth')->group(function () {
         Route::controller(SudoWebController::class)->group(function () {
             Route::get('', 'home')->name('sudo.home');
             Route::get('provider', 'provider')->name('sudo.provider');
-            Route::get('rates', 'rates')->name('sudo.rates');
         });
     });
     Route::prefix('provider')->middleware(ProviderMiddleware::class)->group(function () {
         Route::controller(ProviderWebController::class)->group(function () {
             Route::get('', 'home')->name('provider.home');
             Route::get('apps', 'apps')->name('provider.apps');
-            Route::get('rates', 'rates')->name('provider.rates');
-            Route::get('prices', 'prices')->name('provider.prices');
             Route::get('sales', 'sales')->name('provider.sales');
             Route::get('purchases', 'purchases')->name('provider.purchases');
+            Route::get('accounting', 'accounting')->name('provider.accounting');
         });
     });
 });

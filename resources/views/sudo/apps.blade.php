@@ -44,11 +44,11 @@
                                 <p class="m-0">Gestion de la comptabilité</p>
                             </div>
                         </div>
-                        <div class="text-center">
+                        {{-- <div class="text-center">
                             <a href="{{ route('sudo.provider', ['tx' => $entity->shortname]) }}">Taux réels</a>
                             <span>|</span>
                             <a href="{{ route('sudo.provider', ['price' => $entity->shortname]) }}">Structures des prix</a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

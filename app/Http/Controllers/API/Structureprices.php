@@ -38,9 +38,9 @@ class Structureprices extends Controller
             })
             ->addColumn('view', function ($row) use ($user) {
                 if ($user->user_role == 'provider') {
-                    $href = route('provider.prices', ['st' => $row->id]);
+                    $href = route('provider.accounting', ['stx' => $row->id]);
                 } else {
-                    $href = route('sudo.provider', ['st' => $row->id]);
+                    $href = route('sudo.provider', ['stx' => $row->id]);
                 }
                 $t = "<a class='dropdown-item' href='$href'>
                         <i class='material-icons md-14 align-middle'>settings</i>

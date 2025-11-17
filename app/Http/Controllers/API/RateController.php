@@ -22,15 +22,16 @@ class RateController extends Controller
         if ($user->user_role === 'provider') {
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
-            $rates = $entity->rates;
+            $rates = $entity->rates()->where('type', $type);
         } else if ($user->user_role === 'sudo') {
-            $entity = Entity::find(request('entity_id'));
-            if ($type == 'structure') {
-                // admin structure rate
-                $rates = Rate::where('type', 'structure');
-            } else {
-                $rates = $entity->rates;
-            }
+            // $entity = Entity::find(request('entity_id'));
+            // if ($type == 'structure') {
+            //     // admin structure rate
+            //     $rates = Rate::where('type', 'structure');
+            // } else {
+            //     $rates = $entity->rates;
+            // }
+            abort(403);
         } else {
             abort(403);
         }
@@ -79,9 +80,9 @@ class RateController extends Controller
                             </div>
                         </div>
                     DATA;
-                    if ($user->user_role === 'provider' || ($type == 'structure' && $user->user_role == 'sudo')) {
-                        return $t;
-                    }
+                    // if ($user->user_role === 'provider' || ($type == 'structure' && $user->user_role == 'sudo')) {
+                    // }
+                    return $t;
                 }
             })
             ->rawColumns(['action', 'rate'])
@@ -111,14 +112,9 @@ class RateController extends Controller
             $rate = Rate::findOrFail($id);
             $entity = $rate->entity;
             abort_if($user->user_role == 'provider' && $entity->users_id != $user->id, 403, "No permission !!!");
-            $isStTX = false;
 
             if ($user->user_role == 'provider') {
                 //
-            } else if ($user->user_role == 'sudo') {
-                $isStTX = true;
-                abort_if('STRUCTURE' !== $rate->type, 403, "invalid data");
-                // $rate = Rate::where('type', 'STRUCTURE')->
             } else {
                 abort(403);
             }
@@ -130,18 +126,11 @@ class RateController extends Controller
                 ], 422);
             }
 
-            if ($isStTX) {
-                $tauxActif = Rate::where('type', 'STRUCTURE')
-                    ->whereNull('to')
-                    ->where('id', '!=', $rate->id)
-                    ->first();
-            } else {
-                $tauxActif = $entity->rates()
-                    ->where('type', 'RÉEL')
-                    ->whereNull('to')
-                    ->where('id', '!=', $rate->id)
-                    ->first();
-            }
+            $tauxActif = $entity->rates()
+                ->where('type', $rate->type)
+                ->whereNull('to')
+                ->where('id', '!=', $rate->id)
+                ->first();
 
             if ($tauxActif) {
                 return response()->json([
@@ -150,16 +139,11 @@ class RateController extends Controller
                 ], 422);
             }
 
-            if ($isStTX) {
-                $dernierTaux = Rate::where('type', 'STRUCTURE')->whereNotNull('to')
-                    ->orderByDesc('to')
-                    ->first();
-            } else {
-                $dernierTaux = $entity->rates()
-                    ->whereNotNull('to')
-                    ->orderByDesc('to')
-                    ->first();
-            }
+            $dernierTaux = $entity->rates()
+                ->where('type', $rate->type)
+                ->whereNotNull('to')
+                ->orderByDesc('to')
+                ->first();
 
             if ($dernierTaux && $dernierTaux->to) {
                 $dateAttendue = Carbon::parse($dernierTaux->to)->addDay()->toDateString();
@@ -186,26 +170,27 @@ class RateController extends Controller
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
                 'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
+                'type' => 'required|in:STRUCTURE,RÉEL',
             ], [
                 'from.required' => 'Veuillez renseigner la date validité initiale.',
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $isStTX = false;
             $user = auth()->user();
             if ($user->user_role == 'provider') {
                 $entity = $user->entities()->first();
                 abort_if(!$entity, 422, "No entity");
-                $rate = $entity->rates();
+                $rate = $entity->rates()->where('type', request('type'));
                 $tauxActif = $rate->where('type', 'RÉEL')->whereNull('to')->first();
-                $validated['type'] = 'RÉEL';
-            } else if ($user->user_role == 'sudo') {
-                $isStTX = true;
-                $validated['type'] = 'STRUCTURE';
-                $tauxActif = Rate::where('type', 'STRUCTURE')->whereNull('to')->first();
-                $rate = new Rate;
-            } else {
+            }
+            //  else if ($user->user_role == 'sudo') {
+            //     $isStTX = true;
+            //     $validated['type'] = 'STRUCTURE';
+            //     $tauxActif = Rate::where('type', 'STRUCTURE')->whereNull('to')->first();
+            //     $rate = new Rate;
+            // }
+            else {
                 abort(403, "No permission");
             }
 
@@ -216,11 +201,8 @@ class RateController extends Controller
                 ], 422);
             }
 
-            if ($isStTX) {
-                $dernierTaux = Rate::where('type', 'STRUCTURE')->orderByDesc('to')->first();
-            } else {
-                $dernierTaux = $entity->rates()->orderByDesc('to')->first();
-            }
+            $dernierTaux = $entity->rates()->where('type', request('type'))->orderByDesc('to')->first();
+
             if ($dernierTaux && $dernierTaux->to) {
                 $dateAttendue = Carbon::parse($dernierTaux->to)->addDay();
                 if ($validated['from'] !== $dateAttendue->toDateString()) {

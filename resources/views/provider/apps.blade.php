@@ -22,7 +22,8 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="carte" style="min-height: 120px">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('provider.accounting') }}')">
                     <div class="w-100">
                         <div class="d-flex align-items-center">
                             <span class="material-icons md-48 ml-2">account_balance</span>
@@ -31,11 +32,11 @@
                                 <p class="m-0">Gestion de la comptabilité</p>
                             </div>
                         </div>
-                        <div class="text-center">
+                        {{-- <div class="text-center">
                             <a href="{{ route('provider.rates') }}">Taux réels</a>
                             <span>|</span>
                             <a href="{{ route('provider.prices') }}">Structures des prix</a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

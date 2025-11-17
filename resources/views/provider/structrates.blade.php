@@ -4,10 +4,18 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux Structures</h2>
-                <p class="lead small m-0">Gestion des taux structures</p>
+                <h2 class="font-weight-bold">Taux structure | {{ $entity->shortname }} </h2>
+                <p class="lead small m-0">Gestion de taux structure</p>
             </div>
-
+            <div class="m-2">
+                <button onclick="history.back()" class="btn btn-sm btn-light d-flex align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px"
+                        fill="#000">
+                        <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
+                    </svg>
+                    Retour
+                </button>
+            </div>
         </div>
         <hr />
 
@@ -58,6 +66,7 @@
                     </button>
                 </div>
                 <form class="was-validated" fadd>
+                    <input type="hidden" name="type" value="STRUCTURE">
                     <div class="modal-body">
                         <div class="mb-2">
                             <label class="mb-0" for="dv1">Date validité du </label>

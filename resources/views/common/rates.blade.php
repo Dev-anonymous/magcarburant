@@ -13,7 +13,7 @@
                         fill="#000">
                         <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
                     </svg>
-                    Applications
+                    Retour
                 </button>
             </div>
         </div>
@@ -68,6 +68,7 @@
                     </button>
                 </div>
                 <form class="was-validated" fadd>
+                    <input type="hidden" name="type" value="RÉEL">
                     <div class="modal-body">
                         <div class="mb-2">
                             <label class="mb-0" for="dv1">Date validité du </label>
@@ -204,7 +205,8 @@
             ajax: {
                 url: '{{ route('rate.index') }}',
                 data: function(d) {
-                    d.entity_id = '{{ $entity->id }}'
+                    d.entity_id = '{{ $entity->id }}';
+                    d.type = 'RÉEL';
                 }
             },
             order: [

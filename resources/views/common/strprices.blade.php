@@ -254,7 +254,7 @@
                     });
                     var m = err.responseJSON?.message;
                     alert(
-                        `Erreur enregistrement sur la zone ${zoneName}, [${tag}] ${labelName} ${m? ": "+m : ''}`
+                        `Erreur enregistrement sur la zone ${zoneName}, [${tag}] ${labelName} ${m? ": "+m : ''}. (Pensez à vérifier votre connexion internet) `
                     );
                 }
             });

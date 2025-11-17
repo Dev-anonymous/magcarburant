@@ -46,7 +46,7 @@ class SudoWebController extends Controller
         $st = request('st');
         if ($st) {
             $structure = Structureprice::where('id', $st)->first();
-           initfuelprice($structure);
+            initfuelprice($structure);
 
             if ($structure) {
                 $zones = Zone::all();
@@ -61,10 +61,5 @@ class SudoWebController extends Controller
         }
 
         return view('sudo.provider');
-    }
-
-    function rates()
-    {
-        return view('sudo.structrates');
     }
 }

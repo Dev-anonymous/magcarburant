@@ -24,6 +24,44 @@
                             <div class="page-title m-0"></div>
                             <div class="collapse navbar-collapse" id="mainNavbar">
                                 <ul class="navbar-nav ml-auto align-items-center">
+                                    @if (Route::is('provider.accounting'))
+                                        <li class="nav-item dropdown nav-language d-flex align-items-center">
+                                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                                                aria-expanded="false">
+                                                Configuration
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <ul class="list-unstyled">
+                                                    <small class="font-italic text-muted ml-2">Gestions des prix</small>
+                                                    <li>
+                                                        <a href="{{ route('provider.accounting') }}"
+                                                            class="dropdown-item ">
+                                                            <i
+                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            Structure des prix
+                                                        </a>
+                                                    </li>
+                                                    <small class="font-italic text-muted ml-2">Gestions des taux</small>
+                                                    <li>
+                                                        <a href="{{ route('provider.accounting', ['item' => 'rtx']) }}"
+                                                            class="dropdown-item ">
+                                                            <i
+                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            Taux réels
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('provider.accounting', ['item' => 'stx']) }}"
+                                                            class="dropdown-item ">
+                                                            <i
+                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            Taux structures
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    @endif
                                     <li class="nav-item nav-divider"></li>
                                     <li class="nav-item">
                                         <a href="#"
@@ -82,12 +120,6 @@
                                             <a href="{{ route('sudo.provider') }}">Fournisseurs</a>
                                         </li>
                                     </ul>
-                                </li>
-                                <li class="drawer-menu-item @if (Route::is('sudo.rates')) active @endif">
-                                    <a href="{{ route('sudo.rates') }}">
-                                        <i class="material-icons">trending_up</i>
-                                        <span class="drawer-menu-text"> Taux Structure</span>
-                                    </a>
                                 </li>
                             @endif
                             @if ($role === 'provider')

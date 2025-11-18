@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    oonclick="location.assign('{{ route('provider.purchases') }}')">
+                    onclick="location.assign('{{ route('provider.purchase') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -42,7 +42,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    oonclick="location.assign('{{ route('provider.sales') }}')">
+                    oonclick="location.assign('{{ route('provider.sale') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path

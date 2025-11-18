@@ -51,7 +51,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($labels as $label)
-                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'H')
+                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
                                                 @php
                                                     $noedit = in_array($label->tag, noteditable());
                                                 @endphp
@@ -135,13 +135,13 @@
         });
 
         const formulas = {
-            D: "C-E-F",
-            K: "A+B+C+G+H+I+J+L",
-            S: "P+Q+R",
-            T: "O-R",
-            U: "S+T",
-            V: "A+K+M+U",
-            W: "V*1000",
+            D: "C-E-F-G-H-I-J",
+            O: "A+B+C+K+L+M+N+P",
+            W: "T+U+V",
+            X: "S-V",
+            Y: "W+X",
+            Z: "A+O+Q+Y",
+            AA: "Z*1000",
         };
 
         function getRowValues(tag, table) {

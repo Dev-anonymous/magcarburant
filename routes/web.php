@@ -38,8 +38,8 @@ Route::middleware('auth')->group(function () {
         Route::controller(ProviderWebController::class)->group(function () {
             Route::get('', 'home')->name('provider.home');
             Route::get('apps', 'apps')->name('provider.apps');
-            Route::get('sales', 'sales')->name('provider.sales');
-            Route::get('purchases', 'purchases')->name('provider.purchases');
+            Route::get('sale', 'sale')->name('provider.sale');
+            Route::get('purchase', 'purchase')->name('provider.purchase');
             Route::get('accounting', 'accounting')->name('provider.accounting');
         });
     });

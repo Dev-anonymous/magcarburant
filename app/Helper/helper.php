@@ -18,8 +18,14 @@ function nnow()
 
 function noteditable()
 {
-    return ['D', 'K', 'S', 'T', 'U', 'V', 'W'];
+    return ['D', 'O', 'W', 'X', 'Y', 'Z', 'AA'];
 }
+
+function mainfuels()
+{
+    return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'];
+}
+
 function defaultdata()
 {
     $entities = [
@@ -68,7 +74,7 @@ function defaultdata()
         $z->save();
     }
 
-    $fuels = ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'];
+    $fuels = mainfuels();
     foreach ($fuels as $e) {
         $z = Fuel::firstOrNew(['fuel' => $e]);
         $z->save();
@@ -81,23 +87,27 @@ function defaultdata()
         'D' => 'Frais de mise en place SEP',
         'E' => 'Stock de sécurité',
         'F' => 'Stock stratégique',
-        'G' => 'Charges additionnelles SPSA',
-        'H' => 'Lerexcom',
-        'I' => 'Charges d\'exploitation Soc. Com.',
-        'J' => 'Marges Sociétés commerciales',
-        'K' => 'Total frais de distribution',
-        'L' => 'Stock de sécurité EST & SUD',
-        'M' => 'FONER (Fonds National d\'Entretien Routier)',
-        'N' => 'PMF Fiscal (PMFF=Ki*PMFC)',
-        'O' => 'TVA à la vente (TVAV) pour calcul',
-        'P' => 'Droits de douane',
-        'Q' => 'Droits de consommation (25%, 15%, 0% du PMFF)',
-        'R' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
-        'S' => 'Total Fiscalité 1',
-        'T' => 'TVA nette à l\'intérieur (TVA Ir=TVAV-TVAI)',
-        'U' => 'Total Fiscalité 2',
-        'V' => 'Prix de référence réel (M3)',
-        'W' => 'Prix de référence à appliquer (L)',
+        'G' => 'Lutte contre la fraude',
+        'H' => 'Lutte contre la pollutiom',
+        'I' => 'Autres entrepôts EST/SUD',
+        'J' => 'Autres entrepôts SUD',
+        'K' => 'Charges additionnelles SPSA',
+        'L' => 'Lerexcom',
+        'M' => 'Charges d\'exploitation Soc. Com.',
+        'N' => 'Marges Sociétés commerciales',
+        'O' => 'Total frais de distribution',
+        'P' => 'Stock de sécurité EST & SUD',
+        'Q' => 'FONER (Fonds National d\'Entretien Routier)',
+        'R' => 'PMF Fiscal (PMFF=Ki*PMFC)',
+        'S' => 'TVA à la vente (TVAV) pour calcul',
+        'T' => 'Droits de douane',
+        'U' => 'Droits de consommation (25%, 15%, 0% du PMFF)',
+        'V' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
+        'W' => 'Total Fiscalité 1',
+        'X' => 'TVA nette à l\'intérieur (TVA Ir=TVAV-TVAI)',
+        'Y' => 'Total Fiscalité 2',
+        'Z' => 'Prix de référence réel (M3)',
+        'AA' => 'Prix de référence à appliquer (L)',
     ];
 
     foreach ($labels as $t => $l) {
@@ -120,7 +130,7 @@ function initfuelprice(Structureprice $structure)
         foreach ($zones as $zoneName => $zone) {
             foreach ($fuels as $fuelName => $fuel) {
                 foreach ($labels as $labelTag => $label) {
-                    if ($zoneName !== 'OUEST' && $labelTag === 'H') {
+                    if ($zoneName !== 'OUEST' && $labelTag === 'L') {
                         continue;
                     }
 

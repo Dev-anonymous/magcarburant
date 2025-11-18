@@ -58,4 +58,9 @@ class ProviderWebController extends Controller
         }
         return view('common.structprices');
     }
+
+    function purchase()
+    {
+        return view('provider.purchase');
+    }
 }

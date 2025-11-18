@@ -12,7 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('entity', EntityController::class);
     Route::resource('rate', RateController::class);
     Route::resource('structureprice', Structureprices::class);
-    Route::resource('fuelprice', FuelpriceController::class)->only(['update']);
+    Route::resource('fuelprice', FuelpriceController::class);
     Route::resource('sale', SaleController::class);
     Route::resource('purchase', PurchaseController::class);
 });

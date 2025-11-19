@@ -28,6 +28,7 @@
                                         <li class="nav-item dropdown nav-language d-flex align-items-center">
                                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
                                                 aria-expanded="false">
+                                                <i class="material-icons md-18 align-middle">settings</i>
                                                 Configuration
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right">

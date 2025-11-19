@@ -181,3 +181,8 @@ function strname(Entity $entity, Structureprice $str)
     $name = "STR-$n-$f";
     return $name;
 }
+
+function v($v)
+{
+    return number_format($v, 2, ',', ' ');
+}

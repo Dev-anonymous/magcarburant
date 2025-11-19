@@ -16,14 +16,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $entity_id
  * @property Carbon|null $date
- * @property string|null $locality
- * @property string|null $way
  * @property string|null $product
- * @property string|null $delivery_note
- * @property string|null $delivery_program
- * @property string|null $client
- * @property string|null $lata
- * @property string|null $l15
+ * @property string|null $provider
+ * @property string|null $billnumber
+ * @property float|null $unitprice
+ * @property float|null $qtytm
+ * @property float|null $qtym3
  * @property string|null $density
  * 
  * @property Entity $entity
@@ -38,20 +36,21 @@ class Purchase extends Model
 
 	protected $casts = [
 		'entity_id' => 'int',
-		'date' => 'datetime'
+		'date' => 'datetime',
+		'unitprice' => 'float',
+		'qtytm' => 'float',
+		'qtym3' => 'float'
 	];
 
 	protected $fillable = [
 		'entity_id',
 		'date',
-		'locality',
-		'way',
 		'product',
-		'delivery_note',
-		'delivery_program',
-		'client',
-		'lata',
-		'l15',
+		'provider',
+		'billnumber',
+		'unitprice',
+		'qtytm',
+		'qtym3',
 		'density'
 	];
 

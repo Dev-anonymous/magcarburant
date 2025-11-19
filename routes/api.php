@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\EntityController;
 use App\Http\Controllers\API\FuelpriceController;
 use App\Http\Controllers\API\PurchaseController;
@@ -15,4 +16,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('fuelprice', FuelpriceController::class);
     Route::resource('sale', SaleController::class);
     Route::resource('purchase', PurchaseController::class);
+    Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
 });

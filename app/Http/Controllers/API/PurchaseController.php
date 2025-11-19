@@ -7,6 +7,7 @@ use App\Models\Purchase;
 use App\Models\Purchasefile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
@@ -26,7 +27,15 @@ class PurchaseController extends Controller
             // $entity = Entity::find(request('entity_id'));
         }
         abort_if(!$entity, 422, "No entity");
-        $purchases = $entity->purchases;
+        $purchases = $entity->purchases();
+
+        $date = request('date');
+        $date = explode(' to ', $date);
+        $date = array_filter($date);
+        $from = @$date[0] ?? nnow()->toDateString();
+        $to = @$date[1] ?? $from;
+
+        $purchases->whereBetween('date', [$from, $to]);
 
         return DataTables::of($purchases)
             ->addIndexColumn()
@@ -38,7 +47,7 @@ class PurchaseController extends Controller
                     $u = asset('storage/' . $e->file);
                     $f .= "<a href='$u' class='text-nowrap mr-2' target='_blank'><i class='material-icons md-18 align-middle mb-1 text-primary'>attach_file</i> Fichier " . ($i + 1) . "</a>";
                 }
-                return "<div class='d-flex'>$f</div>";
+                return "<div class=''>$f</div>";
             })
             ->addColumn('action', function ($row) use ($user) {
                 $eb = "";
@@ -162,7 +171,7 @@ class PurchaseController extends Controller
             $f = [];
             if ($request->hasFile('purchasefile')) {
                 foreach ($request->file('purchasefile') as $file) {
-                    $f[] = ['sale_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
+                    $f[] = ['purchase_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
             Purchasefile::insert($f);
@@ -197,6 +206,20 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        //
+        $user = auth()->user();
+        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        $entity = $user->entities()->first();
+        abort_if($entity->id != $purchase->entity_id, 403, "Not permit");
+
+        foreach ($purchase->purchasefiles as $f) {
+            File::delete("storage/" . $f->file);
+        }
+
+        $purchase->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Vous avez supprimé l'achat $purchase->billnumber avec succès !",
+        ], 200);
     }
 }

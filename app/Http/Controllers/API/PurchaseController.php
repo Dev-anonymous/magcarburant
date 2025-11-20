@@ -242,6 +242,13 @@ class PurchaseController extends Controller
                 ], 422);
             }
 
+            if (!count($insert)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Aucune ligne n'a été importé.",
+                ], 422);
+            }
+
             Purchase::insertOrIgnore($insert);
 
             return response()->json([

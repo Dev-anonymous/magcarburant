@@ -81,6 +81,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <x-dataloader />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,6 +104,11 @@
                                     name="date">
                             </div>
                             <div class="">
+                                <button class="btn btn-sm btn-outline-primary mt-3 mr-2" data-toggle="modal"
+                                    data-target="#mdladd2">
+                                    <i class="material-icons md-18">insert_drive_file</i>
+                                    Importer
+                                </button>
                                 <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdladd">
                                     <i class="material-icons md-18">add_circle_outline</i>
                                     Nouvel achat
@@ -293,7 +301,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="mdldel" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -324,6 +331,51 @@
                                 </span>
                             </button>
                         </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdladd2" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Importation des données d'achat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fadd>
+                    <input type="hidden" name="action" value="import">
+                    <div class="modal-body">
+                        <div class="text-center bg-light rounded-lg p-3">
+                            <h5>Vous pouvez importer la liste de tous vos achats disponibles depuis un fichier Excel en
+                                respectant les colonnes et le format des données.</h5>
+                        </div>
+                        <p class="mt-2">Sélectionnez le fichier excel à importer</p>
+                        <div class="mb-2">
+                            <input type="file" required multiple class="form-control" name="file">
+                        </div>
+                        <x-alert />
+                        <div class="mt-3">
+                            <a href="{{ asset('ModeleImportationAchat.xlsx') }}" class="btn text-danger">
+                                <i class="material-icons md-18">insert_drive_file</i>
+                                Télécharger le modèle
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -560,6 +612,8 @@
         });
 
         function dashboard() {
+            var ldr = $('[dataloader]');
+            ldr.show();
             $.ajax({
                 url: '{{ route('dashboard') }}',
                 data: {
@@ -579,7 +633,7 @@
                     chart2.data.labels = data.chart2.labels;
                     chart2.data.datasets[0].data = data.chart2.data;
                     chart2.update();
-
+                    ldr.hide();
                 },
                 error: function(xhr, a, b) {
 

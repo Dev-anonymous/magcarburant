@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use App\Models\Purchasefile;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
@@ -143,6 +146,108 @@ class PurchaseController extends Controller
                 'success' => true,
                 'message' => "L'achat a été mise à jour avec succès !",
             ]);
+        } elseif (request('action') == 'import') {
+            $validated = $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls'
+            ]);
+
+            if ($user->user_role == 'provider') {
+                $entity = $user->entities()->first();
+            } else {
+                abort(403);
+            }
+
+            $rows = Excel::toArray([], $request->file('file'));
+            $sheet = (array) @$rows[0]; // première feuille EXCEL
+            $sheet = array_slice($sheet, 1);
+            $insert = [];
+            $errors = [];
+            foreach ($sheet as $index => $row) {
+                $rowNumber = $index + 2;
+                $colA = $row[0] ?? null;
+                $colB = $row[1] ?? null;
+                $colC = $row[2] ?? null;
+                $colD = $row[3] ?? null;
+                $colE = $row[4] ?? null;
+                $colF = $row[5] ?? null;
+                $colG = $row[6] ?? null;
+                $colH = $row[7] ?? null;
+
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+                $lineErrors = [];
+
+                if (empty($colA)) {
+                    $lineErrors[] = "Cellule A$rowNumber : veuillez renseigner la date de l'achat";
+                }
+                try {
+                    if (is_numeric($colA)) {
+                        $colA = Date::excelToDateTimeObject($colA)->format('Y-m-d');
+                    } else {
+                        $colA = Carbon::parse(str_replace('/', '-', $colA))->format('Y-m-d');
+                    }
+                    $date = Carbon::parse($colA);
+                    if ($date->gt(Carbon::today())) {
+                        $lineErrors[] = "Cellule A$rowNumber : la date d'achat {$date->format('d-m-Y')} ne doit pas être > aujourd'hui";
+                    }
+                } catch (\Throwable $th) {
+                    $lineErrors[] = "Cellule A$rowNumber : la date est invalide ou au mauvais format";
+                }
+                if (empty($colB)) {
+                    $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner le nom du produit";
+                } else {
+                    if (!in_array($colB,  mainfuels(), true)) {
+                        $lineErrors[] = "Cellule D$rowNumber : le produit \"$colB\" n'est pas reconnu";
+                    }
+                }
+                if (empty($colC)) {
+                    $lineErrors[] = "Cellule C$rowNumber : veuillez renseigner le nom du fournisseur";
+                }
+                if (empty($colD)) {
+                    $lineErrors[] = "Cellule D$rowNumber : veuillez renseigner le numéro facture";
+                } else {
+                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colD])->exists();
+                    if ($exi) {
+                        $lineErrors[] = "Cellule D$rowNumber : l'achat avec ce numéro facture $colD est déjà enregistré";
+                    }
+                }
+                foreach (['E' => $colE, 'F' => $colF, 'G' => $colG, 'H' => $colH] as $colName => $value) {
+                    if (!is_numeric($value) || $value < 0) {
+                        $lineErrors[] = "Cellule $colName$rowNumber : la valeur doit être un nombre >= 0";
+                    }
+                }
+                if (!empty($lineErrors)) {
+                    $errors[] =  implode("; ", $lineErrors);
+                    continue;
+                }
+
+                $insert[] = [
+                    'entity_id' => $entity->id,
+                    'date' => $colA,
+                    'product' => $colB,
+                    'provider' => $colC,
+                    'billnumber' => $colD,
+                    'unitprice' => $colE,
+                    'qtytm' => $colF,
+                    'qtym3' => $colG,
+                    'density' => $colH,
+                ];
+            }
+
+            if (count($errors)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => implode('<br/>', $errors),
+                ], 422);
+            }
+
+            Purchase::insertOrIgnore($insert);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Votre fichier a été importé avec succès.",
+            ], 201);
         } else {
             if ($user->user_role == 'provider') {
                 $entity = $user->entities()->first();

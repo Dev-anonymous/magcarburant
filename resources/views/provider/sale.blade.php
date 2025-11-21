@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Achats')
+@section('title', 'Ventes')
 @section('body')
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Achats </h2>
-                <p class="lead small m-0">Gestion des achats (entrées) </p>
+                <h2 class="font-weight-bold">Ventes </h2>
+                <p class="lead small m-0">Gestion des ventes (sorties) </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-light d-flex align-items-center">
@@ -28,8 +28,8 @@
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <i class="material-icons md-36 text-primary mb-1">receipt</i>
-                                        <div class="font-weight-bold text-secondary">Total Achat (USD)</div>
-                                        <div class="h4 font-weight-bold text-primary" style="font-size: 28px" totalAmount>
+                                        <div class="font-weight-bold text-secondary">Total Densité</div>
+                                        <div class="h4 font-weight-bold text-primary" style="font-size: 28px" totalDensity>
                                         </div>
                                     </div>
                                 </div>
@@ -38,8 +38,9 @@
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <i class="material-icons md-36 text-success mb-1">local_gas_station</i>
-                                        <div class="font-weight-bold text-secondary">Volume Total (TM)</div>
-                                        <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalTm></div>
+                                        <div class="font-weight-bold text-secondary">Volume Total LATA</div>
+                                        <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalLata>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -51,8 +52,9 @@
                                             <path
                                                 d="M480-78q-142 0-242-97.71T138-415q0-68.14 27-130.77 27-62.63 75-108.73L480-892l240 237.5q48 46.1 75.5 108.73T823-415q0 141.58-100.5 239.29Q622-78 480-78ZM229-415h502q0-46-19-91.5T659-586L480-763 301-586q-34 34-53 79.54-19 45.54-19 91.46Z" />
                                         </svg>
-                                        <div class="font-weight-bold text-warning">Volume Total (M³)</div>
-                                        <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalM3></div>
+                                        <div class="font-weight-bold text-warning">Volume Total L15</div>
+                                        <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalL15>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -60,14 +62,15 @@
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <i class="material-icons md-36 text-danger mb-1">payment</i>
-                                        <div class="font-weight-bold text-secondary">Prix d'achat Moyenne (USD)</div>
-                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" avgPrice></div>
+                                        <div class="font-weight-bold text-secondary">Densité de vente Moyenne</div>
+                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" avgDensity>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des achats par carburant (USD)</h5>
+                                    <h5 class="card-title text-center mb-4">Répartition des ventes par densité (M³)</h5>
                                     <div style="height: 300px;" />
                                     <canvas id="chart1"></canvas>
                                 </div>
@@ -75,7 +78,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="">
-                                <h5 class="card-title text-center mb-4">Répartition des achats par carburant (M³)</h5>
+                                <h5 class="card-title text-center mb-4">Répartition des ventes par LATA</h5>
                                 <div style="height: 300px;">
                                     <canvas id="chart2"></canvas>
                                 </div>
@@ -91,7 +94,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title font-weight-bold">
-                        Historique des tous les achats
+                        Historique des toutes les ventes
                     </h4>
                     @if (auth()->user()->user_role === 'provider')
                         <div class="d-flex">
@@ -111,7 +114,7 @@
                                 </button>
                                 <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdladd">
                                     <i class="material-icons md-18">add_circle_outline</i>
-                                    Nouvel achat
+                                    Nouvelle vente
                                 </button>
                             </div>
                         </div>
@@ -124,12 +127,14 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Date</th>
+                                    <th>Localité</th>
+                                    <th>Voie</th>
                                     <th class="text-nowrap">Produit</th>
-                                    <th>Fournisseur</th>
-                                    <th class="text-nowrap">N° Facture</th>
-                                    <th class="text-nowrap">Prix Unitaire (USD)</th>
-                                    <th class="text-nowrap">Qte TM</th>
-                                    <th class="text-nowrap">Qte M3</th>
+                                    <th>Bon de livraison</th>
+                                    <th>Programme de livraison</th>
+                                    <th class="text-nowrap">Client</th>
+                                    <th class="text-nowrap">LATA</th>
+                                    <th class="text-nowrap">L15</th>
                                     <th class="text-nowrap">Densité</th>
                                     <th class="text-nowrap">Factures</th>
                                     <th></th>
@@ -150,7 +155,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Nouvel achat</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Nouvelle vente</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -171,7 +176,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0" for="dv1">Date de l'achat</label>
+                                    <label class="mb-0" for="dv1">Date de la vente</label>
                                     <input class="form-control flatpickr" id="dv1" required name="date">
                                 </div>
                             </div>
@@ -179,39 +184,57 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Fournisseur</label>
-                                    <input class="form-control" required name="provider">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        <option value="">Sélectionnez une voie</option>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">N° Facture</label>
-                                    <input class="form-control" required name="billnumber">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="mb-0">Prix Unitaire (en USD)</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="unitprice">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="mb-0">Qantité TM</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="qtytm">
+                                    <label class="mb-0">Localité</label>
+                                    <input class="form-control" required name="locality">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Qantité M3</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="qtym3">
+                                    <label class="mb-0">Client</label>
+                                    <input class="form-control" required name="client">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Bon de livraison</label>
+                                    <input class="form-control" required name="delivery_note">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Programmme de livraison</label>
+                                    <input class="form-control" required name="delivery_program">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">LAT</label>
+                                    <input type="number" min="0" step="0.0001" class="form-control" required
+                                        name="lata">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">L15</label>
+                                    <input type="number" min="0" step="0.0001" class="form-control" required
+                                        name="l15">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -225,7 +248,7 @@
                         <p class="mt-2">Pièces jointes : factures ou documents (.pdf)</p>
                         <div class="mb-2">
                             <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
-                            <input type="file" multiple class="form-control" name="purchasefile[]">
+                            <input type="file" multiple class="form-control" name="salefile[]">
                         </div>
                         <x-alert />
                     </div>
@@ -250,7 +273,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Modification de l'achat</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Modification de la vente</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -264,7 +287,6 @@
                                 <div class="mb-2">
                                     <label class="mb-0">Produit</label>
                                     <select name="product" id="" class="form-control" required>
-                                        <option value="">Sélectionnez un produit</option>
                                         @foreach (mainfuels() as $e)
                                             <option>{{ $e }}</option>
                                         @endforeach
@@ -273,7 +295,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0" for="dv1">Date de l'achat</label>
+                                    <label class="mb-0" for="dv1">Date de la vente</label>
                                     <input class="form-control flatpickr" id="dv1" required name="date">
                                 </div>
                             </div>
@@ -281,39 +303,56 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Fournisseur</label>
-                                    <input class="form-control" required name="provider">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">N° Facture</label>
-                                    <input class="form-control" required name="billnumber">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="mb-0">Prix Unitaire (en USD)</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="unitprice">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="mb-0">Qantité TM</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="qtytm">
+                                    <label class="mb-0">Localité</label>
+                                    <input class="form-control" required name="locality">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Qantité M3</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
-                                        name="qtym3">
+                                    <label class="mb-0">Client</label>
+                                    <input class="form-control" required name="client">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Bon de livraison</label>
+                                    <input class="form-control" required name="delivery_note">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Programmme de livraison</label>
+                                    <input class="form-control" required name="delivery_program">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">LAT</label>
+                                    <input type="number" min="0" step="0.0001" class="form-control" required
+                                        name="lata">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">L15</label>
+                                    <input type="number" min="0" step="0.0001" class="form-control" required
+                                        name="l15">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -324,11 +363,10 @@
                                 </div>
                             </div>
                         </div>
-
                         <p class="mt-2">Pièces jointes : factures ou documents (.pdf)</p>
                         <div class="mb-2">
                             <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
-                            <input type="file" multiple class="form-control" name="purchasefile[]">
+                            <input type="file" multiple class="form-control" name="salefile[]">
                         </div>
                         <x-alert />
                     </div>
@@ -357,7 +395,7 @@
                     <div class="modal-body">
                         <div class="mb-2 text-center">
                             <h3 class="text-danger">
-                                Voulez-vous supprimer cet achat ?
+                                Voulez-vous supprimer cette vente ?
                             </h3>
                         </div>
                         <x-alert />
@@ -388,7 +426,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Importation des données d'achat</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Importation des données de vente</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -397,7 +435,7 @@
                     <input type="hidden" name="action" value="import">
                     <div class="modal-body">
                         <div class="text-center bg-light rounded-lg p-3">
-                            <h5>Vous pouvez importer la liste de tous vos achats disponibles depuis un fichier Excel en
+                            <h5>Vous pouvez importer la liste de toutes vos ventes disponibles depuis un fichier Excel en
                                 respectant les colonnes et le format des données.</h5>
                         </div>
                         <p class="mt-2">Sélectionnez le fichier excel à importer</p>
@@ -406,7 +444,7 @@
                         </div>
                         <x-alert />
                         <div class="mt-3">
-                            <a href="{{ asset('ModeleImportationAchat.xlsx') }}" class="btn text-danger">
+                            <a href="{{ asset('ModeleImportationVente.xlsx') }}" class="btn text-danger">
                                 <i class="material-icons md-18">insert_drive_file</i>
                                 Télécharger le modèle
                             </a>
@@ -456,7 +494,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('purchase.index') }}',
+                url: '{{ route('sale.index') }}',
                 data: function(d) {
                     d.entity_id = '{{ @$entity->id }}';
                     d.date = $('#dv22').val();
@@ -481,36 +519,44 @@
                     name: 'date'
                 },
                 {
+                    data: 'locality',
+                    name: 'locality'
+                },
+                {
+                    data: 'way',
+                    name: 'way'
+                },
+                {
                     data: 'product',
                     name: 'product'
                 },
                 {
-                    data: 'provider',
-                    name: 'provider'
+                    data: 'delivery_note',
+                    name: 'delivery_note'
                 },
                 {
-                    data: 'billnumber',
-                    name: 'billnumber'
+                    data: 'delivery_program',
+                    name: 'delivery_program'
                 },
                 {
-                    data: 'unitprice',
-                    name: 'unitprice'
+                    data: 'client',
+                    name: 'client'
                 },
                 {
-                    data: 'qtytm',
-                    name: 'qtytm'
+                    data: 'lata',
+                    name: 'lata'
                 },
                 {
-                    data: 'qtym3',
-                    name: 'qtym3'
+                    data: 'l15',
+                    name: 'l15'
                 },
                 {
                     data: 'density',
                     name: 'density'
                 },
                 {
-                    data: 'purchasefile',
-                    name: 'purchasefile',
+                    data: 'salefile',
+                    name: 'salefile',
                     orderable: false,
                     searchable: false,
                 },
@@ -539,11 +585,13 @@
 
                 $('[name="id"]', form).val(data.id);
                 $('[name="product"]', form).val(data.product);
-                $('[name="provider"]', form).val(data.provider);
-                $('[name="billnumber"]', form).val(data.billnumber);
-                $('[name="unitprice"]', form).val(data.unitprice);
-                $('[name="qtytm"]', form).val(data.qtytm);
-                $('[name="qtym3"]', form).val(data.qtym3);
+                $('[name="client"]', form).val(data.client);
+                $('[name="way"]', form).val(data.way);
+                $('[name="locality"]', form).val(data.locality);
+                $('[name="delivery_note"]', form).val(data.delivery_note);
+                $('[name="delivery_program"]', form).val(data.delivery_program);
+                $('[name="lata"]', form).val(data.lata);
+                $('[name="l15"]', form).val(data.l15);
                 $('[name="density"]', form).val(data.density);
                 mdl.modal('show');
             });
@@ -588,7 +636,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('purchase.store') }}',
+                url: '{{ route('sale.store') }}',
                 method: 'POST',
                 data: data,
                 contentType: false,
@@ -632,7 +680,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('purchase.index') }}/' + id,
+                url: '{{ route('sale.index') }}/' + id,
                 method: 'delete',
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
@@ -665,14 +713,14 @@
             $.ajax({
                 url: '{{ route('dashboard') }}',
                 data: {
-                    type: 'purchase',
+                    type: 'sale',
                     date: $('#dv22').val(),
                 },
                 success: function(data) {
-                    $('[totalAmount]').html(data.totalAmount);
-                    $('[totalTm]').html(data.totalTm);
-                    $('[totalM3]').html(data.totalM3);
-                    $('[avgPrice]').html(data.avgPrice);
+                    $('[totalDensity]').html(data.totalDensity);
+                    $('[totalLata]').html(data.totalLata);
+                    $('[totalL15]').html(data.totalL15);
+                    $('[avgDensity]').html(data.avgDensity);
 
                     chart1.data.labels = data.chart1.labels;
                     chart1.data.datasets[0].data = data.chart1.data;
@@ -725,7 +773,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return '$' + value.toLocaleString();
+                                return value.toLocaleString() + ' M³';
                             }
                         }
                     }
@@ -775,7 +823,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return value.toLocaleString() + ' M³';
+                                return 'LATA : ' + value.toLocaleString() + '';
                             }
                         }
                     }

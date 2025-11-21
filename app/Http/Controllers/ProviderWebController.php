@@ -63,4 +63,9 @@ class ProviderWebController extends Controller
     {
         return view('provider.purchase');
     }
+
+    function sale()
+    {
+        return view('provider.sale');
+    }
 }

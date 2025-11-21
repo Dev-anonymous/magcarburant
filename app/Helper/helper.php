@@ -26,6 +26,11 @@ function mainfuels()
     return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'];
 }
 
+function mainWays()
+{
+    return ['NORD', 'SUD', 'EST', 'OUEST'];
+}
+
 function defaultdata()
 {
     $entities = [
@@ -68,7 +73,7 @@ function defaultdata()
         }
     }
 
-    $zones = ['NORD', 'SUD', 'EST', 'OUEST'];
+    $zones = mainWays();
     foreach ($zones as $e) {
         $z = Zone::firstOrNew(['zone' => $e]);
         $z->save();

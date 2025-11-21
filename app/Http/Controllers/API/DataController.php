@@ -48,6 +48,39 @@ class DataController extends Controller
 
                 return compact('totalTm', 'totalM3', 'totalAmount', 'avgPrice', 'chart1', 'chart2');
             }
+            if ($type == 'sale') {
+                $date = request('date');
+                $date = explode(' to ', $date);
+                $date = array_filter($date);
+                $from = @$date[0] ?? nnow()->toDateString();
+                $to = @$date[1] ?? $from;
+
+                $entity = $user->entities()->first();
+                $base = $entity->sales()->whereBetween('date', [$from, $to]);
+
+                $totalLata = v((clone $base)->sum('lata'));
+                $totalL15 = v((clone $base)->sum('l15'));
+                $totalDensity = v((clone $base)->sum('density'));
+                $avgDensity = v((clone $base)->avg('density'));
+
+                $labels = [];
+                $data = [];
+                foreach (mainfuels() as $el) {
+                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('density');
+                    $labels[] = $el;
+                }
+                $chart1 = compact('labels', 'data');
+
+                $labels = [];
+                $data = [];
+                foreach (mainfuels() as $el) {
+                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata');
+                    $labels[] = $el;
+                }
+                $chart2 = compact('labels', 'data');
+
+                return compact('totalLata', 'totalL15', 'totalDensity', 'avgDensity', 'chart1', 'chart2');
+            }
         }
     }
 }

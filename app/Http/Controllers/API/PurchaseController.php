@@ -164,14 +164,14 @@ class PurchaseController extends Controller
             $errors = [];
             foreach ($sheet as $index => $row) {
                 $rowNumber = $index + 2;
-                $colA = $row[0] ?? null;
-                $colB = $row[1] ?? null;
-                $colC = $row[2] ?? null;
-                $colD = $row[3] ?? null;
-                $colE = $row[4] ?? null;
-                $colF = $row[5] ?? null;
-                $colG = $row[6] ?? null;
-                $colH = $row[7] ?? null;
+                $colA = trim($row[0] ?? null);
+                $colB = trim($row[1] ?? null);
+                $colC = trim($row[2] ?? null);
+                $colD = trim($row[3] ?? null);
+                $colE = trim($row[4] ?? null);
+                $colF = trim($row[5] ?? null);
+                $colG = trim($row[6] ?? null);
+                $colH = trim($row[7] ?? null);
 
                 if (empty(array_filter($row))) {
                     continue;

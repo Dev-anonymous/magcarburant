@@ -767,7 +767,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : $${value.toLocaleString()}`,
+                                        text: `${label} : ${value.toFixed(2)} USD`,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -781,7 +781,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return ' Total Achat USD : ' + context.raw.toLocaleString();
+                                return ' Total Achat USD : ' + context.raw.toFixed(2);
                             }
                         }
                     }
@@ -832,7 +832,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : ${value.toLocaleString()} M³`,
+                                        text: `${label} : ${value.toFixed(2)} M³`,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -847,7 +847,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return " Total M³ Achetés : " + value.toLocaleString();
+                                return " Total M³ Achetés : " + value.toFixed(2);
                             }
                         }
                     }

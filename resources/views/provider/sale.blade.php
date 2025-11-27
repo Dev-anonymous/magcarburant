@@ -24,7 +24,7 @@
                 <div class="carte">
                     <div class="container-fluid m-0">
                         <div class="row g-3">
-                            <div class="col-6 col-md-4 col-12">
+                            <div class="col-6 col-md-6 col-12">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <i class="material-icons md-36 text-success mb-1">local_gas_station</i>
@@ -34,7 +34,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4 col-12">
+                            <div class="col-6 col-md-6 col-12">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
@@ -44,16 +44,6 @@
                                         </svg>
                                         <div class="font-weight-bold text-warning">Volume Total L15</div>
                                         <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalL15>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4 col-12">
-                                <div class="card shadow-sm border-0">
-                                    <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-danger mb-1">payment</i>
-                                        <div class="font-weight-bold text-danger">Densité de vente Moyenne</div>
-                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" avgDensity>
                                         </div>
                                     </div>
                                 </div>
@@ -68,7 +58,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="">
-                                <h5 class="card-title text-center mb-4">Répartition des ventes par LATA</h5>
+                                <h5 class="card-title text-center mb-4">Répartition des ventes par produit LATA</h5>
                                 <div style="height: 300px;">
                                     <canvas id="chart2"></canvas>
                                 </div>
@@ -758,10 +748,8 @@
                     date: $('#dv22').val(),
                 },
                 success: function(data) {
-                    $('[totalDensity]').html(data.totalDensity);
                     $('[totalLata]').html(data.totalLata);
                     $('[totalL15]').html(data.totalL15);
-                    $('[avgDensity]').html(data.avgDensity);
 
                     chart1.data.labels = data.chart1.labels;
                     chart1.data.datasets[0].data = data.chart1.data;
@@ -815,7 +803,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : ${value.toLocaleString()} M³`,
+                                        text: `${label} : ${value.toFixed(2)} M³`,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -829,7 +817,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return ' Total Vente USD : ' + context.raw.toLocaleString();
+                                return ' Total Vente USD : ' + context.raw.toFixed(2);
                             }
                         }
                     }
@@ -880,7 +868,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : ${value.toLocaleString()} `,
+                                        text: `${label} : ${value.toFixed(2)} `,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -895,7 +883,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return ' Total Vente LATA : ' + context.raw.toLocaleString();
+                                return ' Total Vente LATA : ' + context.raw.toFixed(2);
                             }
                         }
                     }

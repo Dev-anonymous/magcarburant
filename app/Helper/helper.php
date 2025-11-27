@@ -23,7 +23,7 @@ function noteditable()
 
 function mainfuels()
 {
-    return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'];
+    return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI', 'JET'];
 }
 
 function mainWays()
@@ -126,31 +126,31 @@ function defaultdata()
 
 function initfuelprice(Structureprice $structure)
 {
-    if ($structure && !$structure->fuelprices()->exists()) {
-        $zones  = Zone::all()->keyBy('zone');     // ex: ['OUEST' => ZoneObj, 'EST' => ...]
-        $fuels  = Fuel::all()->keyBy('fuel');     // ex: ['essence' => FuelObj, ...]
-        $labels = Label::all()->keyBy('tag');     // ex: ['A' => LabelObj, 'B' => LabelObj, ...]
+    $zones  = Zone::all()->keyBy('zone');     // ex: ['OUEST' => ZoneObj, 'EST' => ...]
+    $fuels  = Fuel::all()->keyBy('fuel');     // ex: ['essence' => FuelObj, ...]
+    $labels = Label::all()->keyBy('tag');     // ex: ['A' => LabelObj, 'B' => LabelObj, ...]
 
-        $rowsToInsert = [];
-        foreach ($zones as $zoneName => $zone) {
-            foreach ($fuels as $fuelName => $fuel) {
-                foreach ($labels as $labelTag => $label) {
-                    if ($zoneName !== 'OUEST' && $labelTag === 'L') {
-                        continue;
-                    }
-
-                    $rowsToInsert[] = [
+    $rowsToInsert = [];
+    foreach ($zones as $zoneName => $zone) {
+        foreach ($fuels as $fuelName => $fuel) {
+            foreach ($labels as $labelTag => $label) {
+                if ($zoneName !== 'OUEST' && $labelTag === 'L') {
+                    continue;
+                }
+                Fuelprice::firstOrCreate(
+                    [
                         'structureprice_id' => $structure->id,
                         'zone_id'           => $zone->id,
                         'fuel_id'           => $fuel->id,
                         'label_id'          => $label->id,
-                        'amount'            => null,
-                        'currency'        => null,
-                    ];
-                }
+                    ],
+                    [
+                        'amount'   => null,
+                        'currency' => null,
+                    ]
+                );
             }
         }
-        Fuelprice::insert($rowsToInsert);
     }
 }
 

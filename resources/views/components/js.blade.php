@@ -35,6 +35,13 @@
             });
         });
 
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const drawer = document.querySelector("#default-drawer");
+                drawer?.mdkDrawer?.close();
+            }, 0);
+        });
+
         $.ajaxSetup({
             headers: {
                 // 'X-CSRF-TOKEN': '{{ csrf_token() }}',

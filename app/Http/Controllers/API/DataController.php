@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Fuel;
+use App\Models\Label;
+use App\Models\Purchase;
+use App\Models\Sale;
+use App\Models\Structureprice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +33,6 @@ class DataController extends Controller
                 $totalTm = v((clone $base)->sum('qtytm'));
                 $totalM3 = v((clone $base)->sum('qtym3'));
                 $totalAmount = v((clone $base)->sum(DB::raw('unitprice * qtytm')));
-                $avgPrice = v((clone $base)->avg('unitprice'));
 
                 $labels = [];
                 $data = [];
@@ -46,7 +50,7 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                return compact('totalTm', 'totalM3', 'totalAmount', 'avgPrice', 'chart1', 'chart2');
+                return compact('totalTm', 'totalM3', 'totalAmount', 'chart1', 'chart2');
             }
             if ($type == 'sale') {
                 $date = request('date');
@@ -61,7 +65,6 @@ class DataController extends Controller
                 $totalLata = v((clone $base)->sum('lata'));
                 $totalL15 = v((clone $base)->sum('l15'));
                 $totalDensity = v((clone $base)->sum('density'));
-                $avgDensity = v((clone $base)->avg('density'));
 
                 $labels = [];
                 $data = [];
@@ -79,7 +82,86 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                return compact('totalLata', 'totalL15', 'totalDensity', 'avgDensity', 'chart1', 'chart2');
+                return compact('totalLata', 'totalL15', 'totalDensity', 'chart1', 'chart2');
+            }
+
+            if ($type == 'balance') {
+                $date = request('date');
+                $date = explode(' to ', $date);
+                $date = array_filter($date);
+                $from = @$date[0] ?? nnow()->toDateString();
+                $to = @$date[1] ?? $from;
+
+                $devise = request('devise');
+                $zone = request('zone');
+                $fuel = request('fuel');
+
+                $entity = $user->entities()->first();
+
+                $plages = Structureprice::where('entity_id', $entity->id)
+                    ->whereBetween('from', [$from, $to])
+                    ->distinct()
+                    ->orderBy('from', 'desc')
+                    ->get();
+
+                abort_if(!$plages->count(), 422, "Aucune structure de prix trouvée sur la plage de date sélectionnée.");
+
+                $data = [];
+                $labels = Label::whereNotIn('tag', noteditable())->orderBy('tag')->get();
+                $fuels = Fuel::all();
+
+                foreach ($plages as $str) {
+                    $strfrom = $str->from?->format('d-m-Y');
+                    $strto = $str->to?->format('d-m-Y') ?? nnow()->toDateString();
+
+                    $tab = [];
+                    $tot = 0;
+                    foreach ($labels as $lab) {
+                        $line = [];
+                        $line['label'] = $lab->label;
+
+                        $fprice = $str->fuelprices()->whereHas('zone', function ($q) use ($zone) {
+                            if ($zone) {
+                                $q->where('zone', $zone);
+                            }
+                        })->whereHas('fuel', function ($qq) use ($fuel) {
+                            if ($fuel) {
+                                $qq->where('fuel', $fuel);
+                            }
+                        })->where(['label_id' => $lab->id])->first();
+                        if ($fprice?->zone->zone !== 'OUEST' && $lab->tag === 'L') {
+                            continue;
+                        }
+                        abort_if(!$fprice, 422, "Aucun prix ($fuel, $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure #$str->id).");
+
+                        $amount = 0;
+                        $currency = 'USD';
+                        if ($fprice) {
+                            $amount = (double) $fprice->amount;
+                            $currency = $fprice->currency;
+                        }
+                        if ('A' === $lab->tag) {
+                            $vol = Purchase::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('qtym3');
+                        } else {
+                            $vol = Sale::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('lata'); // lata en litre
+                            $vol /= 1000; // m3
+                        }
+                        $t = $vol * $amount;
+                        $tot += $t;
+                        $line['struct_price'] = $amount;
+                        $line['vol'] = $vol;
+                        $line['tot'] = v($t);
+                        $line['zone'] = $zone;
+                        $line['fuel'] = $fuel;
+                        $line['date'] = "DU $strfrom AU $strto";
+
+                        $tab[] = $line;
+                    }
+
+                    $data["$str->id###$str->name###ZONE $zone"] = $tab;
+                }
+
+                return response()->json($data);
             }
         }
     }

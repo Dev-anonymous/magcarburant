@@ -14,11 +14,6 @@ class ProviderWebController extends Controller
 {
     function home()
     {
-        return view('provider.home');
-    }
-
-    function apps()
-    {
         $entity = auth()->user()->entities()->first();
         return view('provider.apps', compact('entity'));
     }
@@ -67,5 +62,10 @@ class ProviderWebController extends Controller
     function sale()
     {
         return view('provider.sale');
+    }
+
+    function analyse()
+    {
+        return view('provider.analyse');
     }
 }

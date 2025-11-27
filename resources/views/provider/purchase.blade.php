@@ -24,50 +24,41 @@
                 <div class="carte">
                     <div class="container-fluid m-0">
                         <div class="row g-3">
-                            <div class="col-6 col-md-3 col-12">
+                            <div class="col-6 col-md-4 col-12">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-primary mb-1">receipt</i>
-                                        <div class="font-weight-bold text-secondary">Total Achat (USD)</div>
-                                        <div class="h4 font-weight-bold text-primary" style="font-size: 28px" totalAmount>
+                                        <i class="material-icons md-36 text-success mb-1">receipt</i>
+                                        <div class="font-weight-bold text-success">Total Achat (USD)</div>
+                                        <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalAmount>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3 col-12">
+                            <div class="col-6 col-md-4 col-12">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-success mb-1">local_gas_station</i>
-                                        <div class="font-weight-bold text-secondary">Volume Total (TM)</div>
-                                        <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalTm></div>
+                                        <i class="material-icons md-36 text-warning mb-1">local_gas_station</i>
+                                        <div class="font-weight-bold text-warning">Volume Total (TM)</div>
+                                        <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalTm></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3 col-12">
+                            <div class="col-6 col-md-4 col-12">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body text-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
-                                            width="48px" fill="#F5B666 ">
+                                            width="48px" fill="#FF3D55">
                                             <path
                                                 d="M480-78q-142 0-242-97.71T138-415q0-68.14 27-130.77 27-62.63 75-108.73L480-892l240 237.5q48 46.1 75.5 108.73T823-415q0 141.58-100.5 239.29Q622-78 480-78ZM229-415h502q0-46-19-91.5T659-586L480-763 301-586q-34 34-53 79.54-19 45.54-19 91.46Z" />
                                         </svg>
-                                        <div class="font-weight-bold text-warning">Volume Total (M³)</div>
-                                        <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalM3></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-12">
-                                <div class="card shadow-sm border-0">
-                                    <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-danger mb-1">payment</i>
-                                        <div class="font-weight-bold text-secondary">Prix d'achat Moyenne (USD)</div>
-                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" avgPrice></div>
+                                        <div class="font-weight-bold text-danger">Volume Total (M³)</div>
+                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" totalM3></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des achats par carburant (USD)</h5>
+                                    <h5 class="card-title text-center mb-4">Répartition des achats par produit (USD)</h5>
                                     <div style="height: 300px;" />
                                     <canvas id="chart1"></canvas>
                                 </div>
@@ -75,7 +66,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="">
-                                <h5 class="card-title text-center mb-4">Répartition des achats par carburant (M³)</h5>
+                                <h5 class="card-title text-center mb-4">Répartition des achats par produit (M³)</h5>
                                 <div style="height: 300px;">
                                     <canvas id="chart2"></canvas>
                                 </div>
@@ -104,12 +95,7 @@
                                     name="date">
                             </div>
                             <div class="">
-                                <button class="btn btn-sm btn-outline-primary mt-3 mr-2" data-toggle="modal"
-                                    data-target="#mdladd2">
-                                    <i class="material-icons md-18">insert_drive_file</i>
-                                    Importer
-                                </button>
-                                <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdladd">
+                                <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdlChose">
                                     <i class="material-icons md-18">add_circle_outline</i>
                                     Nouvel achat
                                 </button>
@@ -429,6 +415,29 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="mdlChose" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <h4 class="mb-3">Quelle action voulez-vous ? </h4>
+                    <button class="btn btn-sm btn-primary m-2" btnmdl data-target="#mdladd">
+                        <i class="material-icons md-18">edit</i>
+                        Saisir un achat
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary m-2 mr-2" btnmdl data-target="#mdladd2">
+                        <i class="material-icons md-18">insert_drive_file</i>
+                        Importer les achats
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">
+                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -451,6 +460,12 @@
                 firstDayOfWeek: 1
             }
         });
+
+        $('[btnmdl]').click(function() {
+            $('.modal.show').modal('hide');
+            var t = $(this).data('target');
+            $(`${t}`).modal('show');
+        })
 
         var dtObj = $('#table').DataTable({
             processing: true,
@@ -520,6 +535,33 @@
                     orderable: false,
                     searchable: false,
                 },
+            ],
+            dom: 'Blfrtip',
+            buttons: [{
+                    extend: 'excelHtml5',
+                    title: 'Export Excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: 'Export PDF',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    }
+                },
+                {
+                    extend: 'print',
+                    title: 'Impression',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    }
+                }
+            ],
+            lengthMenu: [
+                [10, 25, 50, 100, 500, -1],
+                [10, 25, 50, 100, 500, "--"]
             ]
         }).on('draw.dt', function(e, settings, data, xhr) {
             $('[bedit]').off('click').click(function() {
@@ -672,7 +714,6 @@
                     $('[totalAmount]').html(data.totalAmount);
                     $('[totalTm]').html(data.totalTm);
                     $('[totalM3]').html(data.totalM3);
-                    $('[avgPrice]').html(data.avgPrice);
 
                     chart1.data.labels = data.chart1.labels;
                     chart1.data.datasets[0].data = data.chart1.data;
@@ -694,13 +735,13 @@
             data: {
                 labels: [],
                 datasets: [{
-                    // label: 'Montant Total d\'achat',
                     data: [],
                     backgroundColor: [
                         '#4e73df',
                         '#1cc88a',
                         '#36b9cc',
                         '#f6c23e',
+                        '#1e2a38',
                     ],
                     hoverOffset: 30,
                     borderWidth: 2,
@@ -712,20 +753,35 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        position: 'left',
+                        align: 'center',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
+                            padding: 10,
                             font: {
                                 size: 14
+                            },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                const ds = data.datasets[0];
+                                return data.labels.map((label, index) => {
+                                    const value = ds.data[index] ?? 0;
+                                    return {
+                                        text: `${label} : $${value.toLocaleString()}`,
+                                        fillStyle: ds.backgroundColor[index],
+                                        strokeStyle: ds.backgroundColor[index],
+                                        lineWidth: 0,
+                                        hidden: isNaN(value),
+                                        index: index
+                                    };
+                                });
                             }
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                let value = context.raw;
-                                return '$' + value.toLocaleString();
+                                return ' Total Achat USD : ' + context.raw.toLocaleString();
                             }
                         }
                     }
@@ -744,13 +800,13 @@
             data: {
                 labels: [],
                 datasets: [{
-                    // label: 'Montant Total d\'achat',
                     data: [],
                     backgroundColor: [
                         '#4e73df',
                         '#1cc88a',
                         '#36b9cc',
                         '#f6c23e',
+                        '#1e2a38',
                     ],
                     hoverOffset: 30,
                     borderWidth: 2,
@@ -762,12 +818,28 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        position: 'right',
+                        align: 'center',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
+                            padding: 10,
                             font: {
                                 size: 14
+                            },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                const ds = data.datasets[0];
+                                return data.labels.map((label, index) => {
+                                    const value = ds.data[index] ?? 0;
+                                    return {
+                                        text: `${label} : ${value.toLocaleString()} M³`,
+                                        fillStyle: ds.backgroundColor[index],
+                                        strokeStyle: ds.backgroundColor[index],
+                                        lineWidth: 0,
+                                        hidden: isNaN(value),
+                                        index: index
+                                    };
+                                });
                             }
                         }
                     },
@@ -775,7 +847,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return value.toLocaleString() + ' M³';
+                                return " Total M³ Achetés : " + value.toLocaleString();
                             }
                         }
                     }

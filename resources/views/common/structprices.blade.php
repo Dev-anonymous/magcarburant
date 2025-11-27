@@ -236,6 +236,33 @@
                     orderable: false,
                     searchable: false,
                 },
+            ],
+            dom: 'Blfrtip',
+            buttons: [{
+                    extend: 'excelHtml5',
+                    title: 'Export Excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: 'Export PDF',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]
+                    }
+                },
+                {
+                    extend: 'print',
+                    title: 'Impression',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]
+                    }
+                }
+            ],
+            lengthMenu: [
+                [10, 25, 50, 100, 500, -1],
+                [10, 25, 50, 100, 500, "--"]
             ]
         }).on('draw.dt', function(e, settings, data, xhr) {
             $('[bedit]').off('click').click(function() {

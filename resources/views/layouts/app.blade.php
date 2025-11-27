@@ -7,25 +7,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>@yield('title') | {{ config('app.name') }}</title>
     <x-css />
+    <style>
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e0e0e0;
+            border-top-color: var(--appcolor) !important;
+            ;
+            border-radius: 50%;
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
         <div class="mdk-drawer-layout__content">
             <div
                 class="mdk-header-layout js-mdk-header-layout mdk-header--fixed mdk-header-layout__content--scrollable">
-                <div class="mdk-header js-mdk-header bg-primary" data-fixed>
+                <div class="mdk-header js-mdk-header" data-fixed>
                     <div class="mdk-header__content">
                         <nav class="navbar navbar-expand-md d-flex-none bg-white">
-                            <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar">
+                            <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar" sidebarbtn>
                                 <i class="material-icons align-middle md-36">short_text</i>
                             </button>
                             <div class="page-title m-0"></div>
                             <div class="collapse navbar-collapse" id="mainNavbar">
                                 <ul class="navbar-nav ml-auto align-items-center">
-                                    @if (Route::is('provider.accounting'))
+                                    @if (Route::is('provider.accounting') || Route::is('provider.analyse'))
                                         <li class="nav-item dropdown nav-language d-flex align-items-center">
+                                            <a href="{{ route('provider.analyse') }}" class="nav-link"
+                                                aria-expanded="false">
+                                                <i class="material-icons md-18 align-middle">trending_up</i>
+                                                Analyse
+                                            </a>
                                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
                                                 aria-expanded="false">
                                                 <i class="material-icons md-18 align-middle">settings</i>
@@ -124,18 +164,18 @@
                                 </li>
                             @endif
                             @if ($role === 'provider')
-                                <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
+                                {{-- <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
                                     <a href="{{ route('provider.home') }}">
                                         <i class="material-icons">dashboard</i>
                                         <span class="drawer-menu-text"> Dashboard</span>
                                     </a>
                                 </li>
-                                <li class="drawer-menu-item @if (Route::is('provider.apps')) active @endif">
+                                <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
                                     <a href="{{ route('provider.apps') }}">
                                         <i class="material-icons">apps</i>
                                         <span class="drawer-menu-text"> Applications</span>
                                     </a>
-                                </li>
+                                </li> --}}
                             @endif
                             <li class="drawer-menu-item drawer-fixed-bottom">
                                 <a href="#" class="nav-link dropdown-toggle dropdown-clear-caret appcol"
@@ -204,6 +244,20 @@
     @yield('modals')
     <x-js />
     @yield('script')
+    <script>
+        window.addEventListener("load", function() {
+            setTimeout(() => {
+                const loader = document.getElementById("preloader");
+                loader.style.opacity = "0";
+                loader.style.transition = "opacity 0.4s ease";
+
+                setTimeout(() => {
+                    loader.style.display = "none";
+                }, 400);
+            }, 900);
+
+        });
+    </script>
 </body>
 
 </html>

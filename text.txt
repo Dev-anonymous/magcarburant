@@ -1,0 +1,26 @@
+---------------------------------
+structure prix : equivalence en CDF
+
+
+
+JET             OK
+statistique par carburant : ligne label     OK
+export donnees                              OK
+achat/vente : Nouvel/le Achat/Vente -> Choisir Importer ou Saisir       OK
+achat : changer le titre en "repartition des prix par produit"          OK
+vente : changer le titre en "repartition des ventes par produit"        OK
+prix par produit                                                        OK
+
+enlever le side bar, cote fournisseur                                   OK
+mettre les message d'erreur en francais                                 OK
+
+---------------
+partie admin : on voit tout en lecture seul
+
+tableau de bord : xxxxx
+menu analyse
+PMF se calcule sur base des volume achat, le reste sur base de volume vendu (LATA ==> est en litre faut /1000 -> m3)
+- les details sur les lignes de total
+
+
+

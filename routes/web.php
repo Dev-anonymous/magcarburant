@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
             Route::get('sale', 'sale')->name('provider.sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
             Route::get('accounting', 'accounting')->name('provider.accounting');
+            Route::get('analyse', 'analyse')->name('provider.analyse');
         });
     });
 });

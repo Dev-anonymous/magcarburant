@@ -179,6 +179,7 @@ class DataController extends Controller
         $to = $str->to?->toDateString() ?? nnow()->toDateString(); // a maintenant
 
         $plages = Rate::where('type', $ratetype)
+            ->where(['entity_id' => $str->entity_id])
             ->whereBetween('from', [$from, $to])
             ->distinct()
             ->orderBy('from', 'desc')

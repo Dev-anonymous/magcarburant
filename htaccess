@@ -1,4 +1,4 @@
-lws /public htaccess
+##lws /public htaccess
 
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
@@ -21,7 +21,7 @@ lws /public htaccess
 </IfModule>
 
 
-laravel /public htaccess
+##laravel /public htaccess
 
 
 <IfModule mod_rewrite.c>

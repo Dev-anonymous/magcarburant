@@ -28,3 +28,5 @@ correction des message d'erreur en francais
 remplacer $ par USD sur les graph
 arrangement des liens des fichiers factures
 rennommer le titre du graph en "Repartition des ventes par produit LATA"
+
+

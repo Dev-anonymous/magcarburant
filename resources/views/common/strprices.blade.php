@@ -23,7 +23,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="bg-white d-flex justify-content-between align-items-center">
+                <div class="bg-white d-flex justify-content-between align-items-center p-3">
                     <h4 class="text-muted font-weight-bold">
                         Structure
                         {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? ' à maintenant' : " au {$structure->to->format('d-m-Y')}") }}
@@ -77,16 +77,27 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                @if (empty($structure->to))
-                                    @if (auth()->user()->user_role == 'provider')
-                                        <div class="p-2 text-right">
-                                            <button class="btn btn-sm btn- btn-edit-table">
-                                                <i class="material-icons md-18">edit</i>
-                                                Modifier les prix
-                                            </button>
-                                        </div>
-                                    @endif
-                                @endif
+                                <div class="d-flex justify-content-between">
+                                    <div class="">
+                                        <button class="btn btn-sm btn-dark btn-cdf" zone="{{ $zone->zone }}"
+                                            structure="{{ $structure->id }}">
+                                            <i class="material-icons md-18">info</i>
+                                            Voir la structure en CDF
+                                        </button>
+                                    </div>
+                                    <div class="">
+                                        @if (empty($structure->to))
+                                            @if (auth()->user()->user_role == 'provider')
+                                                <div class="p-2 text-right">
+                                                    <button class="btn btn-sm btn-edit-table">
+                                                        <i class="material-icons md-18">edit</i>
+                                                        Modifier les prix
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -97,12 +108,80 @@
     </div>
 @endsection
 @section('modals')
-
+    <div class="modal fade" id="mdlinfo" role="dialog">
+        <div class="modal-dialog modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-uppercase" id="defaultModalLabel">Structure des prix en CDF</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form finfo="">
+                    <input type="hidden" name="structure">
+                    <input type="hidden" name="zone">
+                </form>
+                <div class="modal-body">
+                    <x-dataloader />
+                    <x-alert />
+                    <div class="w-100" repdata>
+                        <form formfilter="">
+                            <div class="d-flex">
+                                <div class="mr-2">
+                                    <span for="">Produit</span>
+                                    <select name="fuel" class="form-control">
+                                        @foreach (mainfuels() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mr-2">
+                                    <span for="">Au taux</span>
+                                    <select name="ratetype" class="form-control">
+                                        <option>RÉEL</option>
+                                        <option>STRUCTURE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsiver mt-3">
+                        <div data=""></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">
+                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
     <x-datatable />
     <x-flatpickr />
+
+    <style>
+        .modal-dialog.modal-fullscreen {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .modal-dialog.modal-fullscreen .modal-content {
+            height: 100% !important;
+            border-radius: 0 !important;
+        }
+
+        .modal-dialog.modal-fullscreen .modal-body {
+            overflow-y: auto !important;
+        }
+    </style>
 
     <style>
         .table td,
@@ -133,6 +212,96 @@
                 }, 5000);
             });
         });
+
+        $('.btn-cdf').click(function() {
+            var b = $(this);
+            var mdl = $('#mdlinfo');
+            var form = $('[finfo]', mdl);
+            $('[name="zone"]').val(b.attr('zone'));
+            $('[name="structure"]').val(b.attr('structure'));
+            mdl.modal('show');
+            loadpt();
+        });
+
+        var formfilter = $('[formfilter]');
+
+        formfilter.change(() => loadpt());
+
+        function loadpt() {
+            var mdl = $('#mdlinfo');
+            var ldr = $('[dataloader]', mdl);
+            var rep = $('#rep', mdl);
+            var form = $('[finfo]', mdl);
+            var data = form.serialize() + '&' + formfilter.serialize();
+            ldr.show();
+
+            $.ajax({
+                url: `{{ route('pricestructure') }}`,
+                data: data,
+                success: function(data) {
+                    var k = Object.keys(data);
+                    var h = '';
+                    k.forEach(key => {
+                        h += `
+                    <table id="table" class="table table-striped table-bordered table-hover text-nowrap"
+                        style="width:100%">
+                        <thead>
+                            <tr>
+                                <td colspan=4>
+                                    <div class='text-center p-4'>
+                                        DATATITLE
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>ITEM</th>
+                                <th class='text-center'>Prix Structure de Prix</th>
+                                <th class='text-center'>Volume Vendu M3</th>
+                                <th class='text-center'>MONTANT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+                        var d = data[key];
+
+                        var li = null;
+                        d.forEach(line => {
+                            h += `
+                            <tr>
+                                <td>${line.label}</td>
+                                <td class='text-center'>${line.struct_price}</td>
+                                <td class='text-center'>${line.vol}</td>
+                                <td class='text-center font-weight-bold'>${line.tot}</td>
+                            </tr>
+                                `
+                            li = line;
+                        });
+                        h += `</tbody>
+                        </table>`;
+                        if (li) {
+                            var ti = `<h4>${li.fuel} | ${li.date}</h4>`;
+                            h = h.replace('DATATITLE', ti);
+                        }
+                    });
+
+                    $('[data]', mdl).html(h);
+                    $('[repdata]').css('opacity', 1);
+                    ldr.hide();
+                    rep.hide();
+
+                },
+                error: function(xhr, a, b) {
+                    ldr.hide();
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-danger')
+                        .show();
+                    $('[repdata]').css('opacity', 0.1);
+                }
+            });
+
+        }
 
         const formulas = {
             D: "C-E-F-G-H-I-J",

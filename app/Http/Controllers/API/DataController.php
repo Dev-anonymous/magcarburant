@@ -101,15 +101,16 @@ class DataController extends Controller
 
                 $plages = Structureprice::where('entity_id', $entity->id)
                     ->where(function ($q) use ($from, $to) {
-                        $q->where('from', '<=', $to)
-                            ->where('to', '>=', $from);
+                        $q->where(function ($q) use ($from, $to) {
+                            $q->where('from', '<=', $to)
+                                ->where('to', '>=', $from);
+                        })
+                            ->orWhere(function ($q) use ($from, $to) {
+                                $q->whereNull('to')
+                                    ->whereBetween('from', [$from, $to]);
+                            });
                     })
-                    ->orWhere(function ($q) use ($from, $to) {
-                        $q->whereNull('to')
-                            ->whereBetween('from', [$from, $to]);
-                    })
-                    ->distinct()
-                    ->orderBy('from', 'desc')
+                    // ->orderBy(DB::raw('`from`'), 'desc')
                     ->get();
 
                 abort_if(!$plages->count(), 422, "Aucune structure de prix trouvée sur la plage de date sélectionnée.");
@@ -186,17 +187,18 @@ class DataController extends Controller
         $to = $str->to?->toDateString() ?? nnow()->toDateString(); // a maintenant
 
         $plages = Rate::where('type', $ratetype)
-            ->where(['entity_id' => $str->entity_id])
+            ->where('entity_id', $str->entity_id)
             ->where(function ($q) use ($from, $to) {
-                $q->where('from', '<=', $to)
-                    ->where('to', '>=', $from);
+                $q->where(function ($q) use ($from, $to) {
+                    $q->where('from', '<=', $to)
+                        ->where('to', '>=', $from);
+                })
+                    ->orWhere(function ($q) use ($from, $to) {
+                        $q->whereNull('to')
+                            ->whereBetween('from', [$from, $to]);
+                    });
             })
-            ->orWhere(function ($q) use ($from, $to) {
-                $q->whereNull('to')
-                    ->whereBetween('from', [$from, $to]);
-            })
-            ->distinct()
-            ->orderBy('from', 'desc')
+            // ->orderBy(DB::raw('`from`'), 'desc')
             ->get();
 
         abort_if(!$plages->count(), 422, "Aucun TAUX $ratetype trouvé sur la période ($from ... $to) de cette structure de prix.");

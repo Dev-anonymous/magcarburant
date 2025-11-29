@@ -100,7 +100,14 @@ class DataController extends Controller
                 $entity = $user->entities()->first();
 
                 $plages = Structureprice::where('entity_id', $entity->id)
-                    ->whereBetween('from', [$from, $to])
+                    ->where(function ($q) use ($from, $to) {
+                        $q->where('from', '<=', $to)
+                            ->where('to', '>=', $from);
+                    })
+                    ->orWhere(function ($q) use ($from, $to) {
+                        $q->whereNull('to')
+                            ->whereBetween('from', [$from, $to]);
+                    })
                     ->distinct()
                     ->orderBy('from', 'desc')
                     ->get();
@@ -180,12 +187,19 @@ class DataController extends Controller
 
         $plages = Rate::where('type', $ratetype)
             ->where(['entity_id' => $str->entity_id])
-            ->whereBetween('from', [$from, $to])
+            ->where(function ($q) use ($from, $to) {
+                $q->where('from', '<=', $to)
+                    ->where('to', '>=', $from);
+            })
+            ->orWhere(function ($q) use ($from, $to) {
+                $q->whereNull('to')
+                    ->whereBetween('from', [$from, $to]);
+            })
             ->distinct()
             ->orderBy('from', 'desc')
             ->get();
 
-        abort_if(!$plages->count(), 422, "Aucun TAUX $ratetype trouvé sur la période ($from - $to) de cette structure de prix.");
+        abort_if(!$plages->count(), 422, "Aucun TAUX $ratetype trouvé sur la période ($from ... $to) de cette structure de prix.");
 
         $data = [];
         $labels = Label::whereNotIn('tag', noteditable())->orderBy('tag')->get();

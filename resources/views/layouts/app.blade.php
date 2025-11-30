@@ -44,7 +44,6 @@
         <div class="spinner"></div>
     </div>
 
-
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
         <div class="mdk-drawer-layout__content">
@@ -55,6 +54,11 @@
                         <nav class="navbar navbar-expand-md d-flex-none bg-white">
                             <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar" sidebarbtn>
                                 <i class="material-icons align-middle md-36">short_text</i>
+                            </button>
+                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-white appcol pl-0"
+                                type="button">
+                                <i class="material-icons align-middle md-18">home</i>
+                                Accueil
                             </button>
                             <div class="page-title m-0"></div>
                             <div class="collapse navbar-collapse" id="mainNavbar">
@@ -76,26 +80,35 @@
                                                     <small class="font-italic text-muted ml-2">Gestions des prix</small>
                                                     <li>
                                                         <a href="{{ route('provider.accounting') }}"
-                                                            class="dropdown-item ">
-                                                            <i
-                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            class="dropdown-item d-flex">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px"
+                                                                viewBox="0 -960 960 960" width="18px" fill="#000000">
+                                                                <path
+                                                                    d="m421-298 283-283-46-45-237 237-120-120-45 45 165 166Zm59 218q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z" />
+                                                            </svg>
                                                             Structure des prix
                                                         </a>
                                                     </li>
                                                     <small class="font-italic text-muted ml-2">Gestions des taux</small>
                                                     <li>
                                                         <a href="{{ route('provider.accounting', ['item' => 'rtx']) }}"
-                                                            class="dropdown-item ">
-                                                            <i
-                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            class="dropdown-item d-flex">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px"
+                                                                viewBox="0 -960 960 960" width="18px" fill="#000000">
+                                                                <path
+                                                                    d="m421-298 283-283-46-45-237 237-120-120-45 45 165 166Zm59 218q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z" />
+                                                            </svg>
                                                             Taux réels
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <a href="{{ route('provider.accounting', ['item' => 'stx']) }}"
-                                                            class="dropdown-item ">
-                                                            <i
-                                                                class="material-icons md-18 align-middle mb-1 text-primary">arrow_forward</i>
+                                                            class="dropdown-item d-flex">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px"
+                                                                viewBox="0 -960 960 960" width="18px" fill="#000000">
+                                                                <path
+                                                                    d="m421-298 283-283-46-45-237 237-120-120-45 45 165 166Zm59 218q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Zm0-60q142 0 241-99.5T820-480q0-142-99-241t-241-99q-141 0-240.5 99T140-480q0 141 99.5 240.5T480-140Zm0-340Z" />
+                                                            </svg>
                                                             Taux structures
                                                         </a>
                                                     </li>

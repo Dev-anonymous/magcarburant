@@ -72,28 +72,37 @@
             </div>
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title font-weight-bold">
-                        Historique des toutes les ventes
-                    </h4>
-                    @if (auth()->user()->user_role === 'provider')
-                        <div class="d-flex">
-                            @php
-                                $d = now()->startOfMonth()->toDateString() . ' to ' . now()->toDateString();
-                            @endphp
-                            <div class="mr-2">
-                                <label class="mb-0" for="dv22">Date</label>
-                                <input class="form-control flatpickr2" id="dv22" value="{{ $d }}"
-                                    name="date">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <h4 class="card-title font-weight-bold">Historique des toutes les ventes</h4>
+                        </div>@php
+                            $d = now()->startOfMonth()->toDateString();
+                            $d2 = now()->toDateString();
+                        @endphp
+                        @if (auth()->user()->user_role === 'provider')
+                            <div class="col-xs-12 col-sm-6">
+                                <form class="form-inline filters-form pull-right" role="form">
+                                    <div class="form-group mb-1">
+                                        <label class="mr-2" for="dv222">Du</label>
+                                        <input class="form-control flatpickr2" id="dv222" value="{{ $d }}"
+                                            name="date1" style="width:100px" />
+                                    </div>
+                                    <div class="form-group mb-1">
+                                        <label class="mr-2" for="dv22">Au</label>
+                                        <input class="form-control flatpickr2" id="dv22" value="{{ $d2 }}"
+                                            name="date2" style="width:100px" />
+                                    </div>
+                                    <div class="form-group mb-1">
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                            data-target="#mdlChose">
+                                            <i class="material-icons md-18">add_circle_outline</i> Nouvelle vente
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="">
-                                <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdlChose">
-                                    <i class="material-icons md-18">add_circle_outline</i>
-                                    Nouvelle vente
-                                </button>
-                            </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
                 <div class="py-4">
                     <div class="table-responsive">
@@ -472,6 +481,7 @@
     <x-flatpickr />
 
     <script src="{{ asset('assets/vendor/Chart.4.5.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/datalabels.min.js') }}"></script>
 
     <script>
         flatpickr(".flatpickr", {
@@ -481,7 +491,6 @@
             }
         });
         flatpickr(".flatpickr2", {
-            mode: "range",
             maxDate: "today",
             locale: {
                 firstDayOfWeek: 1
@@ -501,7 +510,7 @@
                 url: '{{ route('sale.index') }}',
                 data: function(d) {
                     d.entity_id = '{{ @$entity->id }}';
-                    d.date = $('#dv22').val();
+                    d.date = $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val();
                 }
             },
             order: [
@@ -636,7 +645,7 @@
             });
         });
 
-        $('#dv22').change(function() {
+        $('.flatpickr2').change(function() {
             dtObj.ajax.reload(null, false);
             dashboard();
         });
@@ -745,7 +754,7 @@
                 url: '{{ route('dashboard') }}',
                 data: {
                     type: 'sale',
-                    date: $('#dv22').val(),
+                    date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },
                 success: function(data) {
                     $('[totalLata]').html(data.totalLata);
@@ -765,6 +774,15 @@
                 },
             })
         }
+
+        function formatNumber(val) {
+            return val
+                .toFixed(2)
+                .replace('.', ',')
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        Chart.register(ChartDataLabels);
 
         var chart1 = new Chart($('#chart1')[0].getContext('2d'), {
             type: 'doughnut',
@@ -788,6 +806,19 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 13
+                        },
+                        formatter: function(value, ctx) {
+                            const data = ctx.chart.data.datasets[0].data;
+                            const total = data.reduce((a, b) => a + b, 0);
+                            const percent = (value / total * 100).toFixed(1);
+                            return percent + '%';
+                        }
+                    },
                     legend: {
                         position: 'left',
                         align: 'center',
@@ -803,7 +834,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : ${value.toFixed(2)} M³`,
+                                        text: `${label} : ${formatNumber(value)} M³`,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -817,7 +848,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return ' Total Vente USD : ' + context.raw.toFixed(2);
+                                return ' Total Vente USD : ' + formatNumber(context.raw);
                             }
                         }
                     }
@@ -830,6 +861,7 @@
                 }
             }
         });
+
 
         var chart2 = new Chart($('#chart2')[0].getContext('2d'), {
             type: 'doughnut',
@@ -853,6 +885,19 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 13
+                        },
+                        formatter: function(value, ctx) {
+                            const data = ctx.chart.data.datasets[0].data;
+                            const total = data.reduce((a, b) => a + b, 0);
+                            const percent = (value / total * 100).toFixed(1);
+                            return percent + '%';
+                        }
+                    },
                     legend: {
                         position: 'right',
                         align: 'center',
@@ -868,7 +913,7 @@
                                 return data.labels.map((label, index) => {
                                     const value = ds.data[index] ?? 0;
                                     return {
-                                        text: `${label} : ${value.toFixed(2)} `,
+                                        text: `${label} : ${formatNumber(value)} `,
                                         fillStyle: ds.backgroundColor[index],
                                         strokeStyle: ds.backgroundColor[index],
                                         lineWidth: 0,
@@ -883,7 +928,7 @@
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
-                                return ' Total Vente LATA : ' + context.raw.toFixed(2);
+                                return ' Total Vente LATA : ' + formatNumber(context.raw);
                             }
                         }
                     }

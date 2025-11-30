@@ -87,11 +87,8 @@ class DataController extends Controller
             }
 
             if ($type == 'balance') {
-                $date = request('date');
-                $date = explode(' to ', $date);
-                $date = array_filter($date);
-                $from = @$date[0] ?? nnow()->toDateString();
-                $to = @$date[1] ?? $from;
+                $from = request('date1') ?? nnow()->toDateString();
+                $to = request('date2') ?? $from;
 
                 $devise = request('devise');
                 $zone = request('zone');

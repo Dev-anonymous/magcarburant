@@ -34,6 +34,13 @@ class ProviderWebController extends Controller
             return view('provider.structrates', compact('entity'));
         }
 
+        $item = request('item');
+        if ($item == 'pricestr') {
+            $user = auth()->user();
+            $entity = $user->entities()->first();
+            return view('common.structprices', compact('entity'));
+        }
+
         $stx = request('stx');
         if ($stx) {
             $entity = auth()->user()->entities()->first();
@@ -51,7 +58,7 @@ class ProviderWebController extends Controller
                 return view('common.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
             }
         }
-        return view('common.structprices');
+        return view('provider.apps-accounting');
     }
 
     function purchase()

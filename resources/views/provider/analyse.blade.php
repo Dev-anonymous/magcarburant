@@ -21,54 +21,101 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="carte">
-                    <div class="w-100">
-                        <form action="#" id="ffilter">
-                            <input type="hidden" name="type" value="balance">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="card-title font-weight-bold">
-                                    Bilan d'analyse
-                                </h4>
-                                <div class="d-flex">
-                                    @php
-                                        $d = now()->startOfMonth()->toDateString() . ' to ' . now()->toDateString();
-                                    @endphp
-                                    <div class="mr-2">
-                                        <label class="mb-0" for="dv22">Date</label>
-                                        <input class="form-control flatpickr" value="{{ $d }}" name="date">
-                                    </div>
-                                    {{-- <div class="mr-2">
-                                        <span for="">Devise</span>
-                                        <select name="devise" id="devise" class="form-control">
-                                            <option>CDF</option>
-                                            <option>USD</option>
-                                        </select>
-                                    </div> --}}
-                                    <div class="mr-2">
-                                        <span for="">Zone</span>
-                                        <select name="zone" class="form-control">
-                                            @foreach (mainWays() as $e)
-                                                <option>{{ $e }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="mr-2">
-                                        <span for="">Produit</span>
-                                        <select name="fuel" class="form-control">
-                                            @foreach (mainfuels() as $e)
-                                                <option>{{ $e }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                <div class="card">
+                    <input type="hidden" name="type" value="balance">
+                    {{-- <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title font-weight-bold">
+                            Bilan d'analyse
+                        </h4>
+                        <div class="d-flex">
+                            @php
+                                $d = now()->startOfMonth()->toDateString();
+                                $d2 = now()->toDateString();
+                            @endphp
+                            <div class="mr-2">
+                                <label class="mb-0" for="dv222">Du</label>
+                                <input class="form-control flatpickr2" id="dv222" value="{{ $d }}"
+                                    name="date1" style="width: 100px">
+                            </div>
+                            <div class="mr-2">
+                                <label class="mb-0" for="dv22">Au</label>
+                                <input class="form-control flatpickr2" id="dv22" value="{{ $d2 }}"
+                                    name="date2" style="width: 100px">
+                            </div>
+                            <div class="mr-2">
+                                <span for="">Zone</span>
+                                <select name="zone" class="form-control">
+                                    @foreach (mainWays() as $e)
+                                        <option>{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mr-2">
+                                <span for="">Produit</span>
+                                <select name="fuel" class="form-control">
+                                    @foreach (mainfuels() as $e)
+                                        <option>{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div> --}}
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <h4 class="card-title font-weight-bold">Bilan d'analyse</h4>
+                            </div>@php
+                                $d = now()->startOfMonth()->toDateString();
+                                $d2 = now()->toDateString();
+                            @endphp
+                            @if (auth()->user()->user_role === 'provider')
+                                <div class="col-xs-12 col-sm-6 col-md-12">
+                                    <form id="ffilter" class="form-inline filters-form pull-right" role="form">
+                                        <input type="hidden" name="type" value="balance">
+                                        <div class="form-group mb-1">
+                                            <div class="">
+                                                <label class="justify-content-start" for="dv222">Du</label>
+                                                <input class="form-control flatpickr2" id="dv222"
+                                                    value="{{ $d }}" name="date1" style="width:100px" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
+                                                <label class="justify-content-start" for="dv22">Au</label>
+                                                <input class="form-control flatpickr2" id="dv22"
+                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
+                                                <label class="justify-content-start" for="">Zone</label>
+                                                <select name="zone" class="form-control">
+                                                    @foreach (mainWays() as $e)
+                                                        <option>{{ $e }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
+                                                <label class="justify-content-start">Produit</label>
+                                                <select name="fuel" class="form-control">
+                                                    @foreach (mainfuels() as $e)
+                                                        <option>{{ $e }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-                            </div>
-                        </form>
-                        <x-dataloader />
-                        <x-alert />
-                        <div class="py-4">
-                            <div class="table-responsive" data>
+                            @endif
+                        </div>
+                    </div>
+                    <x-dataloader />
+                    <x-alert />
+                    <div class="card-body" style="min-height: 300px">
+                        <div class="table-responsive" data>
 
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,15 +142,12 @@
         }
     </style>
     <script>
-        flatpickr(".flatpickr", {
+        flatpickr(".flatpickr2", {
             maxDate: "today",
-            mode: "range",
             locale: {
                 firstDayOfWeek: 1
             }
         });
-
-
 
         $('#ffilter').change(function() {
             getData();

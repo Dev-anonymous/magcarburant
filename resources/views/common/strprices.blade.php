@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Structure des prix')
 @section('body')
-    <div class="container">
+    <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Voies et Structures des prix
@@ -29,11 +29,11 @@
                         {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? ' à maintenant' : " au {$structure->to->format('d-m-Y')}") }}
                     </h4>
                 </div>
-                <div class="py-4">
+                <div class="card-body">
                     @foreach ($zones as $zone)
-                        <div class="carte">
-                            <div class="w-100">
-                                <div class="table-responsive p-1">
+                        <div class="table-responsive d-flex">
+                            <div class="carte autocalc m-2">
+                                <div class="w-100" style="min-height: 820px">
                                     <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
                                         Vous pouvez maintenant modifier les prix
                                     </p>
@@ -76,19 +76,10 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <div class="">
-                                        <button class="btn btn-sm btn-dark btn-cdf" zone="{{ $zone->zone }}"
-                                            structure="{{ $structure->id }}">
-                                            <i class="material-icons md-18">info</i>
-                                            Voir la structure en CDF
-                                        </button>
-                                    </div>
                                     <div class="">
                                         @if (empty($structure->to))
                                             @if (auth()->user()->user_role == 'provider')
-                                                <div class="p-2 text-right">
+                                                <div class="text-right">
                                                     <button class="btn btn-sm btn-edit-table">
                                                         <i class="material-icons md-18">edit</i>
                                                         Modifier les prix
@@ -97,6 +88,52 @@
                                             @endif
                                         @endif
                                     </div>
+                                </div>
+                            </div>
+                            <div class="carte m-2">
+                                <div class="w-100" style="min-height: 820px">
+                                    <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
+                                    <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
+                                    <table class="table table-striped table-bordered table-hover" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>{!! $tx
+                                                    ? "<small class='text-danger'>1 USD = $tx->usd_cdf CDF</small>"
+                                                    : "<small class='text-danger'>Aucun taux structure trouvé</small>" !!}</th>
+                                                @foreach ($fuels as $fuel)
+                                                    <th>{{ $fuel->fuel }}</th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($labels as $label)
+                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
+                                                @php
+                                                    $noedit = in_array($label->tag, noteditable());
+                                                @endphp
+                                                <tr tag="{{ $label->tag }}"
+                                                    class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
+                                                    <td>{{ $label->tag }}</td>
+                                                    <td>{{ $label->label }}</td>
+                                                    @foreach ($fuels as $fuel)
+                                                        @php
+                                                            $price = optional(
+                                                                $fuelprices[$zone->id][$fuel->id][$label->id] ?? null,
+                                                            )->first();
+                                                        @endphp
+                                                        <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
+                                                            data-fuelprice-id="{{ $price->id }}"
+                                                            data-zone="{{ $zone->zone }}"
+                                                            data-label="{{ $label->label }}"
+                                                            data-tag="{{ $label->tag }}">
+                                                            {{ $price->amount * (float) @$tx->usd_cdf }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -213,95 +250,82 @@
             });
         });
 
-        $('.btn-cdf').click(function() {
-            var b = $(this);
-            var mdl = $('#mdlinfo');
-            var form = $('[finfo]', mdl);
-            $('[name="zone"]').val(b.attr('zone'));
-            $('[name="structure"]').val(b.attr('structure'));
-            mdl.modal('show');
-            loadpt();
-        });
-
         var formfilter = $('[formfilter]');
 
-        formfilter.change(() => loadpt());
+        // formfilter.change(() => loadpt());
+        // function loadpt() {
+        //     var mdl = $('#mdlinfo');
+        //     var ldr = $('[dataloader]', mdl);
+        //     var rep = $('#rep', mdl);
+        //     var form = $('[finfo]', mdl);
+        //     var data = form.serialize() + '&' + formfilter.serialize();
+        //     ldr.show();
+        //     $.ajax({
+        //         url: `route('pricestructure') }}`,
+        //         data: data,
+        //         success: function(data) {
+        //             var k = Object.keys(data);
+        //             var h = '';
+        //             k.forEach(key => {
+        //                 h += `
+    //             <table id="table" class="table table-striped table-bordered table-hover text-nowrap"
+    //                 style="width:100%">
+    //                 <thead>
+    //                     <tr>
+    //                         <td colspan=4>
+    //                             <div class='text-center p-4'>
+    //                                 DATATITLE
+    //                             </div>
+    //                         </td>
+    //                     </tr>
+    //                     <tr>
+    //                         <th>ITEM</th>
+    //                         <th class='text-center'>Prix Structure de Prix</th>
+    //                         <th class='text-center'>Volume Vendu M3</th>
+    //                         <th class='text-center'>MONTANT</th>
+    //                     </tr>
+    //                 </thead>
+    //                 <tbody>
+    //             `;
+        //                 var d = data[key];
 
-        function loadpt() {
-            var mdl = $('#mdlinfo');
-            var ldr = $('[dataloader]', mdl);
-            var rep = $('#rep', mdl);
-            var form = $('[finfo]', mdl);
-            var data = form.serialize() + '&' + formfilter.serialize();
-            ldr.show();
+        //                 var li = null;
+        //                 d.forEach(line => {
+        //                     h += `
+    //                     <tr>
+    //                         <td>${line.label}</td>
+    //                         <td class='text-center'>${line.struct_price}</td>
+    //                         <td class='text-center'>${line.vol}</td>
+    //                         <td class='text-center font-weight-bold'>${line.tot}</td>
+    //                     </tr>
+    //                         `
+        //                     li = line;
+        //                 });
+        //                 h += `</tbody>
+    //                 </table>`;
+        //                 if (li) {
+        //                     var ti = `<h4>${li.fuel} | ${li.date}</h4>`;
+        //                     h = h.replace('DATATITLE', ti);
+        //                 }
+        //             });
 
-            $.ajax({
-                url: `{{ route('pricestructure') }}`,
-                data: data,
-                success: function(data) {
-                    var k = Object.keys(data);
-                    var h = '';
-                    k.forEach(key => {
-                        h += `
-                    <table id="table" class="table table-striped table-bordered table-hover text-nowrap"
-                        style="width:100%">
-                        <thead>
-                            <tr>
-                                <td colspan=4>
-                                    <div class='text-center p-4'>
-                                        DATATITLE
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>ITEM</th>
-                                <th class='text-center'>Prix Structure de Prix</th>
-                                <th class='text-center'>Volume Vendu M3</th>
-                                <th class='text-center'>MONTANT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    `;
-                        var d = data[key];
+        //             $('[data]', mdl).html(h);
+        //             $('[repdata]').css('opacity', 1);
+        //             ldr.hide();
+        //             rep.hide();
 
-                        var li = null;
-                        d.forEach(line => {
-                            h += `
-                            <tr>
-                                <td>${line.label}</td>
-                                <td class='text-center'>${line.struct_price}</td>
-                                <td class='text-center'>${line.vol}</td>
-                                <td class='text-center font-weight-bold'>${line.tot}</td>
-                            </tr>
-                                `
-                            li = line;
-                        });
-                        h += `</tbody>
-                        </table>`;
-                        if (li) {
-                            var ti = `<h4>${li.fuel} | ${li.date}</h4>`;
-                            h = h.replace('DATATITLE', ti);
-                        }
-                    });
-
-                    $('[data]', mdl).html(h);
-                    $('[repdata]').css('opacity', 1);
-                    ldr.hide();
-                    rep.hide();
-
-                },
-                error: function(xhr, a, b) {
-                    ldr.hide();
-                    var resp = xhr.responseJSON;
-                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
-                    rep.html(mess).stop().removeClass().addClass(
-                            'p-1 m-0 text-center alert alert-danger')
-                        .show();
-                    $('[repdata]').css('opacity', 0.1);
-                }
-            });
-
-        }
+        //         },
+        //         error: function(xhr, a, b) {
+        //             ldr.hide();
+        //             var resp = xhr.responseJSON;
+        //             var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+        //             rep.html(mess).stop().removeClass().addClass(
+        //                     'p-1 m-0 text-center alert alert-danger')
+        //                 .show();
+        //             $('[repdata]').css('opacity', 0.1);
+        //         }
+        //     });
+        // }
 
         const formulas = {
             D: "C-E-F-G-H-I-J",
@@ -374,7 +398,7 @@
         }
         calculate();
 
-        $('.carte table td[contenteditable="true"]').on('input', calculate);
+        $('.carte.autocalc table td[contenteditable="true"]').on('input', calculate);
 
         $('.editable-price').on('blur', function() {
             let td = $(this);

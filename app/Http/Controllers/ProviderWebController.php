@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fuel;
 use App\Models\Fuelprice;
 use App\Models\Label;
+use App\Models\Rate;
 use App\Models\Structureprice;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -55,7 +56,18 @@ class ProviderWebController extends Controller
                     ->get()
                     ->groupBy(['zone_id', 'fuel_id', 'label_id']);
 
-                return view('common.strprices', compact('structure', 'zones', 'fuels', 'labels', 'fuelprices'));
+                $from = $structure->from?->format('Y-m-d');
+                $to = $structure->to ?? nnow()->toDateString();
+
+                $tx = Rate::where('type', 'STRUCTURE')->where(function ($q) use ($from, $to) {
+                    $q->where(function ($q) use ($from, $to) {
+                        $q->where('from', '<=', $to)->where('to', '>=', $from);
+                    })->orWhere(function ($q) use ($from, $to) {
+                        $q->whereNull('to')->whereBetween('from', [$from, $to]);
+                    });
+                })->first();
+
+                return view('common.strprices', compact('structure', 'tx', 'zones', 'fuels', 'labels', 'fuelprices'));
             }
         }
         return view('provider.apps-accounting');

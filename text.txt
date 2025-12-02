@@ -35,7 +35,7 @@ label graphique sur achat /ventes: formatter les prix, sur le graph afficher les
 sectiom  compta acceuil -> avec le boutonn comme sur acceuil                                                            OK
 selecteur date : 2 date separee , date du date au                                                                       OK
 
-equivalence CDF --> uniquement par rapport au taux structure
+equivalence CDF --> uniquement par rapport au taux structure                                                            OK
 design image bg
 
 menu  analyse : quand on click sur un items on affiche les details (cfr grand livre)

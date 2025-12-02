@@ -17,5 +17,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('sale', SaleController::class);
     Route::resource('purchase', PurchaseController::class);
     Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
-    Route::get('price-structure', [DataController::class, 'pricestructure'])->name('pricestructure');
+    // Route::get('price-structure', [DataController::class, 'pricestructure'])->name('pricestructure');
 });

@@ -179,7 +179,8 @@ class DataController extends Controller
                 $user = auth()->user();
                 $entity = $user->entities()->first();
 
-                $structure = Structureprice::findOrFail($structure);
+                $structure = Structureprice::find($structure);
+                abort_if(!$structure, 403, "Aucune strucutre de prix trouvée");
                 abort_if($structure->entity_id != $entity->id, 403, "Not permit");
 
                 $from = $structure->from ?? nnow();

@@ -260,7 +260,7 @@ class SaleController extends Controller
             if (!count($insert)) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Aucune ligne n'a été importé.",
+                    'message' => "Aucune ligne n'a été importé. Veuillez remplir le fichier excel en commençant par la cellule A2.",
                 ], 422);
             }
 

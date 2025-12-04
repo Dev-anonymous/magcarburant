@@ -34,15 +34,17 @@ rennommer le titre du graph en "Repartition des ventes par produit LATA"
 label graphique sur achat /ventes: formatter les prix, sur le graph afficher les % visibles au lieu des montant,        OK
 sectiom  compta acceuil -> avec le boutonn comme sur acceuil                                                            OK
 selecteur date : 2 date separee , date du date au                                                                       OK
-
 equivalence CDF --> uniquement par rapport au taux structure                                                            OK
-design image bg
 
-menu  analyse : quand on click sur un items on affiche les details (cfr grand livre)
+
+
+menu  analyse : quand on click sur un items on affiche les details (cfr grand livre)                                    OK
 
 analyse sous menu Bilan , grand livre -> le tablead de details
 analyse : possibilite d'afficher les tableaux par plusieur produit. zone ;;;
+
+
 animation des pages
+design image bg
 
-tache Cpanel sur trello
-
+import fichier --> lignes vide, modal erreur  msg lomg; message si num facture existe

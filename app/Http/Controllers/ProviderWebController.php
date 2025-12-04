@@ -42,6 +42,14 @@ class ProviderWebController extends Controller
             return view('common.structprices', compact('entity'));
         }
 
+        $item = request('item');
+        if ($item == 'gb') {
+            $user = auth()->user();
+            $entity = $user->entities()->first();
+            $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
+            return view('provider.greatebook', compact('ps'));
+        }
+
         $stx = request('stx');
         if ($stx) {
             $entity = auth()->user()->entities()->first();

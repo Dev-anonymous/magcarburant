@@ -85,12 +85,10 @@ class DataController extends Controller
 
                 return compact('totalLata', 'totalL15', 'totalDensity', 'chart1', 'chart2');
             }
-
             if ($type == 'balance') {
                 $from = request('date1') ?? nnow()->toDateString();
                 $to = request('date2') ?? $from;
 
-                $devise = request('devise');
                 $zone = request('zone');
                 $fuel = request('fuel');
 
@@ -117,8 +115,8 @@ class DataController extends Controller
                 $fuels = Fuel::all();
 
                 foreach ($plages as $str) {
-                    $strfrom = $str->from?->format('d-m-Y');
-                    $strto = $str->to?->format('d-m-Y') ?? nnow()->toDateString();
+                    $strfrom = $str->from;
+                    $strto = $str->to ?? nnow();
 
                     $tab = [];
                     $tot = 0;
@@ -147,19 +145,21 @@ class DataController extends Controller
                             $currency = $fprice->currency;
                         }
                         if ('A' === $lab->tag) {
-                            $vol = Purchase::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('qtym3');
+                            $vol = Purchase::whereBetween('date', [$strfrom, $strto])->where('product', $fuel)->sum('qtym3');
                         } else {
-                            $vol = Sale::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('lata'); // lata en litre
+                            $vol = Sale::where('way', $zone)->whereBetween('date', [$strfrom, $strto])->where('product', $fuel)->sum('lata'); // lata en litre
                             $vol /= 1000; // m3
                         }
                         $t = $vol * $amount;
                         $tot += $t;
                         $line['struct_price'] = $amount;
+                        $line['struct_price_id'] = $str->id;
+                        $line['tag'] = $lab->tag;
                         $line['vol'] = $vol;
                         $line['tot'] = v($t);
                         $line['zone'] = $zone;
                         $line['fuel'] = $fuel;
-                        $line['date'] = "DU $strfrom AU $strto";
+                        $line['date'] = "DU {$strfrom->format('d-m-Y')} AU {$strto->format('d-m-Y')}";
 
                         $tab[] = $line;
                     }
@@ -168,6 +168,86 @@ class DataController extends Controller
                 }
 
                 return response()->json($data);
+            }
+
+            if ($type == 'greatbook') {
+                $structure = request('structure');
+                $devise = request('devise');
+                $zone = request('zone');
+                $fuel = request('fuel');
+
+                $user = auth()->user();
+                $entity = $user->entities()->first();
+
+                $structure = Structureprice::findOrFail($structure);
+                abort_if($structure->entity_id != $entity->id, 403, "Not permit");
+
+                $from = $structure->from ?? nnow();
+                $to = $structure->to ?? nnow();
+
+                $head = [
+                    ['label' => 'ID',],
+                    ['label' => 'Date',],
+                    ['label' => 'Localité',],
+                    ['label' => 'Voie',],
+                    ['label' => 'Produit',],
+                    ['label' => 'Bon de livraison',],
+                    ['label' => 'Programme de livraison'],
+                    ['label' => 'Client',],
+                    ['label' => 'LATA',],
+                    ['label' => 'L15',],
+                    ['label' => 'Densité',],
+                    ['label' => 'M3',],
+                ];
+
+                $rows = [];
+                $labels = Label::orderBy('tag')->whereNotIn('tag', noteditable())->get();
+                $sales = $entity->sales()->where(function ($q) use ($fuel, $zone) {
+                    if ($fuel) {
+                        $q->where('product', $fuel);
+                    }
+                    if ($zone) {
+                        $q->where('way', $zone);
+                    }
+                })->whereBetween('date', [$from, $to])->orderBy('date')->get();
+
+                foreach ($sales as $e) {
+                    $m3 = ((float) $e->lata) / 1000;
+                    $pline = [
+                        $e->id,
+                        $e->date?->format('d-m-Y'),
+                        $e->locality,
+                        $e->way,
+                        $e->product,
+                        $e->delivery_note,
+                        $e->delivery_program,
+                        $e->client,
+                        $e->lata,
+                        $e->l15,
+                        $e->density,
+                        v($m3),
+                    ];
+                    $zone = $zone ?? $e->way;
+                    $fuel = $fuel ?? $e->product;
+
+                    $pline2 = [];
+                    foreach ($labels as $l) {
+                        $fprice = (float)@$structure->fuelprices()
+                            ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                            ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                            ->where(['label_id' => $l->id])->first()?->amount;
+                        $pline2[] = $fprice;
+                        $pline2[] = v($m3 * $fprice);
+                    }
+                    $line = [...$pline, ...$pline2];
+                    $rows[] = $line;
+                }
+                foreach ($labels as $l) {
+                    $head[] = ['label' => $l->label, 'tag' => $l->tag];
+                    $head[] = ['label' => "Valeur $l->label", 'tag' => $l->tag];
+                }
+
+                return compact('head', 'rows');
             }
         }
     }

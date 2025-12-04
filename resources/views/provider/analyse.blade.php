@@ -172,7 +172,7 @@
                         <thead>
                             <tr>
                                 <td colspan=4>
-                                    <div class='text-center p-4'>
+                                    <div class='text-center p-2'>
                                         DATATITLE
                                     </div>
                                 </td>
@@ -189,9 +189,21 @@
                         var d = data[key];
 
                         var li = null;
+                        var url =
+                            '{!! route('provider.accounting', [
+                                'item' => 'gb',
+                                'stp' => 'STRUCTURENAME',
+                                'f' => 'FUELNAME',
+                                'z' => 'ZONENAME',
+                                'tag' => 'TAGNAME',
+                            ]) !!}';
                         d.forEach(line => {
+                            var u = url.split('STRUCTURENAME').join(line.struct_price_id)
+                                .split('FUELNAME').join(line.fuel)
+                                .split('ZONENAME').join(line.zone)
+                                .split('TAGNAME').join(line.tag);
                             h += `
-                            <tr>
+                            <tr style="cursor:pointer" onclick="location.assign('${u}')" >
                                 <td>${line.label}</td>
                                 <td class='text-center'>${line.struct_price}</td>
                                 <td class='text-center'>${line.vol}</td>

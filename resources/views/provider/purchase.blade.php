@@ -379,7 +379,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="mdladd2" role="dialog">
+    <div class="modal fade" id="mdladd2" role="dialog" style="overflow-y: auto;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">

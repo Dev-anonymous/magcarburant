@@ -177,6 +177,8 @@ class SaleController extends Controller
                 $colH = trim($row[7] ?? null);
                 $colI = trim($row[8] ?? null);
                 $colJ = trim($row[9] ?? null);
+                $row = array_splice($row, 0, 10);
+
 
                 if (empty(array_filter($row))) {
                     continue;

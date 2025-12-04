@@ -118,7 +118,7 @@ class PurchaseController extends Controller
                 'density'  => 'required|numeric',
                 'purchasefile' => 'nullable|array',
                 'purchasefile.*' => 'mimes:pdf|max:10240'
-            ]);
+            ], ['billnumber.unique' => "Le numéro de la facture existe déjà."]);
             DB::beginTransaction();
 
             $purchase->update($validated);
@@ -172,6 +172,8 @@ class PurchaseController extends Controller
                 $colF = trim($row[5] ?? null);
                 $colG = trim($row[6] ?? null);
                 $colH = trim($row[7] ?? null);
+
+                $row = array_splice($row, 0, 8);
 
                 if (empty(array_filter($row))) {
                     continue;
@@ -274,7 +276,7 @@ class PurchaseController extends Controller
                 'density'  => 'required|numeric',
                 'purchasefile' => 'nullable|array',
                 'purchasefile.*' => 'mimes:pdf|max:10240'
-            ]);
+            ], ['billnumber.unique' => "Le numéro de la facture existe déjà."]);
 
             DB::beginTransaction();
             $validated['entity_id'] = $entity->id;

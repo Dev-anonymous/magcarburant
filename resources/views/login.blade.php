@@ -10,10 +10,11 @@
     <link type="text/css" href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
     <style>
         body {
-            background-image: url("{{ asset('assets/images/bg.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-image: url("{{ asset('assets/images/bg.jpg') }}") !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh !important;
         }
     </style>
 </head>

@@ -8,6 +8,14 @@
     <title>Connexion | {{ config('app.name') }}</title>
     <link type="text/css" href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
     <link type="text/css" href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("{{ asset('assets/images/bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 </head>
 
 <body>
@@ -17,11 +25,12 @@
             <div class="container h-vh d-flex justify-content-center align-items-center flex-column">
                 <div class="d-flex justify-content-center align-items-center mb-3">
                     <a href="{{ route('login') }}" class="drawer-brand-circle mr-2">MC</a>
-                    <h4 class="ml-2 text-bg mb-0"><strong>{{ config('app.name') }}</strong></h2>
+                    <h4 style="cursor: pointer" onclick="location.assign('{{ route('login') }}')"
+                        class="ml-2 text-bg mb-0"><strong>{{ config('app.name') }}</strong></h2>
                 </div>
                 <div class="row w-100 justify-content-center">
                     <div class="col-12 col-md-6">
-                        <div class="card mb-3">
+                        <div class="card mb-3" style="border-radius: 20px;">
                             <div class="card-body">
                                 <form action="#" flog>
                                     <div class="form-group">
@@ -51,14 +60,17 @@
                                                 placeholder="Votre mot de passe" required>
                                         </div>
                                         <div class="custom-control custom-checkbox mt-3">
-                                            <input type="checkbox" name="remember" class="custom-control-input" id="customCheck1">
-                                            <label class="custom-control-label" for="customCheck1">Rester connecté</label>
+                                            <input type="checkbox" name="remember" class="custom-control-input"
+                                                id="customCheck1">
+                                            <label class="custom-control-label" for="customCheck1">
+                                                Rester connecté
+                                            </label>
                                         </div>
                                     </div>
                                     <x-alert />
                                     <button type="submit"
                                         class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
-                                        <x-loader/>
+                                        <x-loader />
                                         <span text>
                                             <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
                                             Connexion

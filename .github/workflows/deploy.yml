@@ -24,3 +24,25 @@ jobs:
             **/.git*
             **/.github*
             **/node_modules/**
+
+      - name: 🔽 Télécharger /webdata/dev/public depuis le serveur
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          direction: download
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /webdata/dev/public/
+          local-dir: ./_tmp_data_public/
+
+      - name: 🧹 Retirer index.php
+        run: rm -f ./_tmp_data_public/index.php
+
+      - name: 📤 Envoyer vers /public_html/dev/
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/dev/
+          local-dir: ./_tmp_data_public/

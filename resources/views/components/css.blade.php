@@ -59,10 +59,12 @@
     }
 </style>
 
-
+@php
+    $h = (int) date('H');
+@endphp
 <style>
     body {
-        background-image: url("{{ asset('assets/images/bg.jpg') }}") !important;
+        background-image: url('{{ asset("assets/images/bg/$h.png") }}') !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;

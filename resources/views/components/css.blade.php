@@ -60,7 +60,7 @@
 </style>
 
 @php
-    $h = (int) date('H');
+    $h = (int) nnow()->format('H');
 @endphp
 <style>
     body {

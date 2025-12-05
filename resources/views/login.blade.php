@@ -14,7 +14,7 @@
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
-            min-height: 100vh !important;
+            /* min-height: 100vh !important; */
         }
     </style>
 </head>

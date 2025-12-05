@@ -18,7 +18,7 @@ body {
 /* -------------- */
 .carte {
     position: relative;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.85) !important;
     border-radius: 6px;
     overflow: visible;
     margin-bottom: 20px;

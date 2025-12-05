@@ -21,7 +21,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="carte transparent">
+                <div class="carte">
                     <div class="container-fluid m-0">
                         <div class="row g-3">
                             <div class="col-6 col-md-4 col-12">

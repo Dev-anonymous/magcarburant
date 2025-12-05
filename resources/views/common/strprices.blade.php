@@ -32,7 +32,7 @@
                 <div class="card-body">
                     @foreach ($zones as $zone)
                         <div class="table-responsive d-flex">
-                            <div class="carte autocalc m-2 transparent">
+                            <div class="carte autocalc m-2">
                                 <div class="w-100" style="min-height: 820px">
                                     <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
                                         Vous pouvez maintenant modifier les prix
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
 
-                            <div class="carte m-2 transparent">
+                            <div class="carte m-2">
                                 <div class="w-100" style="min-height: 820px">
                                     <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
                                     <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>

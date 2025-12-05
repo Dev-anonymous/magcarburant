@@ -52,3 +52,20 @@ body {
     border-radius: 4px;
 }
 
+.bg-img-1 {
+    background-image: url("../images/bg1.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh !important;
+}
+
+.bg-img-3 {
+    background-image: url("../images/bg3.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh !important;
+}

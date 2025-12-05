@@ -59,19 +59,7 @@
     }
 </style>
 
-@php
-    $h = (int) nnow()->format('H');
-@endphp
 <style>
-    body {
-        background-image: url('{{ asset("assets/images/bg/$h.png") }}') !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
-        background-attachment: fixed !important;
-        min-height: 100vh !important;
-    }
-
     nav.navbar {
         background: rgba(255, 255, 255, 0.1) !important;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;

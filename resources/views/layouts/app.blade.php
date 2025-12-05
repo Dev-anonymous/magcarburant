@@ -9,7 +9,7 @@
     <x-css />
 </head>
 
-<body>
+<body class="@yield('bg-class', 'bg-img-1')">
     <x-preloader />
 
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"

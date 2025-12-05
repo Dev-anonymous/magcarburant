@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Comptabilité')
+@section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
         <h2 class="font-weight-bold">Comptabilité</h2>

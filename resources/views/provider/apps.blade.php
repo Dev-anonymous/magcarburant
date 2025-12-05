@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Apps')
+@section('bg-class', 'bg-img-1')
 @section('body')
     <div class="container">
         <h2 class="font-weight-bold">{{ $entity->shortname }}</h2>
         <p class="lead small m-0">{{ $entity->longname }}</p>
         <hr />
-
         <div class="row">
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"

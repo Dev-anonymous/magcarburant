@@ -17,8 +17,9 @@
             background-attachment: fixed !important;
             min-height: 100vh !important;
         }
+
         .transparent {
-            background: rgba(255, 255, 255, 0.85) !important;
+            background: rgba(255, 255, 255, 0.4) !important;
         }
     </style>
 </head>

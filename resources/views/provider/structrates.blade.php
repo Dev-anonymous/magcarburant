@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Taux Structures')
+@section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
         <div class="d-flex justify-content-between">

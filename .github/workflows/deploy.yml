@@ -19,30 +19,31 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_PATH }}
-          local-dir: ./ # ou ./dist si tu construis ton app
+          local-dir: ./
           exclude: |
             **/.git*
             **/.github*
             **/node_modules/**
 
-      - name: 🔽 Télécharger /webdata/dev/public depuis le serveur
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          direction: download
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /webdata/dev/public/
-          local-dir: ./_tmp_data_public/
+      - name: 📥 Installer lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: 🔽 Télécharger /webdata/dev/public
+        run: |
+          mkdir -p _tmp_data_public
+          lftp -e "
+            open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
+            mirror --verbose /webdata/dev/public ./_tmp_data_public;
+            quit
+          "
 
       - name: 🧹 Retirer index.php
         run: rm -f ./_tmp_data_public/index.php
 
-      - name: 📤 Envoyer vers /public_html/dev/
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/dev/
-          local-dir: ./_tmp_data_public/
+      - name: 📤 Upload vers /public_html/dev/
+        run: |
+          lftp -e "
+            open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
+            mirror --reverse --verbose ./_tmp_data_public /public_html/dev;
+            quit
+          "

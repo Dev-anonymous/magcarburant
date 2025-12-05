@@ -20,6 +20,8 @@
 </head>
 
 <body>
+    <x-preloader />
+
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-has-scrolling-region>
         <div class="mdk-drawer-layout__content mdk-header-layout__content--scrollable" style="overflow-y: auto;"
             data-simplebar data-simplebar-force-enabled="true">

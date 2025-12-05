@@ -29,13 +29,13 @@ jobs:
       - name: 📥 Installer lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: 🔽 Mirror /webdata/dev/public vers _tmp_data_public
+      - name: Mirror /webdata/dev/public vers _tmp_data_public (nouveaux fichiers uniquement)
         run: |
           mkdir -p _tmp_data_public
           lftp -e "
             set ssl:verify-certificate no;
             open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_SERVER }};
-            mirror /webdata/dev/public/ _tmp_data_public;
+            mirror --only-newer /webdata/dev/public/ _tmp_data_public;
             bye
           "
 

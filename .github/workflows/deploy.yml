@@ -20,30 +20,31 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_PATH }}
           local-dir: ./
+          security: loose
           exclude: |
             **/.git*
             **/.github*
             **/node_modules/**
 
-      - name: 📥 Installer lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: 🔽 Télécharger /webdata/dev/public
+      - name: 🔽 Mirror /webdata/dev/public vers _tmp_data_public
         run: |
           mkdir -p _tmp_data_public
           lftp -e "
-            open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
-            mirror --verbose /webdata/dev/public ./_tmp_data_public;
-            quit
+            set ssl:verify-certificate no;
+            open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_SERVER }};
+            mirror /webdata/dev/public/ _tmp_data_public;
+            bye
           "
 
-      - name: 🧹 Retirer index.php
-        run: rm -f ./_tmp_data_public/index.php
+      - name: 🧹 Suppression de index.php
+        run: rm -f _tmp_data_public/index.php
 
       - name: 📤 Upload vers /public_html/dev/
-        run: |
-          lftp -e "
-            open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ${{ secrets.FTP_SERVER }};
-            mirror --reverse --verbose ./_tmp_data_public /public_html/dev;
-            quit
-          "
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/dev/
+          local-dir: ./_tmp_data_public/
+          security: loose

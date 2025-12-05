@@ -21,7 +21,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card transparent">
                     <input type="hidden" name="type" value="balance">
                     {{-- <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title font-weight-bold">
@@ -60,7 +60,7 @@
                             </div>
                         </div>
                     </div> --}}
-                    <div class="card-header">
+                    <div class="card-header mb-3">
                         <div class="row">
                             <div class="col-xs-12 col-sm-6">
                                 <h4 class="card-title font-weight-bold">Bilan d'analyse</h4>

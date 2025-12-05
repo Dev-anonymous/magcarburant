@@ -21,7 +21,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="carte">
+                <div class="carte transparent">
                     <div class="container-fluid m-0">
                         <div class="row g-3">
                             <div class="col-6 col-md-6 col-12">
@@ -71,7 +71,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card transparent">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-xs-12 col-sm-6">
@@ -815,6 +815,9 @@
                         formatter: function(value, ctx) {
                             const data = ctx.chart.data.datasets[0].data;
                             const total = data.reduce((a, b) => a + b, 0);
+                            if (total === 0 || !isFinite(total)) {
+                                return 'aucune donnée à afficher';
+                            }
                             const percent = (value / total * 100).toFixed(1);
                             return percent + '%';
                         }
@@ -894,6 +897,9 @@
                         formatter: function(value, ctx) {
                             const data = ctx.chart.data.datasets[0].data;
                             const total = data.reduce((a, b) => a + b, 0);
+                            if (total === 0 || !isFinite(total)) {
+                                return 'aucune donnée à afficher';
+                            }
                             const percent = (value / total * 100).toFixed(1);
                             return percent + '%';
                         }

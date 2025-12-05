@@ -23,8 +23,8 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="bg-white d-flex justify-content-between align-items-center p-3">
-                    <h4 class="text-muted font-weight-bold">
+                <div class="bg-whitee d-flex justify-content-between align-items-center p-3">
+                    <h4 class="text-dark font-weight-bold">
                         Structure
                         {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? ' à maintenant' : " au {$structure->to->format('d-m-Y')}") }}
                     </h4>
@@ -32,7 +32,7 @@
                 <div class="card-body">
                     @foreach ($zones as $zone)
                         <div class="table-responsive d-flex">
-                            <div class="carte autocalc m-2">
+                            <div class="carte autocalc m-2 transparent">
                                 <div class="w-100" style="min-height: 820px">
                                     <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
                                         Vous pouvez maintenant modifier les prix
@@ -90,7 +90,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="carte m-2">
+
+                            <div class="carte m-2 transparent">
                                 <div class="w-100" style="min-height: 820px">
                                     <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
                                     <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <x-preloader/>
+    <x-preloader />
 
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
@@ -19,11 +19,11 @@
                 class="mdk-header-layout js-mdk-header-layout mdk-header--fixed mdk-header-layout__content--scrollable">
                 <div class="mdk-header js-mdk-header" data-fixed>
                     <div class="mdk-header__content">
-                        <nav class="navbar navbar-expand-md d-flex-none bg-white">
+                        <nav class="navbar navbar-expand-md d-flex-none">
                             <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar" sidebarbtn>
                                 <i class="material-icons align-middle md-36">short_text</i>
                             </button>
-                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-white appcol pl-0"
+                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-white appcol"
                                 type="button">
                                 <i class="material-icons align-middle md-18">home</i>
                                 Accueil
@@ -47,7 +47,7 @@
                                                 <ul class="list-unstyled">
                                                     <small class="font-italic text-muted ml-2">Gestions des prix</small>
                                                     <li>
-                                                        <a href="{{ route('provider.accounting') }}"
+                                                        <a href="{{ route('provider.accounting', ['item' => 'pricestr']) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">

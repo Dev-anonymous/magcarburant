@@ -14,7 +14,11 @@
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
-            /* min-height: 100vh !important; */
+            background-attachment: fixed !important;
+            min-height: 100vh !important;
+        }
+        .transparent {
+            background: rgba(255, 255, 255, 0.85) !important;
         }
     </style>
 </head>
@@ -33,7 +37,7 @@
                 </div>
                 <div class="row w-100 justify-content-center">
                     <div class="col-12 col-md-6">
-                        <div class="card mb-3" style="border-radius: 20px;">
+                        <div class="card mb-3 transparent" style="border-radius: 20px;">
                             <div class="card-body">
                                 <form action="#" flog>
                                     <div class="form-group">

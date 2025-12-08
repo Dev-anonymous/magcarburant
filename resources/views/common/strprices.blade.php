@@ -128,7 +128,10 @@
                                                             data-zone="{{ $zone->zone }}"
                                                             data-label="{{ $label->label }}"
                                                             data-tag="{{ $label->tag }}">
-                                                            {{ $price->amount * (float) @$tx->usd_cdf }}
+                                                            @php
+                                                                $v = $price->amount * (float) @$tx->usd_cdf;
+                                                            @endphp
+                                                            {{ $v ? $v : '' }}
                                                         </td>
                                                     @endforeach
                                                 </tr>

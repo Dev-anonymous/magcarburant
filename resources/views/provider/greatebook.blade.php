@@ -204,29 +204,8 @@
                             {
                                 extend: 'excelHtml5',
                                 title: 'Export Excel',
-                                exportOptions: {
-                                    columns: ':not(.no-export)'
-                                }
                             },
-                            {
-                                extend: 'pdfHtml5',
-                                title: 'Export PDF',
-                                exportOptions: {
-                                    columns: ':not(.no-export)'
-                                }
-                            },
-                            {
-                                extend: 'print',
-                                title: 'Impression',
-                                exportOptions: {
-                                    columns: ':not(.no-export)'
-                                }
-                            }
                         ],
-                        lengthMenu: [
-                            [10, 25, 50, 100, 500, -1],
-                            [10, 25, 50, 100, 500, "--"]
-                        ]
                     });
                 },
                 error: function(xhr, a, b) {

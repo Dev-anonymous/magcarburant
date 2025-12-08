@@ -6,15 +6,26 @@
         <div class="d-flex justify-content-between">
             <p class="lead">Gesion des fournisseurs</p>
             <div class="m-2">
-                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                    <i class="material-icons md-24">add_circle_outline</i>
-                    Nouveau fournisseur
-                </button>
+                <div class="d-flex">
+                    <div class="mr-2">
+                        <label class="mb-0" style="color: #000">Recherche</label>
+                        <input type="text" class="form-control" id="search" placeholder="Ex : Total energies">
+                    </div>
+                    <div class="">
+                        <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdladd">
+                            <i class="material-icons md-24">add_circle_outline</i>
+                            Nouveau fournisseur
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <hr />
         <x-dataloader />
-        <div class="row row-projects" data>
+        <div class="w-100">
+            <h6 id="searchResult" class="text-danger text-center"></h6>
+        </div>
+        <div class="row row-projects mt-2" data>
             {{-- <div class="col">
                     <i class="material-icons text-link-color md-36">dvr</i>
                     <div class="mb-1">Total Projects</div>
@@ -267,6 +278,38 @@
             }
 
             loaddata();
+
+
+            function initsearch() {
+
+            }
+            document.getElementById('search').addEventListener('input', function() {
+                const q = this.value.toLowerCase().trim();
+                let count = 0;
+
+                document.querySelectorAll('.carte').forEach(card => {
+                    const container = card.parentElement; // col-md-3
+                    const text = card.innerText.toLowerCase();
+
+                    if (text.includes(q)) {
+                        container.style.display = '';
+                        count++;
+                    } else {
+                        container.style.display = 'none';
+                    }
+                });
+                const resultSpan = document.getElementById('searchResult');
+                if (q === '') {
+                    resultSpan.textContent = '';
+                } else if (count === 0) {
+                    resultSpan.textContent = "Aucun élément trouvé";
+                } else if (count === 1) {
+                    resultSpan.textContent = "1 élément trouvé";
+                } else {
+                    resultSpan.textContent = `${count} éléments trouvés`;
+                }
+            });
+
 
             $('[fadd],[fedit]').on('submit', function(e) {
                 e.preventDefault();

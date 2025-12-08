@@ -127,8 +127,8 @@
                                     <th class="text-nowrap">Qte TM</th>
                                     <th class="text-nowrap">Qte M3</th>
                                     <th class="text-nowrap">Densité</th>
-                                    <th class="text-nowrap">Factures</th>
-                                    <th></th>
+                                    <th class="text-nowrap no-export">Factures</th>
+                                    <th class="no-export"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -548,31 +548,12 @@
             ],
             dom: 'Blfrtip',
             buttons: [{
-                    extend: 'excelHtml5',
-                    title: 'Export Excel',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-                    }
-                },
-                {
-                    extend: 'pdfHtml5',
-                    title: 'Export PDF',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-                    }
-                },
-                {
-                    extend: 'print',
-                    title: 'Impression',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-                    }
+                extend: 'excelHtml5',
+                title: 'Export Excel',
+                exportOptions: {
+                    columns: ':not(.no-export)'
                 }
-            ],
-            lengthMenu: [
-                [10, 25, 50, 100, 500, -1],
-                [10, 25, 50, 100, 500, "--"]
-            ]
+            }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
             $('[bedit]').off('click').click(function() {
                 var data = JSON.parse($(this).attr('data'));

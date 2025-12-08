@@ -53,7 +53,8 @@ body {
 }
 
 .bg-img-1 {
-    background-image: url("../images/bg1.jpg") !important;
+    background-image: url("../images/bg.jpg") !important;
+    /* background-image: url("../images/bg1.jpg") !important; */
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;

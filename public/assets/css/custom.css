@@ -69,3 +69,11 @@ body {
     background-attachment: fixed !important;
     min-height: 100vh !important;
 }
+
+.modal-content {
+    background-image: url("../images/bg4.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}

@@ -419,7 +419,7 @@
                 <form class="was-validated" fadd>
                     <input type="hidden" name="action" value="import">
                     <div class="modal-body">
-                        <div class="text-center bg-light rounded-lg p-3">
+                        <div class="text-center p-3">
                             <h5>Vous pouvez importer la liste de toutes vos ventes disponibles depuis un fichier Excel en
                                 respectant les colonnes et le format des données.</h5>
                         </div>

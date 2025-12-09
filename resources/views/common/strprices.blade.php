@@ -39,7 +39,7 @@
                                     </p>
                                     <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
                                     <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
-                                    <table class="table table-striped table-bordered table-hover" style="width:100%">
+                                    <table class="table table-striped table-hover" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th></th>
@@ -95,7 +95,7 @@
                                 <div class="w-100" style="min-height: 820px">
                                     <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
                                     <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
-                                    <table class="table table-striped table-bordered table-hover" style="width:100%">
+                                    <table class="table table-striped table-hover" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th></th>
@@ -272,7 +272,7 @@
         //             var h = '';
         //             k.forEach(key => {
         //                 h += `
-    //             <table id="table" class="table table-striped table-bordered table-hover text-nowrap"
+    //             <table id="table" class="table table-striped table-hover text-nowrap"
     //                 style="width:100%">
     //                 <thead>
     //                     <tr>

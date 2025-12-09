@@ -132,10 +132,7 @@
 @section('script')
     <x-flatpickr />
     <style>
-        .table td,
-        .table th {
-            padding: 4px !important;
-        }
+
 
         .noneditable td {
             border-top: 2px solid #ccc !important;
@@ -168,7 +165,7 @@
                     var h = '';
                     k.forEach(key => {
                         h += `
-                    <table id="table" class="table table-striped table-bordered table-hover text-nowrap"
+                    <table id="table" class="table table-striped table-hover text-nowrap"
                         style="width:100%">
                         <thead>
                             <tr>

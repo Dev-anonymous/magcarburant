@@ -20,119 +20,118 @@
         </div>
         <hr />
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="carte">
-                    <div class="container-fluid m-0">
-                        <div class="row g-3">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 p-0">
+                    <div class="carte d-block">
+                        <div class="row g-3 mb-3">
                             <div class="col-6 col-md-4 col-12">
-                                <div class="card shadow-sm border-0">
-                                    <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-success mb-1">receipt</i>
-                                        <div class="font-weight-bold text-success">Total Achat (USD)</div>
-                                        <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalAmount>
-                                        </div>
+                                <div class="text-center">
+                                    <i class="material-icons md-36 text-success mb-1">receipt</i>
+                                    <div class="font-weight-bold text-success">Total Achat (USD)</div>
+                                    <div class="h4 font-weight-bold text-success" style="font-size: 28px" totalAmount>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-4 col-12">
-                                <div class="card shadow-sm border-0">
-                                    <div class="card-body text-center">
-                                        <i class="material-icons md-36 text-warning mb-1">local_gas_station</i>
-                                        <div class="font-weight-bold text-warning">Volume Total (TM)</div>
-                                        <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalTm></div>
-                                    </div>
+                                <div class="text-center">
+                                    <i class="material-icons md-36 text-warning mb-1">local_gas_station</i>
+                                    <div class="font-weight-bold text-warning">Volume Total (TM)</div>
+                                    <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalTm></div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-4 col-12">
-                                <div class="card shadow-sm border-0">
-                                    <div class="card-body text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
-                                            width="48px" fill="#FF3D55">
-                                            <path
-                                                d="M480-78q-142 0-242-97.71T138-415q0-68.14 27-130.77 27-62.63 75-108.73L480-892l240 237.5q48 46.1 75.5 108.73T823-415q0 141.58-100.5 239.29Q622-78 480-78ZM229-415h502q0-46-19-91.5T659-586L480-763 301-586q-34 34-53 79.54-19 45.54-19 91.46Z" />
-                                        </svg>
-                                        <div class="font-weight-bold text-danger">Volume Total (M³)</div>
-                                        <div class="h4 font-weight-bold text-danger" style="font-size: 28px" totalM3></div>
+                                <div class="text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
+                                        width="48px" fill="#FF3D55">
+                                        <path
+                                            d="M480-78q-142 0-242-97.71T138-415q0-68.14 27-130.77 27-62.63 75-108.73L480-892l240 237.5q48 46.1 75.5 108.73T823-415q0 141.58-100.5 239.29Q622-78 480-78ZM229-415h502q0-46-19-91.5T659-586L480-763 301-586q-34 34-53 79.54-19 45.54-19 91.46Z" />
+                                    </svg>
+                                    <div class="font-weight-bold text-danger">Volume Total (M³)</div>
+                                    <div class="h4 font-weight-bold text-danger" style="font-size: 28px" totalM3></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <div class="">
+                                    <h5 class="card-title text-center mb-4">Répartition des achats par produit (USD)</h5>
+                                    <div style="height: 300px;">
+                                        <canvas id="chart1"></canvas>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des achats par produit (USD)</h5>
-                                    <div style="height: 300px;" />
-                                    <canvas id="chart1"></canvas>
+                                    <h5 class="card-title text-center mb-4">Répartition des achats par produit (M³)</h5>
+                                    <div style="height: 300px;">
+                                        <canvas id="chart2"></canvas>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="">
-                                <h5 class="card-title text-center mb-4">Répartition des achats par produit (M³)</h5>
-                                <div style="height: 300px;">
-                                    <canvas id="chart2"></canvas>
-                                </div>
+                            <div class="col-12">
+                                <x-dataloader />
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <x-dataloader />
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="card transparent">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6">
-                            <h4 class="card-title font-weight-bold">Historique des tous les achats</h4>
-                        </div>@php
-                            $d = now()->startOfMonth()->toDateString();
-                            $d2 = now()->toDateString();
-                        @endphp
-                        @if (auth()->user()->user_role === 'provider')
-                            <div class="col-xs-12 col-sm-6">
-                                <form class="form-inline filters-form pull-right" role="form">
-                                    <div class="form-group mb-1">
-                                        <label class="mr-2" for="dv222">Du</label>
-                                        <input class="form-control flatpickr2" id="dv222" value="{{ $d }}"
-                                            name="date1" style="width:100px" />
+                <div class="col-12 p-0">
+                    <div class="card transparent">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <h4 class="card-title font-weight-bold">Historique des tous les achats</h4>
+                                </div>@php
+                                    $d = now()->startOfMonth()->toDateString();
+                                    $d2 = now()->toDateString();
+                                @endphp
+                                @if (auth()->user()->user_role === 'provider')
+                                    <div class="col-xs-12 col-sm-6">
+                                        <form class="form-inline filters-form pull-right" role="form">
+                                            <div class="form-group mb-1">
+                                                <label class="mr-2" for="dv222">Du</label>
+                                                <input class="form-control flatpickr2" id="dv222"
+                                                    value="{{ $d }}" name="date1" style="width:100px" />
+                                            </div>
+                                            <div class="form-group mb-1">
+                                                <label class="mr-2" for="dv22">Au</label>
+                                                <input class="form-control flatpickr2" id="dv22"
+                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
+                                            </div>
+                                            <div class="form-group mb-1">
+                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                                    data-target="#mdlChose">
+                                                    <i class="material-icons md-18">add_circle_outline</i> Nouvel achat
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div class="form-group mb-1">
-                                        <label class="mr-2" for="dv22">Au</label>
-                                        <input class="form-control flatpickr2" id="dv22" value="{{ $d2 }}"
-                                            name="date2" style="width:100px" />
-                                    </div>
-                                    <div class="form-group mb-1">
-                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
-                                            data-target="#mdlChose">
-                                            <i class="material-icons md-18">add_circle_outline</i> Nouvel achat
-                                        </button>
-                                    </div>
-                                </form>
+                                @endif
                             </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="py-4">
-                    <div class="table-responsive">
-                        <table id="table" class="table table-striped table-bordered table-hover" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Date</th>
-                                    <th class="text-nowrap">Produit</th>
-                                    <th>Fournisseur</th>
-                                    <th class="text-nowrap">N° Facture</th>
-                                    <th class="text-nowrap">Prix Unitaire (USD)</th>
-                                    <th class="text-nowrap">Qte TM</th>
-                                    <th class="text-nowrap">Qte M3</th>
-                                    <th class="text-nowrap">Densité</th>
-                                    <th class="text-nowrap no-export">Factures</th>
-                                    <th class="no-export"></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                        </div>
+                        <div class="py-4">
+                            <div class="table-responsive">
+                                <table id="table" class="table table-striped table-hover"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Date</th>
+                                            <th class="text-nowrap">Produit</th>
+                                            <th>Fournisseur</th>
+                                            <th class="text-nowrap">N° Facture</th>
+                                            <th class="text-nowrap">Prix Unitaire (USD)</th>
+                                            <th class="text-nowrap">Qte TM</th>
+                                            <th class="text-nowrap">Qte M3</th>
+                                            <th class="text-nowrap">Densité</th>
+                                            <th class="text-nowrap no-export">Factures</th>
+                                            <th class="no-export"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

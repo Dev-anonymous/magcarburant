@@ -162,7 +162,7 @@
                     });
 
                     var h = `
-                    <table table class="table table-striped table-bordered table-hover text-nowrap display nowrap"
+                    <table table class="table table-striped table-hover text-nowrap display nowrap"
                         style="width:100%">
                         <thead>
                             <tr>${th}</tr>

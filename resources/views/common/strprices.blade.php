@@ -244,20 +244,6 @@
             border-top: 2px solid #ccc !important;
             border-bottom: 2px solid #ccc !important;
         }
-
-        .carte {
-            display: flex;
-            flex-direction: column;
-            height: 820px;
-            overflow: hidden;
-        }
-
-        /* La zone de contenu devient scrollable */
-        .carte-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 5px;
-        }
     </style>
 
     <script>

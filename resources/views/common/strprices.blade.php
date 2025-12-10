@@ -30,118 +30,130 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    @foreach ($zones as $zone)
-                        <div class="table-responsive d-flex">
-                            <div class="carte autocalc m-2">
-                                <div class="w-100" style="min-height: 820px">
-                                    <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
-                                        Vous pouvez maintenant modifier les prix
-                                    </p>
-                                    <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
-                                    <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
-                                    <table class="table table-striped table-hover" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th></th>
-                                                @foreach ($fuels as $fuel)
-                                                    <th>{{ $fuel->fuel }}</th>
-                                                @endforeach
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($labels as $label)
-                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
-                                                @php
-                                                    $noedit = in_array($label->tag, noteditable());
-                                                @endphp
-                                                <tr tag="{{ $label->tag }}"
-                                                    class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
-                                                    <td>{{ $label->tag }}</td>
-                                                    <td>{{ $label->label }}</td>
-                                                    @foreach ($fuels as $fuel)
+                    <div class="row">
+                        @foreach ($zones as $zone)
+                            <div class="col-md-6 mb-3">
+                                <div class="carte autocalc m-2">
+                                    <div class="w-100" style="min-height: 820px">
+                                        <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
+                                            Vous pouvez maintenant modifier les prix
+                                        </p>
+                                        <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
+                                        <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th></th>
+                                                        @foreach ($fuels as $fuel)
+                                                            <th>{{ $fuel->fuel }}</th>
+                                                        @endforeach
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($labels as $label)
+                                                        @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
                                                         @php
-                                                            $price = optional(
-                                                                $fuelprices[$zone->id][$fuel->id][$label->id] ?? null,
-                                                            )->first();
+                                                            $noedit = in_array($label->tag, noteditable());
                                                         @endphp
-                                                        <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
-                                                            data-fuelprice-id="{{ $price->id }}"
-                                                            data-zone="{{ $zone->zone }}" data-label="{{ $label->label }}"
-                                                            data-tag="{{ $label->tag }}">
-                                                            {{ $price->amount }}
-                                                        </td>
+                                                        <tr tag="{{ $label->tag }}"
+                                                            class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
+                                                            <td>{{ $label->tag }}</td>
+                                                            <td>{{ $label->label }}</td>
+                                                            @foreach ($fuels as $fuel)
+                                                                @php
+                                                                    $price = optional(
+                                                                        $fuelprices[$zone->id][$fuel->id][$label->id] ??
+                                                                            null,
+                                                                    )->first();
+                                                                @endphp
+                                                                <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
+                                                                    data-fuelprice-id="{{ $price->id }}"
+                                                                    data-zone="{{ $zone->zone }}"
+                                                                    data-label="{{ $label->label }}"
+                                                                    data-tag="{{ $label->tag }}">
+                                                                    {{ $price->amount }}
+                                                                </td>
+                                                            @endforeach
+                                                        </tr>
                                                     @endforeach
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <div class="">
-                                        @if (empty($structure->to))
-                                            @if (auth()->user()->user_role == 'provider')
-                                                <div class="text-right">
-                                                    <button class="btn btn-sm btn-edit-table">
-                                                        <i class="material-icons md-18">edit</i>
-                                                        Modifier les prix
-                                                    </button>
-                                                </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="">
+                                            @if (empty($structure->to))
+                                                @if (auth()->user()->user_role == 'provider')
+                                                    <div class="text-right">
+                                                        <button class="btn btn-sm btn-edit-table">
+                                                            <i class="material-icons md-18">edit</i>
+                                                            Modifier les prix
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             @endif
-                                        @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="carte m-2">
-                                <div class="w-100" style="min-height: 820px">
-                                    <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
-                                    <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
-                                    <table class="table table-striped table-hover" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>{!! $tx
-                                                    ? "<small class='text-danger'>1 USD = $tx->usd_cdf CDF</small>"
-                                                    : "<small class='text-danger'>Aucun taux structure trouvé</small>" !!}</th>
-                                                @foreach ($fuels as $fuel)
-                                                    <th>{{ $fuel->fuel }}</th>
-                                                @endforeach
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($labels as $label)
-                                                @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
-                                                @php
-                                                    $noedit = in_array($label->tag, noteditable());
-                                                @endphp
-                                                <tr tag="{{ $label->tag }}"
-                                                    class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
-                                                    <td>{{ $label->tag }}</td>
-                                                    <td>{{ $label->label }}</td>
-                                                    @foreach ($fuels as $fuel)
+                            <div class="col-md-6 mb-3">
+                                <div class="carte m-2">
+                                    <div class="w-100" style="min-height: 820px">
+                                        <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
+                                        <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>{!! $tx
+                                                            ? "<small class='text-danger'>1 USD = $tx->usd_cdf CDF</small>"
+                                                            : "<small class='text-danger'>Aucun taux structure trouvé</small>" !!}</th>
+                                                        @foreach ($fuels as $fuel)
+                                                            <th>{{ $fuel->fuel }}</th>
+                                                        @endforeach
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($labels as $label)
+                                                        @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
                                                         @php
-                                                            $price = optional(
-                                                                $fuelprices[$zone->id][$fuel->id][$label->id] ?? null,
-                                                            )->first();
+                                                            $noedit = in_array($label->tag, noteditable());
                                                         @endphp
-                                                        <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
-                                                            data-fuelprice-id="{{ $price->id }}"
-                                                            data-zone="{{ $zone->zone }}"
-                                                            data-label="{{ $label->label }}"
-                                                            data-tag="{{ $label->tag }}">
-                                                            @php
-                                                                $v = $price->amount * (float) @$tx->usd_cdf;
-                                                            @endphp
-                                                            {{ $v ? $v : '' }}
-                                                        </td>
+                                                        <tr tag="{{ $label->tag }}"
+                                                            class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
+                                                            <td>{{ $label->tag }}</td>
+                                                            <td>{{ $label->label }}</td>
+                                                            @foreach ($fuels as $fuel)
+                                                                @php
+                                                                    $price = optional(
+                                                                        $fuelprices[$zone->id][$fuel->id][$label->id] ??
+                                                                            null,
+                                                                    )->first();
+                                                                @endphp
+                                                                <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
+                                                                    data-fuelprice-id="{{ $price->id }}"
+                                                                    data-zone="{{ $zone->zone }}"
+                                                                    data-label="{{ $label->label }}"
+                                                                    data-tag="{{ $label->tag }}">
+                                                                    @php
+                                                                        $v = $price->amount * (float) @$tx->usd_cdf;
+                                                                    @endphp
+                                                                    {{ $v ? $v : '' }}
+                                                                </td>
+                                                            @endforeach
+                                                        </tr>
                                                     @endforeach
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,9 +234,7 @@
         .modal-dialog.modal-fullscreen .modal-body {
             overflow-y: auto !important;
         }
-    </style>
 
-    <style>
         .table td,
         .table th {
             padding: 4px !important;
@@ -233,6 +243,20 @@
         .noneditable td {
             border-top: 2px solid #ccc !important;
             border-bottom: 2px solid #ccc !important;
+        }
+
+        .carte {
+            display: flex;
+            flex-direction: column;
+            height: 820px;
+            overflow: hidden;
+        }
+
+        /* La zone de contenu devient scrollable */
+        .carte-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
         }
     </style>
 

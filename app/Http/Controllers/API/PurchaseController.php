@@ -211,7 +211,7 @@ class PurchaseController extends Controller
                 } else {
                     $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colD])->exists();
                     if ($exi) {
-                        $lineErrors[] = "Cellule D$rowNumber : l'achat avec ce numéro facture $colD est déjà enregistré";
+                        $lineErrors[] = "Cellule D$rowNumber : l'achat avec le numéro facture $colD est déjà enregistré";
                     }
                 }
                 foreach (['E' => $colE, 'F' => $colF, 'G' => $colG, 'H' => $colH] as $colName => $value) {

@@ -30,7 +30,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row no-gutter">
                         @foreach ($zones as $zone)
                             <div class="col-md-6 mb-3">
                                 <div class="carte autocalc m-2">
@@ -243,6 +243,16 @@
         .noneditable td {
             border-top: 2px solid #ccc !important;
             border-bottom: 2px solid #ccc !important;
+        }
+
+        .col-md-6 {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .row.no-gutter>[class*="col-"] {
+            padding-left: 5px;
+            padding-right: 5px;
         }
     </style>
 

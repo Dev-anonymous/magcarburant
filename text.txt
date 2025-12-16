@@ -48,3 +48,18 @@ animation des pages
 design image bg
 
 import fichier --> lignes vide, modal erreur  msg lomg; message si num facture existe
+
+
+
+================================================
+## nouvelle strucutre de prix
+
+cloture structure auto des date strut j-1
+mettre la tx tructure sur le formularie de creation des structure
+dropdown  legerement bleu
+filtre grand libre, possibilite de cocher sur le filtre, ...
+graphique ventre/achat  3d ??
+
+
+
+

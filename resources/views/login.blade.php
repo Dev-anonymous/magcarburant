@@ -140,6 +140,9 @@
                         rep.html(mess).stop().removeClass().addClass(
                                 'p-1 text-center alert alert-danger')
                             .show();
+                        if (419 == xhr.status) {
+                            location.reload();
+                        }
                     },
                 }).always(function() {
                     $(':input', form).attr('disabled', false);

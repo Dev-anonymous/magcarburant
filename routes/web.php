@@ -5,12 +5,17 @@ use App\Http\Controllers\ProviderWebController;
 use App\Http\Controllers\SudoWebController;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.logout');
+});
+
+Route::get('def', function () {
+    Artisan::call('db:seed');
 });
 
 Route::get('', function () {

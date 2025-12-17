@@ -34,7 +34,6 @@ function mainWays()
 function defaultdata()
 {
 
-
     // $labels = [
     //     'A' => 'PMF Commerciale (PMFC)',
     //     'B' => 'Frais & Services SOCIR',
@@ -132,10 +131,7 @@ function defaultdata()
     //     );
     //     $tagAscii++;
     // }
-
-
-
-    DB::commit();
+    // DB::commit();
 }
 
 function initfuelprice(Structureprice $structure)

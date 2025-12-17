@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property int|null $entity_id
- * @property string|null $type
  * @property Carbon|null $from
  * @property Carbon|null $to
  * @property float|null $usd_cdf
@@ -39,7 +38,6 @@ class Rate extends Model
 
 	protected $fillable = [
 		'entity_id',
-		'type',
 		'from',
 		'to',
 		'usd_cdf',

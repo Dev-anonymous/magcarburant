@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $name
  * @property Carbon|null $from
  * @property Carbon|null $to
+ * @property float|null $usd_cdf
+ * @property float|null $cdf_usd
  * 
  * @property Entity $entity
  * @property Collection|Fuelprice[] $fuelprices
@@ -32,14 +34,18 @@ class Structureprice extends Model
 	protected $casts = [
 		'entity_id' => 'int',
 		'from' => 'datetime',
-		'to' => 'datetime'
+		'to' => 'datetime',
+		'usd_cdf' => 'float',
+		'cdf_usd' => 'float'
 	];
 
 	protected $fillable = [
 		'entity_id',
 		'name',
 		'from',
-		'to'
+		'to',
+		'usd_cdf',
+		'cdf_usd'
 	];
 
 	public function entity()

@@ -44,6 +44,7 @@
                                     <tr>
                                         <th>ID </th>
                                         <th>Structure</th>
+                                        <th>Taux Structure</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
                                         <th class="no-export"></th>
@@ -75,6 +76,31 @@
                         <div class="mb-2">
                             <label class="mb-0" for="dv1">Date validité du </label>
                             <input type="text" class="form-control flatpickr" id="dv1" required name="from">
+                        </div>
+                        <h5>Taux structure</h5>
+                        <div class="mb-2">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <div class="input-group-text">1 CDF = </div>
+                                </div>
+                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd" class="form-control"
+                                    required>
+                                <div class="input-group-preppend">
+                                    <div class="input-group-text"> USD</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <div class="input-group-text">1 USD = </div>
+                                </div>
+                                <input type="number" min="0.00000001" step="0.00000001" name="usd_cdf" class="form-control"
+                                    required>
+                                <div class="input-group-preppend">
+                                    <div class="input-group-text"> CDF</div>
+                                </div>
+                            </div>
                         </div>
                         <x-alert />
                     </div>
@@ -116,10 +142,36 @@
                             <label class="mb-0">Date validité au </label>
                             <input type="text" class="form-control" name="to" required>
                         </div>
-                        <p class="m-0 text-danger">
+                        <p class="m-0 text-danger mb-3">
                             Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les prix de la
                             structure, rassurez-vous donc de configurer les prix avant de renseigner la date de clôture
                         </p>
+                        <h5>Taux structure</h5>
+                        <div class="mb-2">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <div class="input-group-text">1 CDF = </div>
+                                </div>
+                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd"
+                                    class="form-control" required>
+                                <div class="input-group-preppend">
+                                    <div class="input-group-text"> USD</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <div class="input-group-text">1 USD = </div>
+                                </div>
+                                <input type="number" min="0.00000001" step="0.00000001" name="usd_cdf"
+                                    class="form-control" required>
+                                <div class="input-group-preppend">
+                                    <div class="input-group-text"> CDF</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <x-alert />
                     </div>
                     <div class="modal-footer">
@@ -214,21 +266,32 @@
                 },
                 {
                     data: 'name',
-                    name: 'name'
+                    name: 'name',
+                    className: 'text-nowrap',
+                },
+                {
+                    data: 'tx',
+                    name: 'tx',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'from',
-                    name: 'from'
+                    name: 'from',
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'to',
-                    name: 'to'
+                    name: 'to',
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'view',
                     name: 'view',
                     orderable: false,
                     searchable: false,
+                    className:'text-nowrap',
                 },
                 {
                     data: 'action',

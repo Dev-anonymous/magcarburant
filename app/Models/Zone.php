@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string|null $zone
+ * @property string $type_carburant
  * 
  * @property Collection|Fuelprice[] $fuelprices
  *
@@ -25,7 +26,8 @@ class Zone extends Model
 	public $timestamps = false;
 
 	protected $fillable = [
-		'zone'
+		'zone',
+		'type_carburant'
 	];
 
 	public function fuelprices()

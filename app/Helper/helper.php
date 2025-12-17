@@ -33,122 +33,321 @@ function mainWays()
 
 function defaultdata()
 {
-    $entities = [
-        ['TOTAL', 'TOTAL ENERGIES SA'],
-        ['ENGEN', 'ENGEN RDC SA'],
-        ['COBIL', 'COBIL SA'],
-        ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo'],
-        ['LEREXCOM', 'LEREXCOM'],
-        ['SEP CONGO', 'SEP CONGO'],
-        ['SPSA', 'SPSA COBIL'],
-        ['SOCIR', 'SOCIR'],
-        ['GPDPP', 'GPDPP'],
-        ['FEC', 'Fédération des Entreprises du Congo'],
-        ['MINECO', 'Ministère de l\'Économie'],
-        ['PRIMATURE', 'Primature (Cabinet du Premier Ministre)'],
-        ['PRESIDENCE', 'Présidence de la République'],
-        ['MINHYD', 'Ministère des Hydrocarbures'],
-        ['DGDA', 'Direction Générale des Douanes et Accises'],
-        ['DGI', 'Direction Générale des Impôts'],
-        ['AUTHENTIX', 'AUTHENTIX']
-    ];
 
-    DB::beginTransaction();
-    foreach ($entities as $el) {
-        $e = Entity::firstOrNew(['shortname' => $el[0]]);
-        if (!$e->exists) {
-            $email = strtolower($el[0]) . "@email.com";
-            $u = User::where(['email' => $email])->firstOrNew();
-            if (!$u->exists) {
-                $u->name = $el[0];
-                $u->email = $email;
-                $u->password = Hash::make('mdp@123');
-                $u->user_role = 'provider';
-                $u->save();
-            }
 
-            $e->longname =  $el[1];
-            $e->users_id = $u->id;
-            $e->save();
-        }
-    }
+    // $labels = [
+    //     'A' => 'PMF Commerciale (PMFC)',
+    //     'B' => 'Frais & Services SOCIR',
+    //     'C' => 'Charges d\'exploitation SEP, Strock de sécurité & stratégique',
+    //     'D' => 'Frais de mise en place SEP',
+    //     'E' => 'Stock de sécurité',
+    //     'F' => 'Stock stratégique',
+    //     'G' => 'Lutte contre la fraude',
+    //     'H' => 'Lutte contre la pollutiom',
+    //     'I' => 'Autres entrepôts EST/SUD',
+    //     'J' => 'Autres entrepôts SUD',
+    //     'K' => 'Charges additionnelles SPSA',
+    //     'L' => 'Lerexcom',
+    //     'M' => 'Charges d\'exploitation Soc. Com.',
+    //     'N' => 'Marges Sociétés commerciales',
+    //     'O' => 'Total frais de distribution',
+    //     'P' => 'Stock de sécurité EST & SUD',
+    //     'Q' => 'FONER (Fonds National d\'Entretien Routier)',
+    //     'R' => 'PMF Fiscal (PMFF=Ki*PMFC)',
+    //     'S' => 'TVA à la vente (TVAV) pour calcul',
+    //     'T' => 'Droits de douane',
+    //     'U' => 'Droits de consommation (25%, 15%, 0% du PMFF)',
+    //     'V' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
+    //     'W' => 'Total Fiscalité 1',
+    //     'X' => 'TVA nette à l\'intérieur (TVA Ir=TVAV-TVAI)',
+    //     'Y' => 'Total Fiscalité 2',
+    //     'Z' => 'Prix de référence réel (M3)',
+    //     'AA' => 'Prix de référence à appliquer (L)',
+    // ];
 
-    $zones = mainWays();
-    foreach ($zones as $e) {
-        $z = Zone::firstOrNew(['zone' => $e]);
-        $z->save();
-    }
+    // foreach ($labels =[] as $t => $l) {
+    //     $z = Label::firstOrNew(['tag' => $t]);
+    //     $z->label = $l;
+    //     $z->save();
+    // }
 
-    $fuels = mainfuels();
-    foreach ($fuels as $e) {
-        $z = Fuel::firstOrNew(['fuel' => $e]);
-        $z->save();
-    }
 
-    $labels = [
-        'A' => 'PMF Commerciale (PMFC)',
-        'B' => 'Frais & Services SOCIR',
-        'C' => 'Charges d\'exploitation SEP, Strock de sécurité & stratégique',
-        'D' => 'Frais de mise en place SEP',
-        'E' => 'Stock de sécurité',
-        'F' => 'Stock stratégique',
-        'G' => 'Lutte contre la fraude',
-        'H' => 'Lutte contre la pollutiom',
-        'I' => 'Autres entrepôts EST/SUD',
-        'J' => 'Autres entrepôts SUD',
-        'K' => 'Charges additionnelles SPSA',
-        'L' => 'Lerexcom',
-        'M' => 'Charges d\'exploitation Soc. Com.',
-        'N' => 'Marges Sociétés commerciales',
-        'O' => 'Total frais de distribution',
-        'P' => 'Stock de sécurité EST & SUD',
-        'Q' => 'FONER (Fonds National d\'Entretien Routier)',
-        'R' => 'PMF Fiscal (PMFF=Ki*PMFC)',
-        'S' => 'TVA à la vente (TVAV) pour calcul',
-        'T' => 'Droits de douane',
-        'U' => 'Droits de consommation (25%, 15%, 0% du PMFF)',
-        'V' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
-        'W' => 'Total Fiscalité 1',
-        'X' => 'TVA nette à l\'intérieur (TVA Ir=TVAV-TVAI)',
-        'Y' => 'Total Fiscalité 2',
-        'Z' => 'Prix de référence réel (M3)',
-        'AA' => 'Prix de référence à appliquer (L)',
-    ];
+    // Tous les labels terrestres et aviation, sans les numéros
+    // $excelLabels = [
+    //     'Platts',
+    //     'Premium/TM',
+    //     'PMFC en TM',
+    //     'Densité',
+    //     'PMFC en M3',
+    //     'Charges SOCIR',
+    //     'Charges Sep Congo',
+    //     'Charges SPSA-COBIL',
+    //     'Charges LEREXCOM PETROLEUM ET Appui Terrestre',
+    //     'Total frais des sociétés de logistique',
+    //     'Charges d\'exploitation Sociétés commerciales',
+    //     'Marges Sociétés Commerciales (10% PMF)',
+    //     'Total frais des sociétés Commerciales',
+    //     'Stock de sécurité 1',
+    //     'Stock de sécurité 2',
+    //     'Effort de reconstruction et Stock Stratégiques',
+    //     'CRP & Comité de suivi des Prix des produits Petroliers',
+    //     'Marquage moléculaire',
+    //     'FONER (Fonds National d\'Entretien Routier)',
+    //     'Interventions Economiques',
+    //     'Total Parafiscalité',
+    //     'PMF fiscal (PMFF=Ki*PMFC)',
+    //     'TVA à la vente (TVAV) pour calcul',
+    //     'Droits de douane (10% PMF Commercial)',
+    //     'Droits de consommation (25%, 15%, 0% du PMFF)',
+    //     'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
+    //     'Total Fiscalité 1',
+    //     'TVA nette à l\'intérieur (TVAIr=TVAV-TVAI)',
+    //     'Total Fiscalité 2',
+    //     'Prix de référence réel (USD/M3)',
+    //     'Prix de référence à appliquer (USD/L)',
 
-    foreach ($labels as $t => $l) {
-        $z = Label::firstOrNew(['tag' => $t]);
-        $z->label = $l;
-        $z->save();
-    }
+    //     'Frais & Services SOCIR',
+    //     'Charges d\'exploitation Sep Congo',
+    //     'Charges capacités additionnelles SPSA',
+    //     'Charges d\'exploitation logisticien (Frais d\'entrepot)',
+    // ];
+
+    // function numberToExcelColumn($num)
+    // {
+    //     $column = '';
+    //     while ($num >= 0) {
+    //         $column = chr($num % 26 + 65) . $column;
+    //         $num = intval($num / 26) - 1;
+    //     }
+    //     return $column;
+    // }
+
+    // $tagAscii = 65;
+    // foreach ($excelLabels as $index =>  $labelText) {
+    //     $tag = numberToExcelColumn($index);
+
+    //     Label::firstOrCreate(
+    //         ['label' => $labelText],
+    //         ['tag' => $tag]
+    //     );
+    //     $tagAscii++;
+    // }
+
+
 
     DB::commit();
 }
 
 function initfuelprice(Structureprice $structure)
 {
-    $zones  = Zone::all()->keyBy('zone');     // ex: ['OUEST' => ZoneObj, 'EST' => ...]
-    $fuels  = Fuel::all()->keyBy('fuel');     // ex: ['essence' => FuelObj, ...]
-    $labels = Label::all()->keyBy('tag');     // ex: ['A' => LabelObj, 'B' => LabelObj, ...]
+    $zoneLabels = [
+        'Nord' => [
+            'terrestre' => [
+                'Platts',
+                'Premium/TM',
+                'PMFC en TM',
+                'Densité',
+                'PMFC en M3',
+                'Charges Sep Congo et Autres entrepots',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'Stock de sécurité 1',
+                'Stock de sécurité 2',
+                'Marquage moléculaire',
+                'FONER (Fonds National d\'Entretien Routier)',
+                'Total Parafiscalité',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ]
+        ],
+        'Sud' => [
+            'terrestre' => [
+                'PMFC en M3',
+                'Charges d\'exploitation logisticiens',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'Stock de sécurité 1',
+                'Stock de sécurité 2',
+                'Marquage moléculaire',
+                'FONER (Fonds National d\'Entretien Routier)',
+                'Effort de reconstruction et Stock Stratégiques',
+                'Interventions Economiques',
+                'Total Parafiscalité',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ],
+            'aviation' => [
+                'PMFC en M3',
+                'Charges d\'exploitation logisticien',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ]
+        ],
+        'Est' => [
+            'terrestre' => [
+                'PMFC en M3',
+                'Charges d\'exploitation logisticiens',
+                'Capacités additionnelles KPS',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'Stock de sécurité 1',
+                'Stock de sécurité 2',
+                'Marquage moléculaire',
+                'FONER (Fonds National d\'Entretien Routier)',
+                'Effort de reconstruction et Stock Stratégiques',
+                'Interventions Economiques',
+                'Total Parafiscalité',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ],
+            'aviation' => [
+                'PMFC en M3',
+                'Charges d\'exploitation logisticien',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ]
+        ],
+        'Ouest' => [
+            'terrestre' => [
+                'Platts',
+                'Premium/TM',
+                'PMFC en TM',
+                'Densité',
+                'PMFC en M3',
+                'Charges SOCIR',
+                'Charges Sep Congo',
+                'Charges SPSA-COBIL',
+                'Charges LEREXCOM PETROLEUM ET Appui Terrestre',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'Stock de sécurité 1',
+                'Stock de sécurité 2',
+                'Effort de reconstruction et Stock Stratégiques',
+                'CRP & Comité de suivi des Prix des produits Petroliers',
+                'Marquage moléculaire',
+                'FONER (Fonds National d\'Entretien Routier)',
+                'Interventions Economiques',
+                'Total Parafiscalité',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ],
+            'aviation' => [
+                'PMFC en M3',
+                'Frais & Services SOCIR',
+                'Charges d\'exploitation Sep Congo',
+                'Charges capacités additionnelles SPSA',
+                'Total frais des sociétés de logistique',
+                'Charges d\'exploitation Sociétés commerciales',
+                'Marges Sociétés Commerciales (10% PMF)',
+                'Total frais des sociétés Commerciales',
+                'PMF fiscal (PMFF=Ki*PMFC)',
+                'TVA à la vente (TVAV)',
+                'Droits de douane',
+                'Droits de consommation',
+                'TVA à l\'importation',
+                'Total Fiscalité 1',
+                'TVA nette à l\'intérieur',
+                'Total Fiscalité 2',
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)'
+            ]
+        ],
+    ];
 
-    $rowsToInsert = [];
-    foreach ($zones as $zoneName => $zone) {
-        foreach ($fuels as $fuelName => $fuel) {
-            foreach ($labels as $labelTag => $label) {
-                if ($zoneName !== 'OUEST' && $labelTag === 'L') {
-                    continue;
+    // 2️⃣ Boucle sur zones et labels valides
+    foreach ($zoneLabels as $zoneName => $types) {
+        $zone = Zone::where('zone', $zoneName)->first();
+        foreach ($types as $fuelType => $labels) {
+            $fuels = Fuel::where('fuel_type', $fuelType)->get();
+            foreach ($fuels as $fuel) {
+                foreach ($labels as $labelName) {
+                    $label = Label::where('label', $labelName)->first();
+                    if ($label && $zone) {
+                        $exists = FuelPrice::where('structureprice_id', $structure->id)
+                            ->where('fuel_id', $fuel->id)
+                            ->where('zone_id', $zone->id)
+                            ->where('label_id', $label->id)
+                            ->exists();
+
+                        if (! $exists) {
+                            FuelPrice::create([
+                                'structureprice_id' => $structure->id,
+                                'fuel_id' => $fuel->id,
+                                'zone_id' => $zone->id,
+                                'label_id' => $label->id,
+                                'amount' => 0,
+                                'currency' => 'USD',
+                            ]);
+                        }
+                    }
+                    // if (!$label) {
+                    //     dd($labelName, $label, $zone->zone, $fuel->fuel);
+                    // }
                 }
-                Fuelprice::firstOrCreate(
-                    [
-                        'structureprice_id' => $structure->id,
-                        'zone_id'           => $zone->id,
-                        'fuel_id'           => $fuel->id,
-                        'label_id'          => $label->id,
-                    ],
-                    [
-                        'amount'   => null,
-                        'currency' => null,
-                    ]
-                );
             }
         }
     }

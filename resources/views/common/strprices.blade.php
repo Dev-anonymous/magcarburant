@@ -23,15 +23,146 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="bg-whitee d-flex justify-content-between align-items-center p-3">
+                <div class="bg-whitee d-flex justify-content-between align-items-center">
                     <h4 class="text-dark font-weight-bold">
                         Structure
                         {{ "$structure->name du {$structure->from->format('d-m-Y')} " . (empty($structure->to) ? ' à maintenant' : " au {$structure->to->format('d-m-Y')}") }}
                     </h4>
                 </div>
                 <div class="card-body">
-                    <div class="row no-gutter">
-                        @foreach ($zones as $zone)
+                    @foreach ($grouped as $type => $zones)
+                        <div class="row no-gutter">
+                            <div class="col-12">
+                                <b class="text-white bold">CARBURANT {{ strtoupper($type) }}</b>
+                            </div>
+                            @foreach ($zones as $zoneName => $fuels)
+                                <div class="col-md-6 mb-3">
+                                    <div class="carte m-2">
+                                        <div class="w-100">
+                                            <p info class="mb-2 text-danger font-weight-bold text-right"
+                                                style="display:none;">
+                                                Vous pouvez maintenant modifier les prix
+                                            </p>
+                                            <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
+                                            <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-hover" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            @foreach ($fuels as $fuelName => $labels)
+                                                                <th>{{ $fuelName }}</th>
+                                                            @endforeach
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @php
+                                                            // Récupérer tous les labels uniques pour cette zone
+                                                            $allLabels = [];
+                                                            foreach ($fuels as $labels) {
+                                                                foreach ($labels as $labelName => $data) {
+                                                                    $allLabels[$labelName] = $data['tag']; // associer label → tag
+                                                                }
+                                                            }
+                                                        @endphp
+
+                                                        @foreach ($allLabels as $labelName => $tag)
+                                                            @php
+                                                                $noedit = in_array($tag, noteditable());
+                                                            @endphp
+                                                            <tr tag="{{ $tag }}"
+                                                                class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
+                                                                <td>{{ $tag }}</td>
+                                                                <td>{{ $labelName }}</td>
+                                                                @foreach ($fuels as $fuelName => $labels)
+                                                                    @php
+                                                                        $v = $labels[$labelName]['amount'] ?? 0;
+                                                                        $fpi = $labels[$labelName]['id'] ?? 0;
+                                                                    @endphp
+                                                                    <td class="@if (!$noedit) editable-price @endif text-center @if (!$fpi) bg-danger @endif"
+                                                                        data-fuelprice-id="{{ $fpi }}"
+                                                                        data-zone="{{ $zoneName }}"
+                                                                        data-label="{{ $labelName }}"
+                                                                        data-tag="{{ $tag }}">{{ $v ? $v : '' }}
+                                                                    </td>
+                                                                @endforeach
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="">
+                                                @if (empty($structure->to))
+                                                    @if (auth()->user()->user_role == 'provider')
+                                                        <div class="text-right">
+                                                            <button class="btn btn-sm btn-edit-table">
+                                                                <i class="material-icons md-18">edit</i>
+                                                                Modifier les prix
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="carte m-2">
+                                        <div class="w-100" style="2min-height: 820px">
+                                            <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
+                                            <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-hover" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>
+                                                                <small class='text-danger'>
+                                                                    1 USD = {{ $structure->usd_cdf ?? 0 }} CDF
+                                                                </small>
+                                                            </th>
+                                                            @foreach ($fuels as $fuelName => $labels)
+                                                                <th>{{ $fuelName }}</th>
+                                                            @endforeach
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @php
+                                                            // Récupérer tous les labels uniques pour cette zone
+                                                            $allLabels = [];
+                                                            foreach ($fuels as $labels) {
+                                                                foreach ($labels as $labelName => $data) {
+                                                                    $allLabels[$labelName] = $data['tag']; // associer label → tag
+                                                                }
+                                                            }
+                                                        @endphp
+
+                                                        @foreach ($allLabels as $labelName => $tag)
+                                                            <tr>
+                                                                <td>{{ $tag }}</td>
+                                                                <td>{{ $labelName }}</td>
+                                                                @foreach ($fuels as $fuelName => $labels)
+                                                                    @php
+                                                                        $v = $labels[$labelName]['amount'] ?? 0;
+                                                                        $v *= (float) $structure->usd_cdf;
+                                                                    @endphp
+                                                                    <td>{{ $v ? $v : '' }}</td>
+                                                                @endforeach
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
+
+
+                    {{-- @foreach ($zones = [] as $zone)
                             <div class="col-md-6 mb-3">
                                 <div class="carte autocalc m-2">
                                     <div class="w-100" style="min-height: 820px">
@@ -152,8 +283,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        @endforeach --}}
                 </div>
             </div>
         </div>
@@ -373,6 +503,7 @@
         }
 
         function calculate() {
+            return;
             $('.carte').each(function(i, carte) {
                 var table = $('table', $(carte));
                 const rows = {}; // stocke toutes les lignes lues
@@ -388,7 +519,7 @@
                     const operators = formula.match(/[\+\-\*\/]/g) || []; // ["-", "-"]
                     const operands = formula.split(/[\+\-\*\/]/); // ["C","A","B"]
 
-                    const length = rows[operands[0]].length;
+                    const length = rows[operands[0]]?.length || 0;
                     const result = [];
                     for (let i = 0; i < length; i++) {
                         let value = rows[operands[0]] ?

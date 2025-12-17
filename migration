@@ -1,0 +1,26 @@
+-- Active: 1763470543333@@127.0.0.1@3306@magcarburant
+ALTER TABLE fuel ADD COLUMN type_carburant ENUM('terrestre','aviation') NOT NULL DEFAULT 'terrestre';
+
+INSERT INTO fuel (fuel, type_carburant) VALUES
+('ESSENCE','terrestre'),
+('GASOIL','terrestre'),
+('PETROLE','terrestre'),
+('FOMI','terrestre'),
+('JET','aviation');
+
+ALTER TABLE zone ADD COLUMN type_carburant ENUM('terrestre','aviation') NOT NULL DEFAULT 'terrestre';
+
+INSERT INTO zone (zone, type_carburant) VALUES
+('NORD','terrestre'),
+('SUD','terrestre'),
+('EST','terrestre'),
+('OUEST','terrestre'),
+('SUD','aviation'),
+('EST','aviation'),
+('OUEST','aviation');
+
+ALTER TABLE structureprice ADD COLUMN type_carburant ENUM('terrestre','aviation') NOT NULL DEFAULT 'terrestre';
+
+ALTER TABLE fuelprice
+ADD CONSTRAINT unique_price UNIQUE (structureprice_id, zone_id, fuel_id, label_id);
+

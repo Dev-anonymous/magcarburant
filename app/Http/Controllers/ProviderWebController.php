@@ -53,29 +53,37 @@ class ProviderWebController extends Controller
         $stx = request('stx');
         if ($stx) {
             $entity = auth()->user()->entities()->first();
-            $structure = $entity?->structureprices()->find($stx);
+            $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
                 initfuelprice($structure);
-                $zones = Zone::all();
-                $fuels = Fuel::all();
-                $labels = Label::all();
+                $structure->refresh();
 
-                $fuelprices = Fuelprice::where('structureprice_id', $structure->id)
-                    ->get()
-                    ->groupBy(['zone_id', 'fuel_id', 'label_id']);
+                $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
+                $aviation  = ['JET'];
+                $grouped = [
+                    'terrestre' => [],
+                    'aviation'  => [],
+                ];
+                foreach ($structure->fuelprices as $price) {
+                    $fuelName  = strtoupper($price->fuel->fuel);
+                    $zoneName  = $price->zone->zone;
+                    $labelName = $price->label->label;
+                    $labelTag  = $price->label->tag;
 
-                $from = $structure->from?->format('Y-m-d');
-                $to = $structure->to ?? nnow()->toDateString();
+                    $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
 
-                $tx = Rate::where('type', 'STRUCTURE')->where(function ($q) use ($from, $to) {
-                    $q->where(function ($q) use ($from, $to) {
-                        $q->where('from', '<=', $to)->where('to', '>=', $from);
-                    })->orWhere(function ($q) use ($from, $to) {
-                        $q->whereNull('to')->whereBetween('from', [$from, $to]);
-                    });
-                })->first();
+                    if (!isset($grouped[$type][$zoneName][$fuelName])) {
+                        $grouped[$type][$zoneName][$fuelName] = [];
+                    }
 
-                return view('common.strprices', compact('structure', 'tx', 'zones', 'fuels', 'labels', 'fuelprices'));
+                    $grouped[$type][$zoneName][$fuelName][$labelName] = [
+                        'id' => $price->id,
+                        'amount' => $price->amount,
+                        'tag'    => $labelTag,
+                    ];
+                }
+
+                return view('common.strprices', compact('grouped', 'structure'));
             }
         }
         return view('provider.apps-accounting');

@@ -61,14 +61,7 @@ class DefaultDataSeeder extends Seeder
 
         $zones = mainWays();
         foreach ($zones as $e) {
-            $z = Zone::firstOrNew(['zone' => $e]);
-            $z->save();
-        }
-
-        $fuels = mainfuels();
-        foreach ($fuels as $e) {
-            $z = Fuel::firstOrNew(['fuel' => $e]);
-            $z->save();
+            Zone::firstOrCreate(['zone' => $e]);
         }
 
         $fuels = [
@@ -140,7 +133,6 @@ class DefaultDataSeeder extends Seeder
         foreach ($labels as $l) {
             Label::firstOrCreate($l);
         }
-
 
         DB::commit();
     }

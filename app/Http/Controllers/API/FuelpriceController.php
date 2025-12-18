@@ -45,7 +45,7 @@ class FuelpriceController extends Controller
         abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
         abort_if($fuelprice->structureprice->to != null, 403, "Vous ne pouvez plus modifier les prix sur une structure dont la date de fin est déjà renseignée.");
         abort_if($fuelprice->zone->zone !==  "OUEST" && $fuelprice->label->tag === 'L', 403, "Can't edit");
-        abort_if(in_array($fuelprice->label->tag, noteditable()), 403, "Can't edit");
+        abort_if(in_array($fuelprice->label->label, noteditable($fuelprice->fuel->fuel_type, $fuelprice->zone->zone)), 403, "Can't edit");
 
         $fuelprice->amount = $request->price;
         $fuelprice->currency = 'USD';

@@ -36,9 +36,12 @@
                                 <b class="text-white bold">CARBURANT {{ strtoupper($type) }}</b>
                             </div>
                             @foreach ($zones as $zoneName => $fuels)
+                                @php
+                                    $rnd = rand(10000, 90000);
+                                @endphp
                                 <div class="col-md-6 mb-3">
-                                    <div class="carte m-2">
-                                        <div class="w-100">
+                                    <div class="carte m-2 d-block" type="{{ $type }}" zone="{{ $zoneName }}">
+                                        <div class="div_a_{{ $rnd }}">
                                             <p info class="mb-2 text-danger font-weight-bold text-right"
                                                 style="display:none;">
                                                 Vous pouvez maintenant modifier les prix
@@ -69,12 +72,15 @@
 
                                                         @foreach ($allLabels as $labelName => $tag)
                                                             @php
-                                                                $noedit = in_array($tag, noteditable());
+                                                                $noedit = in_array(
+                                                                    $labelName,
+                                                                    noteditable($type, $zoneName),
+                                                                );
                                                             @endphp
                                                             <tr tag="{{ $tag }}"
                                                                 class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
                                                                 <td>{{ $tag }}</td>
-                                                                <td>{{ $labelName }}</td>
+                                                                <td class="text-nowrap">{{ $labelName }}</td>
                                                                 @foreach ($fuels as $fuelName => $labels)
                                                                     @php
                                                                         $v = $labels[$labelName]['amount'] ?? 0;
@@ -108,8 +114,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <div class="carte m-2">
-                                        <div class="w-100" style="2min-height: 820px">
+                                    <div class="carte m-2 d-block" type="{{ $type }}" zone="{{ $zoneName }}">
+                                        <div class="div_b_{{ $rnd }}">
                                             <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
                                             <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
                                             <div class="table-responsive">
@@ -139,9 +145,16 @@
                                                         @endphp
 
                                                         @foreach ($allLabels as $labelName => $tag)
-                                                            <tr>
+                                                            @php
+                                                                $noedit = in_array(
+                                                                    $labelName,
+                                                                    noteditable($type, $zoneName),
+                                                                );
+                                                            @endphp
+                                                            <tr tag="{{ $tag }}"
+                                                                class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
                                                                 <td>{{ $tag }}</td>
-                                                                <td>{{ $labelName }}</td>
+                                                                <td class="text-nowrap">{{ $labelName }}</td>
                                                                 @foreach ($fuels as $fuelName => $labels)
                                                                     @php
                                                                         $v = $labels[$labelName]['amount'] ?? 0;
@@ -230,7 +243,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <div class="carte m-2">
+                                <div class="carte m-2 d-block">
                                     <div class="w-100" style="min-height: 820px">
                                         <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
                                         <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
@@ -291,56 +304,7 @@
     </div>
 @endsection
 @section('modals')
-    <div class="modal fade" id="mdlinfo" role="dialog">
-        <div class="modal-dialog modal-fullscreen" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-uppercase" id="defaultModalLabel">Structure des prix en CDF</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form finfo="">
-                    <input type="hidden" name="structure">
-                    <input type="hidden" name="zone">
-                </form>
-                <div class="modal-body">
-                    <x-dataloader />
-                    <x-alert />
-                    <div class="w-100" repdata>
-                        <form formfilter="">
-                            <div class="d-flex">
-                                <div class="mr-2">
-                                    <span for="">Produit</span>
-                                    <select name="fuel" class="form-control">
-                                        @foreach (mainfuels() as $e)
-                                            <option>{{ $e }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mr-2">
-                                    <span for="">Au taux</span>
-                                    <select name="ratetype" class="form-control">
-                                        <option>RÉEL</option>
-                                        <option>STRUCTURE</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="table-responsiver mt-3">
-                        <div data=""></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">
-                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
-                        Fermer
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @section('script')
@@ -404,91 +368,104 @@
             });
         });
 
-        var formfilter = $('[formfilter]');
+        $('[class^="div_a_"]').each(function() {
+            var divA = $(this);
+            // Récupérer le suffixe (par exemple "001", "002", ...)
+            var classes = divA.attr('class').split(/\s+/);
+            var suffix = '';
+            $.each(classes, function(i, cls) {
+                if (cls.startsWith('div_a_')) {
+                    suffix = cls.replace('div_a_', '');
+                }
+            });
+            // Trouver le div_b correspondant
+            var divB = $('.div_b_' + suffix);
+            // Appliquer la hauteur
+            if (divB.length) {
+                divB.height(divA.height());
+            }
+        });
 
-        // formfilter.change(() => loadpt());
-        // function loadpt() {
-        //     var mdl = $('#mdlinfo');
-        //     var ldr = $('[dataloader]', mdl);
-        //     var rep = $('#rep', mdl);
-        //     var form = $('[finfo]', mdl);
-        //     var data = form.serialize() + '&' + formfilter.serialize();
-        //     ldr.show();
-        //     $.ajax({
-        //         url: `route('pricestructure') }}`,
-        //         data: data,
-        //         success: function(data) {
-        //             var k = Object.keys(data);
-        //             var h = '';
-        //             k.forEach(key => {
-        //                 h += `
-    //             <table id="table" class="table table-striped table-hover text-nowrap"
-    //                 style="width:100%">
-    //                 <thead>
-    //                     <tr>
-    //                         <td colspan=4>
-    //                             <div class='text-center p-4'>
-    //                                 DATATITLE
-    //                             </div>
-    //                         </td>
-    //                     </tr>
-    //                     <tr>
-    //                         <th>ITEM</th>
-    //                         <th class='text-center'>Prix Structure de Prix</th>
-    //                         <th class='text-center'>Volume Vendu M3</th>
-    //                         <th class='text-center'>MONTANT</th>
-    //                     </tr>
-    //                 </thead>
-    //                 <tbody>
-    //             `;
-        //                 var d = data[key];
 
-        //                 var li = null;
-        //                 d.forEach(line => {
-        //                     h += `
-    //                     <tr>
-    //                         <td>${line.label}</td>
-    //                         <td class='text-center'>${line.struct_price}</td>
-    //                         <td class='text-center'>${line.vol}</td>
-    //                         <td class='text-center font-weight-bold'>${line.tot}</td>
-    //                     </tr>
-    //                         `
-        //                     li = line;
-        //                 });
-        //                 h += `</tbody>
-    //                 </table>`;
-        //                 if (li) {
-        //                     var ti = `<h4>${li.fuel} | ${li.date}</h4>`;
-        //                     h = h.replace('DATATITLE', ti);
-        //                 }
-        //             });
 
-        //             $('[data]', mdl).html(h);
-        //             $('[repdata]').css('opacity', 1);
-        //             ldr.hide();
-        //             rep.hide();
+        // const formulas = {
+        //     D: "C-E-F-G-H-I-J",
+        //     O: "A+B+C+K+L+M+N+P",
+        //     W: "T+U+V",
+        //     X: "S-V",
+        //     Y: "W+X",
+        //     Z: "A+O+Q+Y",
+        //     AA: "Z*1000",
+        // };
 
-        //         },
-        //         error: function(xhr, a, b) {
-        //             ldr.hide();
-        //             var resp = xhr.responseJSON;
-        //             var mess = resp?.message ?? "Erreur, veuillez réessayer !";
-        //             rep.html(mess).stop().removeClass().addClass(
-        //                     'p-1 m-0 text-center alert alert-danger')
-        //                 .show();
-        //             $('[repdata]').css('opacity', 0.1);
-        //         }
-        //     });
-        // }
-
-        const formulas = {
-            D: "C-E-F-G-H-I-J",
-            O: "A+B+C+K+L+M+N+P",
-            W: "T+U+V",
-            X: "S-V",
-            Y: "W+X",
-            Z: "A+O+Q+Y",
-            AA: "Z*1000",
+        const Glfomulas = {
+            terrestre_zone_nord: {
+                S: "J",
+                V: "T+U",
+                AD: "W+X+AA+AB",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AD+AL",
+                AN: "AM/1000"
+            },
+            terrestre_zone_sud: {
+                S: "O",
+                V: "T+U",
+                AD: "W+X+AA+AB+Y+AC",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AD+AL",
+                AN: "AM/1000"
+            },
+            terrestre_zone_est: {
+                S: "O+M",
+                V: "T+U",
+                AD: "W+X+AA+AB+Y+AC",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AD+AL",
+                AN: "AM/1000"
+            },
+            terrestre_zone_ouest: {
+                S: "H+I+K+N",
+                V: "T+U",
+                AD: "W+X+Y+Z+AA+AB+AC",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AD+AL",
+                AN: "AM/1000"
+            },
+            aviation_zone_sud: {
+                S: "P",
+                V: "T+U",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AL",
+                AN: "AM/1000"
+            },
+            aviation_zone_est: {
+                S: "P",
+                V: "T+U",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AL",
+                AN: "AM/1000"
+            },
+            aviation_zone_ouest: {
+                S: "R+Q+L",
+                V: "T+U",
+                AJ: "AG+AH+AI",
+                AK: "AF+AI",
+                AL: "AJ+AK",
+                AM: "G+S+V+AL",
+                AN: "AM/1000"
+            }
         };
 
         function getRowValues(tag, table) {
@@ -503,15 +480,24 @@
         }
 
         function calculate() {
-            return;
             $('.carte').each(function(i, carte) {
-                var table = $('table', $(carte));
+                var carte = $(carte);
+                var table = $('table', carte);
+                var type = carte.attr('type');
+                var zone = carte.attr('zone').toString().toLowerCase();
                 const rows = {}; // stocke toutes les lignes lues
                 // Lire toutes les lignes de A à Z (ou celles existantes)
                 $('tbody tr', table).each(function() {
                     const tag = $(this).attr('tag');
                     rows[tag] = getRowValues(tag, table);
                 });
+
+                var ind = `${type}_zone_${zone}`;
+                var formulas = Glfomulas[ind];
+                if (!formulas) {
+                    console.log("FORMULE NON TROUVEE ->" + ind);
+                    return;
+                }
 
                 // Parcourir les formules
                 Object.keys(formulas).forEach(tag => {

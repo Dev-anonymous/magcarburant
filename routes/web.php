@@ -15,7 +15,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::get('def', function () {
-    Artisan::call('db:seed');
+    $action = request('action');
+    if ('reset' == $action) {
+        Artisan::call('migrate:refresh', ['--seed' => true]);
+    }
+    if ('migrate' == $action) {
+        Artisan::call('migrate');
+    }
+
+    $out = Artisan::output();
+    dd(@$out);
 });
 
 Route::get('', function () {

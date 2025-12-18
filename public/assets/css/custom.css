@@ -78,6 +78,7 @@ a.nav-link {
     display: flex;
     align-items: center;
     padding: 20px;
+    width: 100% !important;
 }
 
 .carte h4 {

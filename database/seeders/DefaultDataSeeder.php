@@ -77,62 +77,77 @@ class DefaultDataSeeder extends Seeder
         }
 
         $labels = [
-            ['label' => 'Platts', 'tag' => 'A'],
-            ['label' => 'Premium/TM', 'tag' => 'B'],
-            ['label' => 'PMFC en TM', 'tag' => 'C'],
-            ['label' => 'Densité', 'tag' => 'D'],
-            ['label' => 'PMFC en M3', 'tag' => 'E'],
-            ['label' => 'Charges SOCIR', 'tag' => 'F'],
-            ['label' => 'Charges Sep Congo', 'tag' => 'G'],
-            ['label' => 'Charges SPSA-COBIL', 'tag' => 'H'],
-            ['label' => 'Charges LEREXCOM PETROLEUM ET Appui Terrestre', 'tag' => 'I'],
-            ['label' => 'Total frais des sociétés de logistique', 'tag' => 'J'],
-            ['label' => 'Charges d\'exploitation Sociétés commerciales', 'tag' => 'K'],
-            ['label' => 'Marges Sociétés Commerciales (10% PMF)', 'tag' => 'L'],
-            ['label' => 'Total frais des sociétés Commerciales', 'tag' => 'M'],
-            ['label' => 'Stock de sécurité 1', 'tag' => 'N'],
-            ['label' => 'Stock de sécurité 2', 'tag' => 'O'],
-            ['label' => 'Effort de reconstruction et Stock Stratégiques', 'tag' => 'P'],
-            ['label' => 'CRP & Comité de suivi des Prix des produits Petroliers', 'tag' => 'Q'],
-            ['label' => 'Marquage moléculaire', 'tag' => 'R'],
-            ['label' => 'FONER (Fonds National d\'Entretien Routier)', 'tag' => 'S'],
-            ['label' => 'Interventions Economiques', 'tag' => 'T'],
-            ['label' => 'Total Parafiscalité', 'tag' => 'U'],
-            ['label' => 'PMF fiscal (PMFF=Ki*PMFC)', 'tag' => 'V'],
-            ['label' => 'TVA à la vente (TVAV)', 'tag' => 'W'],
-            ['label' => 'Droits de douane', 'tag' => 'X'],
-            ['label' => 'Droits de consommation', 'tag' => 'Y'],
-            ['label' => 'TVA à l\'importation', 'tag' => 'Z'],
-            ['label' => 'Total Fiscalité 1', 'tag' => 'AA'],
-            ['label' => 'TVA nette à l\'intérieur', 'tag' => 'AB'],
-            ['label' => 'Total Fiscalité 2', 'tag' => 'AC'],
-            ['label' => 'Prix de référence réel (USD/M3)', 'tag' => 'AD'],
-            ['label' => 'Prix de référence à appliquer (USD/L)', 'tag' => 'AE'],
+            'Platts',
+            'Premium/TM',
+            'PMFC en TM',
+            'Densité',
+            'PMFC Ouest',
+            'Différentiel de livraison à l\'intérieur',
+            'PMFC en M3',
+
+            'Charges SOCIR',
+            'Charges Sep Congo',
+            'Charges Sep Congo et Autres entrepots',
+            'Charges SPSA-COBIL',
+            'Charges capacités additionnelles SPSA',
+            'Capacités additionnelles KPS',
+            'Charges LEREXCOM PETROLEUM ET Appui Terrestre',
+            'Charges d\'exploitation logisticiens (frais d\'entreprot)',
+            'Charges d\'exploitation logisticien (Frais d\'entrepot)',
+            'Charges d\'exploitation Sep Congo',
+
+            'Frais & Services SOCIR',
+
+            'Total frais des sociétés de logistique',
+
+            'Charges d\'exploitation Sociétés commerciales',
+            'Marges Sociétés Commerciales (10% PMF)',
+            'Total frais des sociétés Commerciales',
+
+            'Stock de sécurité 1',
+            'Stock de sécurité 2',
+
+            'Effort de reconstruction et Stock Stratégiques',
+            'CRP & Comité de suivi des Prix des produits Petroliers',
+            'Marquage moléculaire',
+            'FONER (Fonds National d\'Entretien Routier)',
+            'Interventions Economiques',
+
+            'Total Parafiscalité',
+
+            'PMF fiscal (PMFF=Ki*PMFC)',
+            'TVA à la vente (TVAV) pour calcul',
+            'Droits de douane (10% PMF Commercial)',
+            'Droits de consommation (25%, 15%, 0% du PMFF)',
+            'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)',
+
+            'Total Fiscalité 1',
+            'TVA nette à l\'intérieur (TVAIr=TVAV-TVAI)',
+            'Total Fiscalité 2',
+
+            'Prix de référence réel (USD/M3)',
+            'Prix de référence à appliquer (USD/L)',
         ];
 
-        function numberToExcelColumn($num)
-        {
-            $column = '';
-            while ($num >= 0) {
-                $column = chr($num % 26 + 65) . $column;
-                $num = intval($num / 26) - 1;
-            }
-            return $column;
+
+        $alphabet = range('A', 'Z');
+        $index = 0;
+
+        foreach ($labels as $text) {
+            $tag = '';
+            $n = $index;
+            do {
+                $tag = $alphabet[$n % 26] . $tag;
+                $n = intdiv($n, 26) - 1;
+            } while ($n >= 0);
+
+            Label::firstOrCreate(
+                ['label' => $text],
+                ['tag' => $tag]
+            );
+            $index++;
         }
 
-        // $tagAscii = 65;
-        // foreach ($labels as $index =>  $labelText) {
-        //     $tag = numberToExcelColumn($index);
-        //     Label::firstOrCreate(
-        //         ['label' => $labelText],
-        //         ['tag' => $tag]
-        //     );
-        //     $tagAscii++;
-        // }
-
-        foreach ($labels as $l) {
-            Label::firstOrCreate($l);
-        }
 
         DB::commit();
     }

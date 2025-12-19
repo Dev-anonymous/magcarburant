@@ -91,6 +91,7 @@ class DataController extends Controller
 
                 $zone = request('zone');
                 $fuel = request('fuel');
+                $fuel_type = request('fuel_type');
 
                 $entity = $user->entities()->first();
 
@@ -111,8 +112,19 @@ class DataController extends Controller
                 abort_if(!$plages->count(), 422, "Aucune structure de prix trouvée sur la plage de date sélectionnée.");
 
                 $data = [];
-                $labels = Label::whereNotIn('label', uneditable())->orderBy('tag')->get();
-                $fuels = Fuel::all();
+                $labels = Label::whereNotIn('label', uneditable())
+                    ->whereHas('fuelprices', function ($q) use ($zone, $fuel_type) {
+                        $q->whereHas('zone', function ($q) use ($zone) {
+                            $q->where('zone', $zone);
+                        });
+                        $q->whereHas('fuel', function ($q) use ($fuel_type) {
+                            $q->where('fuel_type', $fuel_type);
+                        });
+                    })
+                    ->orderBy('tag')
+                    ->get();
+
+                $fuelOb =  Fuel::where('fuel', $fuel)->first();
 
                 foreach ($plages as $str) {
                     $strfrom = $str->from;
@@ -133,10 +145,8 @@ class DataController extends Controller
                                 $qq->where('fuel', $fuel);
                             }
                         })->where(['label_id' => $lab->id])->first();
-                        if ($fprice?->zone->zone !== 'OUEST' && $lab->tag === 'L') {
-                            continue;
-                        }
-                        abort_if(!$fprice, 422, "Aucun prix ($fuel, $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure $str->name #$str->id).");
+
+                        abort_if(!$fprice, 422, "Aucun prix ($fuelOb->fuel $fuelOb->fuel_type , $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure $str->name #$str->id).");
 
                         $amount = 0;
                         $currency = 'USD';
@@ -253,94 +263,4 @@ class DataController extends Controller
             }
         }
     }
-
-    // function pricestructure()
-    // {
-    //     $fuel = request('fuel');
-    //     $zone = request('zone');
-    //     $structure = request('structure');
-    //     $ratetype = request('ratetype') ?? "RÉEL"; // STRUCTURE RÉEL
-
-    //     $str = Structureprice::findOrFail($structure);
-    //     $from = $str->from?->toDateString() ?? nnow()->toDateString();
-    //     $to = $str->to?->toDateString() ?? nnow()->toDateString(); // a maintenant
-
-    //     $plages = Rate::where('type', $ratetype)
-    //         ->where('entity_id', $str->entity_id)
-    //         ->where(function ($q) use ($from, $to) {
-    //             $q->where(function ($q) use ($from, $to) {
-    //                 $q->where('from', '<=', $to)
-    //                     ->where('to', '>=', $from);
-    //             })
-    //                 ->orWhere(function ($q) use ($from, $to) {
-    //                     $q->whereNull('to')
-    //                         ->whereBetween('from', [$from, $to]);
-    //                 });
-    //         })
-    //         // ->orderBy(DB::raw('`from`'), 'desc')
-    //         ->get();
-
-    //     abort_if(!$plages->count(), 422, "Aucun TAUX $ratetype trouvé sur la période ($from ... $to) de cette structure de prix.");
-
-    //     $data = [];
-    //     $labels = Label::whereNotIn('tag', noteditable())->orderBy('tag')->get();
-    //     $fuels = Fuel::all();
-
-    //     foreach ($plages as $str) {
-    //         $strfrom = $str->from?->format('d-m-Y');
-    //         $strto = $str->to?->format('d-m-Y') ?? nnow()->toDateString();
-
-    //         $tab = [];
-    //         $tot = 0;
-    //         $stprice = Structureprice::where(['entity_id' => $str->entity_id])->whereBetween('from', [$from, $to])
-    //             ->distinct()
-    //             ->orderBy('from', 'desc')->first(); // doit forcement renvoyer au moins 1 element
-
-    //         abort_if(!$stprice, 422, "Aucune structure trouvée.");
-
-    //         foreach ($labels as $lab) {
-    //             $line = [];
-    //             $line['label'] = $lab->label;
-
-    //             $fprice = $stprice->fuelprices()
-    //                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
-    //                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
-    //                 ->where(['label_id' => $lab->id])->first();
-
-    //             if ($fprice?->zone->zone !== 'OUEST' && $lab->tag === 'L') {
-    //                 continue;
-    //             }
-    //             abort_if(!$fprice, 422, "Aucun prix ($fuel, $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure #$str->id).");
-
-    //             $amount = 0;
-    //             $currency = 'USD';
-    //             $tx = (float) $str->usd_cdf;
-    //             $currency = 'CDF'; // lol, yes
-    //             if ($fprice) {
-    //                 $amount = (float) $fprice->amount;
-    //                 // $currency = $fprice->currency;
-    //             }
-    //             $amount *= $tx;
-
-    //             if ('A' === $lab->tag) {
-    //                 $vol = Purchase::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('qtym3');
-    //             } else {
-    //                 $vol = Sale::whereBetween('date', [$from, $to])->where('product', $fuel)->sum('lata'); // lata en litre
-    //                 $vol /= 1000; // m3
-    //             }
-    //             $t = $vol * $amount;
-    //             $tot += $t;
-    //             $line['struct_price'] = v($amount);
-    //             $line['vol'] = $vol;
-    //             $line['tot'] = v($t);
-    //             $line['zone'] = $zone;
-    //             $line['fuel'] = $fuel;
-    //             $line['date'] = "DU $strfrom AU $strto | TAUX $ratetype : 1 USD = " . (v($tx)) . " CDF";
-    //             $tab[] = $line;
-    //         }
-
-    //         $data["$str->id"] = $tab;
-    //     }
-    //     return response()->json($data);
-    // }
 }

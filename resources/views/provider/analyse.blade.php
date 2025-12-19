@@ -89,22 +89,23 @@
                                         </div>
                                         <div class="form-group mb-1">
                                             <div>
-                                                <label class="justify-content-start" for="">Zone</label>
-                                                <select name="zone" class="form-control">
-                                                    @foreach (mainWays() as $e)
-                                                        <option>{{ $e }}</option>
-                                                    @endforeach
+                                                <label class="justify-content-start" for="">Type</label>
+                                                <select name="fuel_type" class="form-control">
+                                                    <option>TERRESTRE</option>
+                                                    <option>AVIATION</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group mb-1">
                                             <div>
+                                                <label class="justify-content-start" for="">Zone</label>
+                                                <select name="zone" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
                                                 <label class="justify-content-start">Produit</label>
-                                                <select name="fuel" class="form-control">
-                                                    @foreach (mainfuels() as $e)
-                                                        <option>{{ $e }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <select name="fuel" class="form-control"></select>
                                             </div>
                                         </div>
                                     </form>
@@ -132,8 +133,6 @@
 @section('script')
     <x-flatpickr />
     <style>
-
-
         .noneditable td {
             border-top: 2px solid #ccc !important;
             border-bottom: 2px solid #ccc !important;
@@ -146,13 +145,48 @@
                 firstDayOfWeek: 1
             }
         });
+        var ldr = $('[dataloader]');
 
-        $('#ffilter').change(function() {
+        var ff = $('#ffilter');
+
+        ff.change(function(e) {
+            var e = $(e.target)
+            if (e.attr('name') == 'fuel_type') {
+                getExtra();
+            } else {
+                getData();
+            }
+        });
+
+        function getExtra() {
+            var sel = $('[name="fuel_type"]');
+            var o = '';
+            var o2 = '';
+
+            if (sel.val() == 'TERRESTRE') {
+                ['NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
+                    o += `<option>${e}</option>`;
+                });
+                ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
+                    o2 += `<option>${e}</option>`;
+                });
+            }
+            if (sel.val() == 'AVIATION') {
+                ['SUD', 'EST', 'OUEST'].forEach((e) => {
+                    o += `<option>${e}</option>`;
+                });
+                ['JET'].forEach((e) => {
+                    o2 += `<option>${e}</option>`;
+                });
+            }
+            $('[name=zone]').html(o);
+            $('[name=fuel]').html(o2);
             getData();
-        })
+        }
+
+        getExtra();
 
         function getData() {
-            var ldr = $('[dataloader]');
             ldr.show();
 
             var data = $('#ffilter').serialize();
@@ -233,10 +267,9 @@
                 },
             }).always(function() {
                 ldr.hide();
-
             })
         }
 
-        getData();
+        // getData();
     </script>
 @endsection

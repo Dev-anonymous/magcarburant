@@ -67,7 +67,7 @@ class RateController extends Controller
                     $t = <<<DATA
                         <div class="dropdown">
                             <a
-                                class="btn btn-white btn-sm"
+                                class="btn btn-primary btn-sm"
                                 href="#"
                                 role="button"
                                 data-toggle="dropdown"
@@ -95,7 +95,7 @@ class RateController extends Controller
                     } else {
                         $href = route('sudo.provider', ['stx' => $row->id]);
                     }
-                    $t = "<a class='dropdown-item' href='$href'>
+                    $t = "<a class='btn btn-primary btn-sm' href='$href'>
                             <i class='material-icons md-14 align-middle'>settings</i>
                             <span class='align-middle'>Voies et Structures</span>
                         </a>";

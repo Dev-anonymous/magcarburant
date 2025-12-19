@@ -66,7 +66,7 @@ class PurchaseController extends Controller
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
-                            class="btn btn-white btn-sm"
+                            class="btn btn-primary btn-sm"
                             href="#"
                             role="button"
                             data-toggle="dropdown"

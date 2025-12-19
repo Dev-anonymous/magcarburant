@@ -23,7 +23,7 @@
                             <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar" sidebarbtn>
                                 <i class="material-icons align-middle md-36">short_text</i>
                             </button>
-                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-white appcol"
+                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-primary btn-sm appcol"
                                 type="button">
                                 <i class="material-icons align-middle md-18">home</i>
                                 Accueil

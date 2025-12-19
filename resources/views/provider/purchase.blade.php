@@ -9,9 +9,9 @@
                 <p class="lead small m-0">Gestion des achats (entrées) </p>
             </div>
             <div class="m-2">
-                <button onclick="history.back()" class="btn btn-sm btn-light d-flex align-items-center">
+                <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px"
-                        fill="#000">
+                        fill="#fff">
                         <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
                     </svg>
                     Retour
@@ -111,8 +111,7 @@
                         </div>
                         <div class="py-4">
                             <div class="table-responsive">
-                                <table id="table" class="table table-striped table-hover"
-                                    style="width:100%">
+                                <table id="table" class="table table-striped table-hover" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -743,7 +742,7 @@
                         '#5a90cc',
                     ],
                     hoverOffset: 30,
-                    borderWidth: 2,
+                    borderWidth: 0,
                     borderColor: '#fff'
                 }]
             },
@@ -824,7 +823,7 @@
                         '#5a90cc',
                     ],
                     hoverOffset: 30,
-                    borderWidth: 2,
+                    borderWidth: 0,
                     borderColor: '#fff'
                 }]
             },

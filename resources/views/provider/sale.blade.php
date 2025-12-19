@@ -9,9 +9,9 @@
                 <p class="lead small m-0">Gestion des ventes (sorties) </p>
             </div>
             <div class="m-2">
-                <button onclick="history.back()" class="btn btn-sm btn-light d-flex align-items-center">
+                <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px"
-                        fill="#000">
+                        fill="#fff">
                         <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
                     </svg>
                     Retour
@@ -36,12 +36,12 @@
                             <div class="col-6 col-md-6 col-12">
                                 <div class="text-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
-                                        width="48px" fill="#F5B666 ">
+                                        width="48px" fill="#FF3D55">
                                         <path
                                             d="M480-78q-142 0-242-97.71T138-415q0-68.14 27-130.77 27-62.63 75-108.73L480-892l240 237.5q48 46.1 75.5 108.73T823-415q0 141.58-100.5 239.29Q622-78 480-78ZM229-415h502q0-46-19-91.5T659-586L480-763 301-586q-34 34-53 79.54-19 45.54-19 91.46Z" />
                                     </svg>
-                                    <div class="font-weight-bold text-warning">Volume Total L15</div>
-                                    <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalL15>
+                                    <div class="font-weight-bold text-danger">Volume Total L15</div>
+                                    <div class="h4 font-weight-bold text-danger" style="font-size: 28px" totalL15>
                                     </div>
                                 </div>
                             </div>
@@ -105,8 +105,7 @@
                         </div>
                         <div class="py-4">
                             <div class="table-responsive">
-                                <table id="table" class="table table-striped table-hover"
-                                    style="width:100%">
+                                <table id="table" class="table table-striped table-hover" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -782,8 +781,8 @@
                         '#5a90cc',
                     ],
                     hoverOffset: 30,
-                    borderWidth: 2,
-                    borderColor: '#fff'
+                    borderWidth: 0,
+                    borderColor: '#000'
                 }]
             },
             options: {
@@ -864,7 +863,7 @@
                         '#5a90cc',
                     ],
                     hoverOffset: 30,
-                    borderWidth: 2,
+                    borderWidth: 0,
                     borderColor: '#fff'
                 }]
             },

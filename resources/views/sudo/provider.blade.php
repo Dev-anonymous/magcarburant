@@ -211,7 +211,7 @@
                                     <div class="text-right p-2">
                                         <div class="dropdown">
                                             <a
-                                                class="btn btn-white btn-sm"
+                                                class="btn btn-primary btn-sm"
                                                 href="#"
                                                 role="button"
                                                 data-toggle="dropdown"

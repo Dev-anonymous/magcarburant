@@ -65,12 +65,12 @@ class DataController extends Controller
 
                 $totalLata = v((clone $base)->sum('lata'));
                 $totalL15 = v((clone $base)->sum('l15'));
-                $totalDensity = v((clone $base)->sum('density'));
+                // $totalDensity = v((clone $base)->sum('density'));
 
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('density');
+                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata')  / 1000;
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -83,7 +83,7 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                return compact('totalLata', 'totalL15', 'totalDensity', 'chart1', 'chart2');
+                return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
             if ($type == 'balance') {
                 $from = request('date1') ?? nnow()->toDateString();

@@ -35,9 +35,9 @@
                             </div>
                             <div class="col-6 col-md-4 col-12">
                                 <div class="text-center">
-                                    <i class="material-icons md-36 text-warning mb-1">local_gas_station</i>
-                                    <div class="font-weight-bold text-warning">Volume Total (TM)</div>
-                                    <div class="h4 font-weight-bold text-warning" style="font-size: 28px" totalTm></div>
+                                    <i class="material-icons md-36 text-primary mb-1">local_gas_station</i>
+                                    <div class="font-weight-bold text-primary">Volume Total (TM)</div>
+                                    <div class="h4 font-weight-bold text-primary" style="font-size: 28px" totalTm></div>
                                 </div>
                             </div>
                             <div class="col-6 col-md-4 col-12">
@@ -56,17 +56,13 @@
                             <div class="col-md-6 col-12">
                                 <div class="">
                                     <h5 class="card-title text-center mb-4">Répartition des achats par produit (USD)</h5>
-                                    <div style="height: 300px;">
-                                        <canvas id="chart1"></canvas>
-                                    </div>
+                                    <div id="chart1"></div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="">
                                     <h5 class="card-title text-center mb-4">Répartition des achats par produit (M³)</h5>
-                                    <div style="height: 300px;">
-                                        <canvas id="chart2"></canvas>
-                                    </div>
+                                    <div id="chart2"></div>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -451,9 +447,7 @@
 @section('script')
     <x-datatable />
     <x-flatpickr />
-
-    <script src="{{ asset('assets/vendor/Chart.4.5.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datalabels.min.js') }}"></script>
+    <x-chart />
 
     <script>
         flatpickr(".flatpickr", {
@@ -704,13 +698,13 @@
                     $('[totalTm]').html(data.totalTm);
                     $('[totalM3]').html(data.totalM3);
 
-                    chart1.data.labels = data.chart1.labels;
-                    chart1.data.datasets[0].data = data.chart1.data;
-                    chart1.update();
+                    chart1.series[0].setData(
+                        data.chart1.labels.map((label, i) => [label, data.chart1.data[i]])
+                    );
 
-                    chart2.data.labels = data.chart2.labels;
-                    chart2.data.datasets[0].data = data.chart2.data;
-                    chart2.update();
+                    chart2.series[0].setData(
+                        data.chart2.labels.map((label, i) => [label, data.chart2.data[i]])
+                    );
                     ldr.hide();
                 },
                 error: function(xhr, a, b) {
@@ -726,170 +720,332 @@
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }
 
-        Chart.register(ChartDataLabels);
+        // var chart1 = new Chart($('#chart1')[0].getContext('2d'), {
+        //     type: 'doughnut',
+        //     data: {
+        //         labels: [],
+        //         datasets: [{
+        //             data: [],
+        //             backgroundColor: [
+        //                 '#4e73df',
+        //                 '#1cc88a',
+        //                 '#36b9cc',
+        //                 '#f6c23e',
+        //                 '#5a90cc',
+        //             ],
+        //             hoverOffset: 30,
+        //             borderWidth: 0,
+        //             borderColor: '#fff'
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         plugins: {
+        //             datalabels: {
+        //                 color: '#000',
+        //                 font: {
+        //                     weight: 'bold',
+        //                     size: 13
+        //                 },
+        //                 formatter: function(value, ctx) {
+        //                     const data = ctx.chart.data.datasets[0].data;
+        //                     const total = data.reduce((a, b) => a + b, 0);
+        //                     if (total === 0 || !isFinite(total)) {
+        //                         return 'aucune donnée à afficher';
+        //                     }
+        //                     const percent = (value / total * 100).toFixed(1);
+        //                     return percent + '%';
+        //                 }
+        //             },
+        //             legend: {
+        //                 position: 'left',
+        //                 align: 'center',
+        //                 labels: {
+        //                     usePointStyle: true,
+        //                     padding: 10,
+        //                     font: {
+        //                         size: 14
+        //                     },
+        //                     generateLabels: function(chart) {
+        //                         const data = chart.data;
+        //                         const ds = data.datasets[0];
+        //                         return data.labels.map((label, index) => {
+        //                             const value = ds.data[index] ?? 0;
+        //                             return {
+        //                                 text: `${label} : ${formatNumber(value)} USD`,
+        //                                 fillStyle: ds.backgroundColor[index],
+        //                                 strokeStyle: ds.backgroundColor[index],
+        //                                 lineWidth: 0,
+        //                                 hidden: isNaN(value),
+        //                                 index: index
+        //                             };
+        //                         });
+        //                     }
+        //                 }
+        //             },
+        //             tooltip: {
+        //                 callbacks: {
+        //                     label: function(context) {
+        //                         return ' Total Achat USD : ' + formatNumber(context.raw);
+        //                     }
+        //                 }
+        //             }
+        //         },
+        //         cutout: '70%',
+        //         animation: {
+        //             animateRotate: true,
+        //             duration: 1500,
+        //             easing: 'easeOutBounce'
+        //         }
+        //     }
+        // });
 
-        var chart1 = new Chart($('#chart1')[0].getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        '#4e73df',
-                        '#1cc88a',
-                        '#36b9cc',
-                        '#f6c23e',
-                        '#5a90cc',
-                    ],
-                    hoverOffset: 30,
-                    borderWidth: 0,
-                    borderColor: '#fff'
-                }]
+        // var chart2 = new Chart($('#chart2')[0].getContext('2d'), {
+        //     type: 'doughnut',
+        //     data: {
+        //         labels: [],
+        //         datasets: [{
+        //             data: [],
+        //             backgroundColor: [
+        //                 '#4e73df',
+        //                 '#1cc88a',
+        //                 '#36b9cc',
+        //                 '#f6c23e',
+        //                 '#5a90cc',
+        //             ],
+        //             hoverOffset: 30,
+        //             borderWidth: 0,
+        //             borderColor: '#fff'
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         plugins: {
+        //             datalabels: {
+        //                 color: '#000',
+        //                 font: {
+        //                     weight: 'bold',
+        //                     size: 13
+        //                 },
+        //                 formatter: function(value, ctx) {
+        //                     const data = ctx.chart.data.datasets[0].data;
+        //                     const total = data.reduce((a, b) => a + b, 0);
+        //                     if (total === 0 || !isFinite(total)) {
+        //                         return 'aucune donnée à afficher';
+        //                     }
+        //                     const percent = (value / total * 100).toFixed(1);
+        //                     return percent + '%';
+        //                 }
+        //             },
+        //             legend: {
+        //                 position: 'right',
+        //                 align: 'center',
+        //                 labels: {
+        //                     usePointStyle: true,
+        //                     padding: 10,
+        //                     font: {
+        //                         size: 14
+        //                     },
+        //                     generateLabels: function(chart) {
+        //                         const data = chart.data;
+        //                         const ds = data.datasets[0];
+        //                         return data.labels.map((label, index) => {
+        //                             const value = ds.data[index] ?? 0;
+        //                             return {
+        //                                 text: `${label} : ${formatNumber(value)} M³`,
+        //                                 fillStyle: ds.backgroundColor[index],
+        //                                 strokeStyle: ds.backgroundColor[index],
+        //                                 lineWidth: 0,
+        //                                 hidden: isNaN(value),
+        //                                 index: index
+        //                             };
+        //                         });
+        //                     }
+        //                 }
+        //             },
+        //             tooltip: {
+        //                 callbacks: {
+        //                     label: function(context) {
+        //                         let value = context.raw;
+        //                         return " Total M³ Achetés : " + formatNumber(value);
+        //                     }
+        //                 }
+        //             }
+        //         },
+        //         cutout: '70%',
+        //         animation: {
+        //             animateRotate: true,
+        //             duration: 1500,
+        //             easing: 'easeOutBounce'
+        //         }
+        //     }
+        // });
+
+        var chart1 = Highcharts.chart('chart1', {
+            chart: {
+                type: 'pie',
+                height: 300,
+                backgroundColor: 'transparent',
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0,
+                    depth: 50
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    datalabels: {
-                        color: '#000',
-                        font: {
-                            weight: 'bold',
-                            size: 13
+
+            title: {
+                text: ''
+            },
+            credits: {
+                enabled: false
+            },
+
+            legend: {
+                enabled: true,
+                align: 'left',
+                verticalAlign: 'middle',
+                layout: 'vertical',
+                itemMarginTop: 8,
+                itemMarginBottom: 8,
+                symbolRadius: 6,
+                symbolHeight: 12,
+                symbolWidth: 12,
+                itemStyle: {
+                    fontSize: '14px',
+                    color: '#1a3b5d'
+                },
+                labelFormatter: function() {
+                    return this.name + ' : ' + formatNumber(this.y) + ' USD';
+                }
+            },
+
+            tooltip: {
+                pointFormatter: function() {
+                    return 'Total Achat USD : ' + formatNumber(this.y);
+                }
+            },
+
+            plotOptions: {
+                pie: {
+                    innerSize: '70%',
+                    depth: 50,
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            const total = this.series.data.reduce((sum, p) => sum + p.y, 0);
+                            if (total === 0) return '';
+                            return ((this.y / total) * 100).toFixed(1) + '%';
                         },
-                        formatter: function(value, ctx) {
-                            const data = ctx.chart.data.datasets[0].data;
-                            const total = data.reduce((a, b) => a + b, 0);
-                            if (total === 0 || !isFinite(total)) {
-                                return 'aucune donnée à afficher';
-                            }
-                            const percent = (value / total * 100).toFixed(1);
-                            return percent + '%';
-                        }
-                    },
-                    legend: {
-                        position: 'left',
-                        align: 'center',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 10,
-                            font: {
-                                size: 14
-                            },
-                            generateLabels: function(chart) {
-                                const data = chart.data;
-                                const ds = data.datasets[0];
-                                return data.labels.map((label, index) => {
-                                    const value = ds.data[index] ?? 0;
-                                    return {
-                                        text: `${label} : ${formatNumber(value)} USD`,
-                                        fillStyle: ds.backgroundColor[index],
-                                        strokeStyle: ds.backgroundColor[index],
-                                        lineWidth: 0,
-                                        hidden: isNaN(value),
-                                        index: index
-                                    };
-                                });
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ' Total Achat USD : ' + formatNumber(context.raw);
-                            }
+                        style: {
+                            fontWeight: 'bold',
+                            color: '#000',
+                            fontSize: '13px'
                         }
                     }
-                },
-                cutout: '70%',
-                animation: {
-                    animateRotate: true,
-                    duration: 1500,
-                    easing: 'easeOutBounce'
                 }
-            }
+            },
+
+            series: [{
+                name: 'Achats USD',
+                showInLegend: true,
+                data: [],
+                colors: [
+                    '#4e73df',
+                    '#1cc88a',
+                    '#36b9cc',
+                    '#f6c23e',
+                    '#5a90cc'
+                ]
+            }]
         });
 
-        var chart2 = new Chart($('#chart2')[0].getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        '#4e73df',
-                        '#1cc88a',
-                        '#36b9cc',
-                        '#f6c23e',
-                        '#5a90cc',
-                    ],
-                    hoverOffset: 30,
-                    borderWidth: 0,
-                    borderColor: '#fff'
-                }]
+
+        var chart2 = Highcharts.chart('chart2', {
+            chart: {
+                type: 'pie',
+                height: 300,
+                backgroundColor: 'transparent',
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0,
+                    depth: 50
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    datalabels: {
-                        color: '#000',
-                        font: {
-                            weight: 'bold',
-                            size: 13
+
+            title: {
+                text: ''
+            },
+            credits: {
+                enabled: false
+            },
+
+            legend: {
+                enabled: true,
+                align: 'right',
+                verticalAlign: 'middle',
+                layout: 'vertical',
+                itemMarginTop: 8,
+                itemMarginBottom: 8,
+                symbolRadius: 6,
+                symbolHeight: 12,
+                symbolWidth: 12,
+                itemStyle: {
+                    fontSize: '14px',
+                    color: '#1a3b5d'
+                },
+                labelFormatter: function() {
+                    return this.name + ' : ' + formatNumber(this.y) + ' M³';
+                }
+            },
+
+            tooltip: {
+                pointFormatter: function() {
+                    return 'Total M³ Achetés : ' + formatNumber(this.y);
+                }
+            },
+
+            plotOptions: {
+                pie: {
+                    innerSize: '70%',
+                    depth: 50,
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            const total = this.series.data.reduce((sum, p) => sum + p.y, 0);
+                            if (total === 0) return '';
+                            return ((this.y / total) * 100).toFixed(1) + '%';
                         },
-                        formatter: function(value, ctx) {
-                            const data = ctx.chart.data.datasets[0].data;
-                            const total = data.reduce((a, b) => a + b, 0);
-                            if (total === 0 || !isFinite(total)) {
-                                return 'aucune donnée à afficher';
-                            }
-                            const percent = (value / total * 100).toFixed(1);
-                            return percent + '%';
-                        }
-                    },
-                    legend: {
-                        position: 'right',
-                        align: 'center',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 10,
-                            font: {
-                                size: 14
-                            },
-                            generateLabels: function(chart) {
-                                const data = chart.data;
-                                const ds = data.datasets[0];
-                                return data.labels.map((label, index) => {
-                                    const value = ds.data[index] ?? 0;
-                                    return {
-                                        text: `${label} : ${formatNumber(value)} M³`,
-                                        fillStyle: ds.backgroundColor[index],
-                                        strokeStyle: ds.backgroundColor[index],
-                                        lineWidth: 0,
-                                        hidden: isNaN(value),
-                                        index: index
-                                    };
-                                });
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let value = context.raw;
-                                return " Total M³ Achetés : " + formatNumber(value);
-                            }
+                        style: {
+                            fontWeight: 'bold',
+                            color: '#000',
+                            fontSize: '13px'
                         }
                     }
-                },
-                cutout: '70%',
-                animation: {
-                    animateRotate: true,
-                    duration: 1500,
-                    easing: 'easeOutBounce'
                 }
-            }
+            },
+
+            series: [{
+                name: 'Achats M³',
+                showInLegend: true,
+                data: [],
+                colors: [
+                    '#4e73df',
+                    '#1cc88a',
+                    '#36b9cc',
+                    '#f6c23e',
+                    '#5a90cc'
+                ]
+            }]
         });
+
 
         dashboard();
     </script>

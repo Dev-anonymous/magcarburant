@@ -720,168 +720,6 @@
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }
 
-        // var chart1 = new Chart($('#chart1')[0].getContext('2d'), {
-        //     type: 'doughnut',
-        //     data: {
-        //         labels: [],
-        //         datasets: [{
-        //             data: [],
-        //             backgroundColor: [
-        //                 '#4e73df',
-        //                 '#1cc88a',
-        //                 '#36b9cc',
-        //                 '#f6c23e',
-        //                 '#5a90cc',
-        //             ],
-        //             hoverOffset: 30,
-        //             borderWidth: 0,
-        //             borderColor: '#fff'
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: {
-        //             datalabels: {
-        //                 color: '#000',
-        //                 font: {
-        //                     weight: 'bold',
-        //                     size: 13
-        //                 },
-        //                 formatter: function(value, ctx) {
-        //                     const data = ctx.chart.data.datasets[0].data;
-        //                     const total = data.reduce((a, b) => a + b, 0);
-        //                     if (total === 0 || !isFinite(total)) {
-        //                         return 'aucune donnée à afficher';
-        //                     }
-        //                     const percent = (value / total * 100).toFixed(1);
-        //                     return percent + '%';
-        //                 }
-        //             },
-        //             legend: {
-        //                 position: 'left',
-        //                 align: 'center',
-        //                 labels: {
-        //                     usePointStyle: true,
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 14
-        //                     },
-        //                     generateLabels: function(chart) {
-        //                         const data = chart.data;
-        //                         const ds = data.datasets[0];
-        //                         return data.labels.map((label, index) => {
-        //                             const value = ds.data[index] ?? 0;
-        //                             return {
-        //                                 text: `${label} : ${formatNumber(value)} USD`,
-        //                                 fillStyle: ds.backgroundColor[index],
-        //                                 strokeStyle: ds.backgroundColor[index],
-        //                                 lineWidth: 0,
-        //                                 hidden: isNaN(value),
-        //                                 index: index
-        //                             };
-        //                         });
-        //                     }
-        //                 }
-        //             },
-        //             tooltip: {
-        //                 callbacks: {
-        //                     label: function(context) {
-        //                         return ' Total Achat USD : ' + formatNumber(context.raw);
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         cutout: '70%',
-        //         animation: {
-        //             animateRotate: true,
-        //             duration: 1500,
-        //             easing: 'easeOutBounce'
-        //         }
-        //     }
-        // });
-
-        // var chart2 = new Chart($('#chart2')[0].getContext('2d'), {
-        //     type: 'doughnut',
-        //     data: {
-        //         labels: [],
-        //         datasets: [{
-        //             data: [],
-        //             backgroundColor: [
-        //                 '#4e73df',
-        //                 '#1cc88a',
-        //                 '#36b9cc',
-        //                 '#f6c23e',
-        //                 '#5a90cc',
-        //             ],
-        //             hoverOffset: 30,
-        //             borderWidth: 0,
-        //             borderColor: '#fff'
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: {
-        //             datalabels: {
-        //                 color: '#000',
-        //                 font: {
-        //                     weight: 'bold',
-        //                     size: 13
-        //                 },
-        //                 formatter: function(value, ctx) {
-        //                     const data = ctx.chart.data.datasets[0].data;
-        //                     const total = data.reduce((a, b) => a + b, 0);
-        //                     if (total === 0 || !isFinite(total)) {
-        //                         return 'aucune donnée à afficher';
-        //                     }
-        //                     const percent = (value / total * 100).toFixed(1);
-        //                     return percent + '%';
-        //                 }
-        //             },
-        //             legend: {
-        //                 position: 'right',
-        //                 align: 'center',
-        //                 labels: {
-        //                     usePointStyle: true,
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 14
-        //                     },
-        //                     generateLabels: function(chart) {
-        //                         const data = chart.data;
-        //                         const ds = data.datasets[0];
-        //                         return data.labels.map((label, index) => {
-        //                             const value = ds.data[index] ?? 0;
-        //                             return {
-        //                                 text: `${label} : ${formatNumber(value)} M³`,
-        //                                 fillStyle: ds.backgroundColor[index],
-        //                                 strokeStyle: ds.backgroundColor[index],
-        //                                 lineWidth: 0,
-        //                                 hidden: isNaN(value),
-        //                                 index: index
-        //                             };
-        //                         });
-        //                     }
-        //                 }
-        //             },
-        //             tooltip: {
-        //                 callbacks: {
-        //                     label: function(context) {
-        //                         let value = context.raw;
-        //                         return " Total M³ Achetés : " + formatNumber(value);
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         cutout: '70%',
-        //         animation: {
-        //             animateRotate: true,
-        //             duration: 1500,
-        //             easing: 'easeOutBounce'
-        //         }
-        //     }
-        // });
 
         var chart1 = Highcharts.chart('chart1', {
             chart: {
@@ -895,14 +733,12 @@
                     depth: 50
                 }
             },
-
             title: {
                 text: ''
             },
             credits: {
                 enabled: false
             },
-
             legend: {
                 enabled: true,
                 align: 'left',
@@ -921,13 +757,11 @@
                     return this.name + ' : ' + formatNumber(this.y) + ' USD';
                 }
             },
-
             tooltip: {
                 pointFormatter: function() {
                     return 'Total Achat USD : ' + formatNumber(this.y);
                 }
             },
-
             plotOptions: {
                 pie: {
                     innerSize: '70%',
@@ -949,7 +783,6 @@
                     }
                 }
             },
-
             series: [{
                 name: 'Achats USD',
                 showInLegend: true,
@@ -961,7 +794,24 @@
                     '#f6c23e',
                     '#5a90cc'
                 ]
-            }]
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            align: 'center',
+                            verticalAlign: 'bottom',
+                            layout: 'horizontal'
+                        },
+                        chart: {
+                            height: 400
+                        }
+                    }
+                }]
+            }
         });
 
 
@@ -977,14 +827,12 @@
                     depth: 50
                 }
             },
-
             title: {
                 text: ''
             },
             credits: {
                 enabled: false
             },
-
             legend: {
                 enabled: true,
                 align: 'right',
@@ -1003,13 +851,11 @@
                     return this.name + ' : ' + formatNumber(this.y) + ' M³';
                 }
             },
-
             tooltip: {
                 pointFormatter: function() {
                     return 'Total M³ Achetés : ' + formatNumber(this.y);
                 }
             },
-
             plotOptions: {
                 pie: {
                     innerSize: '70%',
@@ -1031,7 +877,6 @@
                     }
                 }
             },
-
             series: [{
                 name: 'Achats M³',
                 showInLegend: true,
@@ -1043,7 +888,24 @@
                     '#f6c23e',
                     '#5a90cc'
                 ]
-            }]
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            align: 'center',
+                            verticalAlign: 'bottom',
+                            layout: 'horizontal'
+                        },
+                        chart: {
+                            height: 400
+                        }
+                    }
+                }]
+            }
         });
 
 

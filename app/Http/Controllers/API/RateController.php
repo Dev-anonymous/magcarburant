@@ -19,10 +19,16 @@ class RateController extends Controller
     {
         $user = auth()->user();
         $type = request('type');
+        $isTx = true;
         if ($user->user_role === 'provider') {
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
-            $rates = $entity->rates()->where('type', $type);
+            if ($type == 'structure') {
+                $data = $entity->structureprices();
+                $isTx = false;
+            } else {
+                $data = $entity->rates();
+            }
         } else if ($user->user_role === 'sudo') {
             // $entity = Entity::find(request('entity_id'));
             // if ($type == 'structure') {
@@ -36,7 +42,7 @@ class RateController extends Controller
             abort(403);
         }
 
-        return DataTables::of($rates)
+        return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('from', function ($row) {
                 return $row->from->format('d-m-Y');
@@ -49,8 +55,8 @@ class RateController extends Controller
                 $t .= "<span>1 USD = $row->usd_cdf CDF</span>";
                 return $t;
             })
-            ->addColumn('action', function ($row) use ($user, $type) {
-                if (!$row->to) {
+            ->addColumn('action', function ($row) use ($user, $type, $isTx) {
+                if (!$row->to && $isTx) {
                     $data = e(json_encode([
                         'id' => $row->id,
                         'from' => $row->from->format('Y-m-d'),
@@ -80,8 +86,19 @@ class RateController extends Controller
                             </div>
                         </div>
                     DATA;
-                    // if ($user->user_role === 'provider' || ($type == 'structure' && $user->user_role == 'sudo')) {
-                    // }
+                    return $t;
+                }
+
+                if (!$isTx) {
+                    if ($user->user_role == 'provider') {
+                        $href = route('provider.accounting', ['stx' => $row->id]);
+                    } else {
+                        $href = route('sudo.provider', ['stx' => $row->id]);
+                    }
+                    $t = "<a class='dropdown-item' href='$href'>
+                            <i class='material-icons md-14 align-middle'>settings</i>
+                            <span class='align-middle'>Voies et Structures</span>
+                        </a>";
                     return $t;
                 }
             })
@@ -127,7 +144,6 @@ class RateController extends Controller
             }
 
             $tauxActif = $entity->rates()
-                ->where('type', $rate->type)
                 ->whereNull('to')
                 ->where('id', '!=', $rate->id)
                 ->first();
@@ -140,7 +156,6 @@ class RateController extends Controller
             }
 
             $dernierTaux = $entity->rates()
-                ->where('type', $rate->type)
                 ->whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
@@ -170,7 +185,6 @@ class RateController extends Controller
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
                 'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
-                'type' => 'required|in:STRUCTURE,RÉEL',
             ], [
                 'from.required' => 'Veuillez renseigner la date validité initiale.',
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
@@ -181,39 +195,29 @@ class RateController extends Controller
             if ($user->user_role == 'provider') {
                 $entity = $user->entities()->first();
                 abort_if(!$entity, 422, "No entity");
-                $rate = $entity->rates()->where('type', request('type'));
-                $tauxActif = $rate->where('type', 'RÉEL')->whereNull('to')->first();
-            }
-            //  else if ($user->user_role == 'sudo') {
-            //     $isStTX = true;
-            //     $validated['type'] = 'STRUCTURE';
-            //     $tauxActif = Rate::where('type', 'STRUCTURE')->whereNull('to')->first();
-            //     $rate = new Rate;
-            // }
-            else {
+                $rate = $entity->rates();
+                $lastTx = $entity->rates()->orderByDesc('from')->first();
+            } else {
                 abort(403, "No permission");
             }
 
-            if ($tauxActif) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Impossible d’ajouter un nouveau taux : Vous devez renseigner la date de validité fin du taux en cours : du {$tauxActif->from?->format('d-m-Y')}  au ... ? .",
-                ], 422);
-            }
+            $from = Carbon::parse($validated['from']);
 
-            $dernierTaux = $entity->rates()->where('type', request('type'))->orderByDesc('to')->first();
+            DB::beginTransaction();
 
-            if ($dernierTaux && $dernierTaux->to) {
-                $dateAttendue = Carbon::parse($dernierTaux->to)->addDay();
-                if ($validated['from'] !== $dateAttendue->toDateString()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "La date fin du dernier taux est {$dernierTaux->to->format('d-m-Y')}, la date de debut du nouveau taux doit être : {$dateAttendue->format('d-m-Y')}.",
-                    ], 422);
+            if ($lastTx) {
+                if (is_null($lastTx->to)) {
+                    $minStartDate = Carbon::parse($lastTx->from)->addDays(1);
+                    abort_if($from->lt($minStartDate), 422, "Le nouveau taux doit commencer au moins le {$minStartDate->format('d-m-Y')}.");
+                    $lastTx->update([
+                        'to' => $from->copy()->subDay()->toDateString(),
+                    ]);
+                } else {
+                    $expectedDate = Carbon::parse($lastTx->to)->addDay();
+                    abort_if($from->toDateString() !== $expectedDate->toDateString(), 422, "La nouveaux taux doit commencer le {$expectedDate->format('d-m-Y')}.");
                 }
             }
 
-            DB::beginTransaction();
             $rate->create($validated);
 
             DB::commit();

@@ -111,7 +111,7 @@ class DataController extends Controller
                 abort_if(!$plages->count(), 422, "Aucune structure de prix trouvée sur la plage de date sélectionnée.");
 
                 $data = [];
-                $labels = Label::whereNotIn('tag', noteditable())->orderBy('tag')->get();
+                $labels = Label::whereNotIn('label', uneditable())->orderBy('tag')->get();
                 $fuels = Fuel::all();
 
                 foreach ($plages as $str) {
@@ -136,7 +136,7 @@ class DataController extends Controller
                         if ($fprice?->zone->zone !== 'OUEST' && $lab->tag === 'L') {
                             continue;
                         }
-                        abort_if(!$fprice, 422, "Aucun prix ($fuel, $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure #$str->id).");
+                        abort_if(!$fprice, 422, "Aucun prix ($fuel, $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure $str->name #$str->id).");
 
                         $amount = 0;
                         $currency = 'USD';
@@ -202,7 +202,8 @@ class DataController extends Controller
                 ];
 
                 $rows = [];
-                $labels = Label::orderBy('tag')->whereNotIn('tag', noteditable())->get();
+
+                $labels = Label::orderBy('tag')->whereNotIn('label', uneditable())->get();
                 $sales = $entity->sales()->where(function ($q) use ($fuel, $zone) {
                     if ($fuel) {
                         $q->where('product', $fuel);

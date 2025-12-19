@@ -99,6 +99,17 @@ function noteditable($type, $zone)
     return (array) @$noedit[$type][$zone];
 }
 
+function uneditable()
+{
+    $ignore = [];
+    foreach (['aviation', 'terrestre'] as $t) {
+        foreach (mainWays() as $z) {
+            $ignore = [...$ignore, ...noteditable($t, $z)];
+        }
+    }
+    return array_values(array_unique($ignore));
+}
+
 function mainfuels()
 {
     return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI', 'JET'];

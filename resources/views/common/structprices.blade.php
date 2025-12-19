@@ -102,6 +102,11 @@
                                 </div>
                             </div>
                         </div>
+                        <p class="m-0 text-danger mb-3">
+                            Si vous créez une nouvelle structure de prix sans pour autant spécifier la date de clôture de la
+                            structure de prix actuelle, la date clôture de la structure actuelle sera la date début de la
+                            structure que vous créez – 1.
+                        </p>
                         <x-alert />
                     </div>
                     <div class="modal-footer">
@@ -291,7 +296,7 @@
                     name: 'view',
                     orderable: false,
                     searchable: false,
-                    className:'text-nowrap',
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'action',

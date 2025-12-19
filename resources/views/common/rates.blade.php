@@ -41,9 +41,9 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
+                                        <th>Taux</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
-                                        <th>Quantité UM = Quantité UM</th>
                                         <th class="no-export"></th>
                                     </tr>
                                 </thead>
@@ -98,6 +98,11 @@
                                 </div>
                             </div>
                         </div>
+                        <p class="m-0 text-danger mb-3">
+                            Si vous créez un nouveau taux sans pour autant spécifier la date de clôture du
+                            taux actuel, la date clôture du taux actuel sera la date début du
+                            taux que vous créez – 1.
+                        </p>
                         <x-alert />
                     </div>
                     <div class="modal-footer">
@@ -224,19 +229,19 @@
                     name: 'id',
                 },
                 {
+                    data: 'rate',
+                    name: 'rate',
+                    className: 'text-nowrap font-weight-bold',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
                     data: 'from',
                     name: 'from'
                 },
                 {
                     data: 'to',
                     name: 'to'
-                },
-                {
-                    data: 'rate',
-                    name: 'rate',
-                    className: 'text-nowrap font-weight-bold',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'action',

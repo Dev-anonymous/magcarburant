@@ -190,28 +190,30 @@ class Structureprices extends Controller
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
             $structureprices = $entity->structureprices();
-            $strActif = $structureprices->whereNull('to')->first();
 
-            if ($strActif) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Impossible d’ajouter une nouvelle structure des prix : Vous devez renseigner la date de validité fin de la structure des prix en cours : du {$strActif->from?->format('d-m-Y')}  au ... ? .",
-                ], 422);
-            }
+            DB::beginTransaction();
 
-            $dernierStr = $entity->structureprices()->orderByDesc('to')->first();
+            $lastStructure = $structureprices
+                ->orderByDesc('from')
+                ->first();
 
-            if ($dernierStr && $dernierStr->to) {
-                $dateAttendue = Carbon::parse($dernierStr->to)->addDay();
-                if ($validated['from'] !== $dateAttendue->toDateString()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "La date fin de la dernière structure des prix est {$dernierStr->to->format('d-m-Y')}, la date de debut de la nouvelle structure des prix doit être : {$dateAttendue->format('d-m-Y')}.",
-                    ], 422);
+            $from = Carbon::parse($validated['from']);
+
+            if ($lastStructure) {
+                if (is_null($lastStructure->to)) {
+                    $minStartDate = Carbon::parse($lastStructure->from)->addDays(2);
+                    abort_if($from->lt($minStartDate), 422, "La nouvelle structure doit commencer au moins le {$minStartDate->format('d-m-Y')}.");
+
+                    // Fermeture automatique de l’ancienne structure (n-1)
+                    $lastStructure->update([
+                        'to' => $from->copy()->subDay()->toDateString(),
+                    ]);
+                } else {
+                    $expectedDate = Carbon::parse($lastStructure->to)->addDay();
+                    abort_if($from->toDateString() !== $expectedDate->toDateString(), 422, "La nouvelle structure doit commencer le {$expectedDate->format('d-m-Y')}.");
                 }
             }
 
-            DB::beginTransaction();
             $st = $structureprices->create($validated);
             $name = strname($entity, $st);
             $st->update(['name' => $name]);

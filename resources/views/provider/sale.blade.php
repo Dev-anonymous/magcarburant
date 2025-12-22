@@ -769,8 +769,8 @@
                     );
 
                     setTimeout(() => {
-                        chart1.reflow();
-                        chart2.reflow();
+                        chart1.update({}, true);
+                        chart2.update({}, true);
                     }, 0);
 
                     ldr.hide();

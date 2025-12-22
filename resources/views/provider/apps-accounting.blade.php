@@ -17,7 +17,7 @@
                             d="M180-120q-24 0-42-18t-18-42v-660h60v660h660v60H180Zm75-135v-334h119v334H255Zm198 0v-540h119v540H453Zm194 0v-170h119v170H647Z" />
                     </svg>
                     <div class="p-2">
-                        <h4 class="font-weight-bold">Analyse</h4>
+                        <h4 class="font-weight-bold">Manque à Gagner</h4>
                         {{-- <p class="m-0">Gestion des achats</p> --}}
                     </div>
                 </div>

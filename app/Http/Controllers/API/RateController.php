@@ -51,9 +51,7 @@ class RateController extends Controller
                 return $row->to?->format('d-m-Y') ?? '-';
             })
             ->addColumn('rate', function ($row) {
-                $t = "<span>1 CDF = $row->cdf_usd USD</span><br/>";
-                $t .= "<span>1 USD = $row->usd_cdf CDF</span>";
-                return $t;
+                return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
             ->addColumn('action', function ($row) use ($user, $type, $isTx) {
                 if (!$row->to && $isTx) {
@@ -67,7 +65,7 @@ class RateController extends Controller
                     $t = <<<DATA
                         <div class="dropdown">
                             <a
-                                class="btn btn-primary btn-sm"
+                                class="btn btn-primary2 btn-sm"
                                 href="#"
                                 role="button"
                                 data-toggle="dropdown"
@@ -89,18 +87,18 @@ class RateController extends Controller
                     return $t;
                 }
 
-                if (!$isTx) {
-                    if ($user->user_role == 'provider') {
-                        $href = route('provider.accounting', ['stx' => $row->id]);
-                    } else {
-                        $href = route('sudo.provider', ['stx' => $row->id]);
-                    }
-                    $t = "<a class='btn btn-primary btn-sm' href='$href'>
-                            <i class='material-icons md-14 align-middle'>settings</i>
-                            <span class='align-middle'>Voies et Structures</span>
-                        </a>";
-                    return $t;
-                }
+                // if (!$isTx) {
+                //     if ($user->user_role == 'provider') {
+                //         $href = route('provider.accounting', ['stx' => $row->id]);
+                //     } else {
+                //         $href = route('sudo.provider', ['stx' => $row->id]);
+                //     }
+                //     $t = "<a class='btn btn-primary btn-sm' href='$href'>
+                //             <i class='material-icons md-14 align-middle'>settings</i>
+                //             <span class='align-middle'>Voies et Structures</span>
+                //         </a>";
+                //     return $t;
+                // }
             })
             ->rawColumns(['action', 'rate'])
             ->make(true);
@@ -115,7 +113,6 @@ class RateController extends Controller
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
-                'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
                 'from.required' => 'Veuillez renseigner la date validité initiale.',
@@ -183,7 +180,6 @@ class RateController extends Controller
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
-                'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
                 'from.required' => 'Veuillez renseigner la date validité initiale.',

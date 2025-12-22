@@ -77,18 +77,6 @@
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
-                                    <div class="input-group-text">1 CDF = </div>
-                                </div>
-                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd" class="form-control"
-                                    required>
-                                <div class="input-group-preppend">
-                                    <div class="input-group-text"> USD</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="input-group">
-                                <div class="input-group-append">
                                     <div class="input-group-text">1 USD = </div>
                                 </div>
                                 <input type="number" min="0.00000001" step="0.00000001" name="usd_cdf" class="form-control"
@@ -147,18 +135,6 @@
                             Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les taux,
                             rassurez-vous donc de configurer les taux avant de renseigner la date de clôture
                         </p>
-                        <div class="mb-2 mt-2">
-                            <div class="input-group">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">1 CDF = </div>
-                                </div>
-                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd"
-                                    class="form-control" required>
-                                <div class="input-group-preppend">
-                                    <div class="input-group-text"> USD</div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
@@ -266,7 +242,6 @@
                 $('[name="id"]', form).val(data.id);
                 $('[name="from"]', form).val(data.from);
                 $('[name="to"]', form).val(data.to);
-                $('[name="cdf_usd"]', form).val(data.cdf_usd);
                 $('[name="usd_cdf"]', form).val(data.usd_cdf);
                 mdl.modal('show');
             });

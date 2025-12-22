@@ -36,7 +36,7 @@
                                             <a href="{{ route('provider.analyse') }}" class="nav-link"
                                                 aria-expanded="false">
                                                 <i class="material-icons md-18 align-middle">trending_up</i>
-                                                Analyse
+                                                MAG
                                             </a>
                                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
                                                 aria-expanded="false">

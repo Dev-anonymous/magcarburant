@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Sale
  * 
  * @property int $id
+ * @property string|null $terminal
  * @property int $entity_id
  * @property Carbon|null $date
  * @property string|null $locality
@@ -42,6 +43,7 @@ class Sale extends Model
 	];
 
 	protected $fillable = [
+		'terminal',
 		'entity_id',
 		'date',
 		'locality',

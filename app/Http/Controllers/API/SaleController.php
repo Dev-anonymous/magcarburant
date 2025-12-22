@@ -66,7 +66,7 @@ class SaleController extends Controller
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
-                            class="btn btn-primary btn-sm"
+                            class="btn btn-primary2 btn-sm"
                             href="#"
                             role="button"
                             data-toggle="dropdown"
@@ -108,6 +108,7 @@ class SaleController extends Controller
 
             $validated = $request->validate([
                 'date' => 'required|string|date|before_or_equal:today',
+                'terminal'  => 'required|string|max:255',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'way' => 'required|string|in:' . implode(',', mainWays()),
                 'client'  => 'required|string|max:128',
@@ -177,76 +178,105 @@ class SaleController extends Controller
                 $colH = trim($row[7] ?? null);
                 $colI = trim($row[8] ?? null);
                 $colJ = trim($row[9] ?? null);
-                $row = array_splice($row, 0, 10);
-
+                $colK = trim($row[10] ?? null);
+                $row = array_splice($row, 0, 11);
 
                 if (empty(array_filter($row))) {
                     continue;
                 }
+
                 $lineErrors = [];
 
+                // === A : Date ===
                 if (empty($colA)) {
                     $lineErrors[] = "Cellule A$rowNumber : veuillez renseigner la date de la vente";
                 }
+
                 try {
                     if (is_numeric($colA)) {
                         $colA = Date::excelToDateTimeObject($colA)->format('Y-m-d');
                     } else {
                         $colA = Carbon::parse(str_replace('/', '-', $colA))->format('Y-m-d');
                     }
+
                     $date = Carbon::parse($colA);
                     if ($date->gt(Carbon::today())) {
-                        $lineErrors[] = "Cellule A$rowNumber : la date de la vente {$date->format('d-m-Y')} ne doit pas être > aujourd'hui";
+                        $lineErrors[] =
+                            "Cellule A$rowNumber : la date de la vente {$date->format('d-m-Y')} ne doit pas être > aujourd'hui";
                     }
                 } catch (\Throwable $th) {
                     $lineErrors[] = "Cellule A$rowNumber : la date est invalide ou au mauvais format";
                 }
+
+                // === B : Terminal ===
                 if (empty($colB)) {
-                    $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner la localité";
-                }
-                if (!in_array($colC, mainWays(), true)) {
-                    $lineErrors[] = "Cellule C$rowNumber : la voie \"$colC\" n'est pas valide";
+                    $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner le terminal";
                 }
 
-                if (empty($colD)) {
-                    $lineErrors[] = "Cellule D$rowNumber : veuillez renseigner le nom du produit";
-                } else {
-                    if (!in_array($colD,  mainfuels(), true)) {
-                        $lineErrors[] = "Cellule D$rowNumber : le produit \"$colD\" n'est pas reconnu";
-                    }
+                // === C : Localité ===
+                if (empty($colC)) {
+                    $lineErrors[] = "Cellule C$rowNumber : veuillez renseigner la localité";
                 }
 
+                // === D : Voie ===
+                if (!in_array($colD, mainWays(), true)) {
+                    $lineErrors[] = "Cellule D$rowNumber : la voie \"$colD\" n'est pas valide";
+                }
+
+                // === E : Produit ===
                 if (empty($colE)) {
-                    $lineErrors[] = "Cellule E$rowNumber : veuillez renseigner le bon de livraison";
+                    $lineErrors[] = "Cellule E$rowNumber : veuillez renseigner le nom du produit";
+                } elseif (!in_array($colE, mainfuels(), true)) {
+                    $lineErrors[] = "Cellule E$rowNumber : le produit \"$colE\" n'est pas reconnu";
                 }
+
+                // === F : Bon de livraison ===
                 if (empty($colF)) {
-                    $lineErrors[] = "Cellule F$rowNumber : veuillez renseigner le programme de livraison";
+                    $lineErrors[] = "Cellule F$rowNumber : veuillez renseigner le bon de livraison";
                 }
+
+                // === G : Programme de livraison ===
                 if (empty($colG)) {
-                    $lineErrors[] = "Cellule G$rowNumber : veuillez renseigner le nom du client";
+                    $lineErrors[] = "Cellule G$rowNumber : veuillez renseigner le programme de livraison";
                 }
-                foreach (['H' => $colH, 'I' => $colI, 'J' => $colJ] as $colName => $value) {
+
+                // === H : Client ===
+                if (empty($colH)) {
+                    $lineErrors[] = "Cellule H$rowNumber : veuillez renseigner le nom du client";
+                }
+
+                // === I, J, K : valeurs numériques ===
+                foreach (
+                    [
+                        'I' => $colI,
+                        'J' => $colJ,
+                        'K' => $colK
+                    ] as $colName => $value
+                ) {
                     if (!is_numeric($value) || $value < 0) {
-                        $lineErrors[] = "Cellule $colName$rowNumber : la valeur doit être un nombre >= 0";
+                        $lineErrors[] = "Cellule {$colName}{$rowNumber} : la valeur doit être un nombre >= 0";
                     }
                 }
+
+                // === Gestion des erreurs ===
                 if (!empty($lineErrors)) {
-                    $errors[] =  implode("; ", $lineErrors);
+                    $errors[] = implode('; ', $lineErrors);
                     continue;
                 }
 
                 $insert[] = [
-                    'entity_id' => $entity->id,
-                    'date' => $colA,
-                    'locality' => $colB,
-                    'way' => $colC,
-                    'product' => $colD,
-                    'delivery_note' => $colE,
-                    'delivery_program' => $colF,
-                    'client' => $colG,
-                    'lata' => $colH,
-                    'l15' => $colI,
-                    'density' => $colJ,
+                    'entity_id'        => $entity->id,
+                    'date'             => $colA,
+                    'terminal'         => $colB,
+                    'locality'         => $colC,
+                    'way'              => $colD,
+                    'product'          => $colE,
+                    'delivery_note'    => $colF,
+                    'delivery_program' => $colG,
+                    'client'           => $colH,
+                    'lata'             => $colI,
+                    'l15'              => $colJ,
+                    'density'          => $colK,
                 ];
             }
 
@@ -280,6 +310,7 @@ class SaleController extends Controller
 
             $validated = $request->validate([
                 'date' => 'required|string|date|before_or_equal:today',
+                'terminal'  => 'required|string|max:255',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'way' => 'required|string|in:' . implode(',', mainWays()),
                 'client'  => 'required|string|max:128',

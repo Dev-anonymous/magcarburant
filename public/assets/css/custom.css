@@ -188,6 +188,22 @@ input.form-control:focus {
     border-color: #4f84bf !important;
 }
 
+.btn-primary2 {
+    background-color: #a9cff2 !important;
+    border-color: #a9cff2 !important;
+    /* color: #ccc !important; */
+}
+
+.btn-primary2:hover {
+    background-color: #9ac4ec !important;
+    border-color: #9ac4ec !important;
+}
+
+.btn-primary2:active {
+    background-color: #8bb8e4 !important;
+    border-color: #8bb8e4 !important;
+}
+
 /* Dropdown menu */
 .dropdown-menu {
     background-color: #a8c8f0 !important;

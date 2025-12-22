@@ -211,7 +211,7 @@
                                     <div class="text-right p-2">
                                         <div class="dropdown">
                                             <a
-                                                class="btn btn-primary btn-sm"
+                                                class="btn btn-primary2 btn-sm"
                                                 href="#"
                                                 role="button"
                                                 data-toggle="dropdown"
@@ -236,7 +236,7 @@
                                         </div>
                                     </div>
                                     <div class="card-img text-center p-2">
-                                        <img src="${e.logo}" class="img-responsive center-block">
+                                        <img src="${e.logo}" style="width:70px" class="img-responsive center-block">
                                     </div>
                                     <div class="card-caption text-center">
                                         <h4>${e.shortname}</h4>

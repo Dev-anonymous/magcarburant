@@ -105,6 +105,7 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
+                                            <th>Terminal</th>
                                             <th>Date</th>
                                             <th>Localité</th>
                                             <th>Voie</th>
@@ -159,6 +160,14 @@
                                 <div class="mb-2">
                                     <label class="mb-0" for="dv1">Date de la vente</label>
                                     <input class="form-control flatpickr" id="dv1" required name="date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Terminal</label>
+                                    <input class="form-control" required name="terminal">
                                 </div>
                             </div>
                         </div>
@@ -278,6 +287,14 @@
                                 <div class="mb-2">
                                     <label class="mb-0" for="dv1">Date de la vente</label>
                                     <input class="form-control flatpickr" id="dv1" required name="date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Terminal</label>
+                                    <input class="form-control" required name="terminal">
                                 </div>
                             </div>
                         </div>
@@ -516,12 +533,16 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 4,
+                targets: 13,
                 width: '1%'
             }],
             columns: [{
                     data: 'id',
                     name: 'id',
+                },
+                {
+                    data: 'terminal',
+                    name: 'terminal',
                 },
                 {
                     data: 'date',
@@ -603,6 +624,7 @@
 
                 $('[name="id"]', form).val(data.id);
                 $('[name="product"]', form).val(data.product);
+                $('[name="terminal"]', form).val(data.terminal);
                 $('[name="client"]', form).val(data.client);
                 $('[name="way"]', form).val(data.way);
                 $('[name="locality"]', form).val(data.locality);

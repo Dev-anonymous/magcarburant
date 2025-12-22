@@ -486,7 +486,10 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 4,
+                targets: 1,
+                width: '1%'
+            }, {
+                targets: 10,
                 width: '1%'
             }],
             columns: [{

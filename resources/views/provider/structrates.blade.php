@@ -41,7 +41,6 @@
                                         <th>Taux</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
-                                        <th class="no-export"></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -102,13 +101,6 @@
                     data: 'to',
                     name: 'to',
                     className: 'text-nowrap',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    className: 'text-nowrap',
-                    orderable: false,
-                    searchable: false,
                 },
             ],
             dom: 'Blfrtip',

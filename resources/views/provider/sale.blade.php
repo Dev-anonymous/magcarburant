@@ -768,6 +768,11 @@
                         data.chart2.labels.map((label, i) => [label, data.chart2.data[i]])
                     );
 
+                    setTimeout(() => {
+                        chart1.reflow();
+                        chart2.reflow();
+                    }, 0);
+
                     ldr.hide();
                 },
                 error: function(xhr, a, b) {

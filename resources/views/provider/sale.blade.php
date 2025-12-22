@@ -771,7 +771,7 @@
                     setTimeout(() => {
                         chart1.update({}, true);
                         chart2.update({}, true);
-                    }, 0);
+                    }, 400);
 
                     ldr.hide();
                 },

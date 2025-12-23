@@ -197,18 +197,19 @@ class DataController extends Controller
                 $to = $structure->to ?? nnow();
 
                 $head = [
-                    ['label' => 'ID',],
-                    ['label' => 'Date',],
-                    ['label' => 'Localité',],
-                    ['label' => 'Voie',],
-                    ['label' => 'Produit',],
-                    ['label' => 'Bon de livraison',],
+                    ['label' => 'ID'],
+                    ['label' => 'Terminal'],
+                    ['label' => 'Date'],
+                    ['label' => 'Localité'],
+                    ['label' => 'Voie'],
+                    ['label' => 'Produit'],
+                    ['label' => 'Bon de livraison'],
                     ['label' => 'Programme de livraison'],
-                    ['label' => 'Client',],
-                    ['label' => 'LATA',],
-                    ['label' => 'L15',],
-                    ['label' => 'Densité',],
-                    ['label' => 'M3',],
+                    ['label' => 'Client'],
+                    ['label' => 'LATA'],
+                    ['label' => 'L15'],
+                    ['label' => 'Densité'],
+                    ['label' => 'M3'],
                 ];
 
                 $rows = [];
@@ -227,6 +228,7 @@ class DataController extends Controller
                     $m3 = ((float) $e->lata) / 1000;
                     $pline = [
                         $e->id,
+                        $e->terminal,
                         $e->date?->format('d-m-Y'),
                         $e->locality,
                         $e->way,
@@ -241,6 +243,25 @@ class DataController extends Controller
                     ];
                     $zone = $zone ?? $e->way;
                     $fuel = $fuel ?? $e->product;
+
+
+                    $startOfMonth = $e->date->copy()->startOfMonth();
+                    $endOfMonth   = $e->date->copy()->endOfMonth();
+                    $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel, $zone) {
+                        if ($fuel) {
+                            $q->where('product', $fuel);
+                        }
+                        if ($zone) {
+                            $q->where('way', $zone);
+                        }
+                    })->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('qtym3') ?? 0);
+
+                    $pmfc_struct = (float)@$structure->fuelprices()
+                        ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                        ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                        ->whereHas('label', fn($q) => $q->where('label', 'PMFC en M3'))->first()?->amount;
+
+                    dd($pmfc_reel, $zone, $fuel);
 
                     $pline2 = [];
                     foreach ($labels as $l) {

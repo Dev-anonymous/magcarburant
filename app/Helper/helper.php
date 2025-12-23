@@ -371,7 +371,7 @@ function strname(Entity $entity, Structureprice $str)
     return $name;
 }
 
-function v($v, $decimal = 4)
+function v($v, $decimal = 3)
 {
     return number_format($v, $decimal, ',', ' ');
 }

@@ -37,9 +37,7 @@ class Structureprices extends Controller
                 return $row->to?->format('d-m-Y') ?? '-';
             })
             ->addColumn('tx', function ($row) {
-                $t = "<span>1 CDF = $row->cdf_usd USD</span><br/>";
-                $t .= "<span>1 USD = $row->usd_cdf CDF</span>";
-                return $t;
+                return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
             ->addColumn('view', function ($row) use ($user) {
                 if ($user->user_role == 'provider') {
@@ -60,7 +58,6 @@ class Structureprices extends Controller
                     'name' => $row->name,
                     'from' => $row->from->format('Y-m-d'),
                     'to' => $row->to?->format('Y-m-d'),
-                    'cdf_usd' => $row->cdf_usd,
                     'usd_cdf' => $row->usd_cdf,
                 ]));
                 if (!$row->to) {
@@ -115,7 +112,6 @@ class Structureprices extends Controller
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
-                'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
                 'from.required' => 'Veuillez renseigner la Date validité initiale.',
@@ -180,7 +176,6 @@ class Structureprices extends Controller
         } else {
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
-                'cdf_usd' => 'required|numeric|min:0.00000001',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
                 'from.required' => 'Veuillez renseigner la date de début.',

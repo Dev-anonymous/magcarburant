@@ -81,18 +81,6 @@
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
-                                    <div class="input-group-text">1 CDF = </div>
-                                </div>
-                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd" class="form-control"
-                                    required>
-                                <div class="input-group-preppend">
-                                    <div class="input-group-text"> USD</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="input-group">
-                                <div class="input-group-append">
                                     <div class="input-group-text">1 USD = </div>
                                 </div>
                                 <input type="number" min="0.00000001" step="0.00000001" name="usd_cdf" class="form-control"
@@ -155,18 +143,6 @@
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
-                                    <div class="input-group-text">1 CDF = </div>
-                                </div>
-                                <input type="number" min="0.00000001" step="0.00000001" name="cdf_usd"
-                                    class="form-control" required>
-                                <div class="input-group-preppend">
-                                    <div class="input-group-text"> USD</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="input-group">
-                                <div class="input-group-append">
                                     <div class="input-group-text">1 USD = </div>
                                 </div>
                                 <input type="number" min="0.00000001" step="0.00000001" name="usd_cdf"
@@ -176,7 +152,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <x-alert />
                     </div>
                     <div class="modal-footer">

@@ -130,6 +130,17 @@
             border-top: 2px solid #ccc !important;
             border-bottom: 2px solid #ccc !important;
         }
+
+        .bigtitle,
+        .bigtitlevalue {
+            text-align: center;
+            background: rgba(255, 0, 0, .175);
+            font-weight: bold;
+        }
+
+        .secondarytitle {
+            font-weight: bold;
+        }
     </style>
     <script>
         $('#ffilter').change(function() {
@@ -149,14 +160,17 @@
                 success: function(data) {
                     var th = '';
                     data.head.forEach(e => {
-                        var t = e.tag ? `tag="${e.tag}"` : '';
-                        th += `<th ${t}>${e.label}</th>`;
+                        var t = e.title ? `tooltip title="${e.title}"` : '';
+                        th +=
+                            `<th class='${e.class??''}' ${t} >${e.label}</th>`;
                     });
                     var td = '';
                     data.rows.forEach(e => {
                         td += `<tr>`;
                         e.forEach(ee => {
-                            td += `<td>${ee}</td>`;
+                            var t = ee.title ? `tooltip title="${ee.title}"` : '';
+                            td +=
+                                `<td class='${ee.class??''}' ${t}">${ee.v}</td>`;
                         });
                         td += '</tr>';
                     });
@@ -178,13 +192,13 @@
                     $table.on('draw.dt', function() {
                         var only = '{{ request('tag') }}';
                         if (only.trim().length) {
-                            let table = $(this).DataTable();
-                            table.columns().every(function(idx) {
-                                let th = table.column(idx).header();
-                                let tag = th.getAttribute('tag');
-                                let visible = (tag === only || tag === null);
-                                table.column(idx).visible(visible);
-                            });
+                            // let table = $(this).DataTable();
+                            // table.columns().every(function(idx) {
+                            //     let th = table.column(idx).header();
+                            //     let tag = th.getAttribute('tag');
+                            //     let visible = (tag === only || tag === null);
+                            //     table.column(idx).visible(visible);
+                            // });
                         }
                     });
 
@@ -192,9 +206,9 @@
                         dom: 'Blfrtip',
                         // responsive: true,
                         scrollX: true,
-                        fixedColumns: {
-                            leftColumns: 2
-                        },
+                        // fixedColumns: {
+                        //     leftColumns: 2
+                        // },
                         buttons: [{
                                 extend: 'colvis',
                                 text: 'Filtrer les paramètres',
@@ -207,6 +221,8 @@
                             },
                         ],
                     });
+
+                    $('[tooltip]').tooltip();
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

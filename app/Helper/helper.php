@@ -373,5 +373,5 @@ function strname(Entity $entity, Structureprice $str)
 
 function v($v, $decimal = 3)
 {
-    return number_format($v, $decimal, ',', ' ');
+    return number_format(round($v, $decimal), $decimal, ',', ' ');
 }

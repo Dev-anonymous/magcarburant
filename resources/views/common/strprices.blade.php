@@ -495,13 +495,13 @@
                 var ind = `${type}_zone_${zone}`;
                 var formulas = Glfomulas[ind];
                 if (!formulas) {
-                    console.log("FORMULE NON TROUVEE ->" + ind);
+                    console.error("FORMULE NON TROUVEE ->" + ind);
                     return;
                 }
 
                 // Parcourir les formules
                 Object.keys(formulas).forEach(tag => {
-                    const formula = formulas[tag]; // ex: "C-A-B"
+                    const formula = formulas[tag]; //
                     const operators = formula.match(/[\+\-\*\/]/g) || []; // ["-", "-"]
                     const operands = formula.split(/[\+\-\*\/]/); // ["C","A","B"]
 
@@ -529,6 +529,8 @@
                         }
                         result.push(value);
                     }
+
+                    // console.log(formula, length);
 
                     setRowValues(tag, result, table);
                     rows[tag] = result; // mise à jour pour les formules suivantes

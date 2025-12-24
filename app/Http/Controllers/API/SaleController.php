@@ -122,6 +122,8 @@ class SaleController extends Controller
                 'salefile.*' => 'mimes:pdf|max:10240'
             ]);
 
+            abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
+
             DB::beginTransaction();
 
             $sale->update($validated);
@@ -258,6 +260,9 @@ class SaleController extends Controller
                     }
                 }
 
+                if ('JET' == $colE && 'NORD' == $colD) {
+                    $lineErrors[] = "Cellule E$rowNumber : le JET n'est vendu qu'au SUD, EST et OUEST";
+                }
                 // === Gestion des erreurs ===
                 if (!empty($lineErrors)) {
                     $errors[] = implode('; ', $lineErrors);
@@ -323,6 +328,8 @@ class SaleController extends Controller
                 'salefile' => 'nullable|array',
                 'salefile.*' => 'mimes:pdf|max:10240'
             ]);
+
+            abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
 
             DB::beginTransaction();
             $validated['entity_id'] = $entity->id;

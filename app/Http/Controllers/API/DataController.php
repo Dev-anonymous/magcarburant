@@ -182,9 +182,8 @@ class DataController extends Controller
 
             if ($type == 'greatbook') {
                 $structure = request('structure');
-                $devise = request('devise');
-                $zone = request('zone');
-                $fuel = request('fuel');
+                $reqzone = request('zone');
+                $reqfuel = request('fuel');
 
                 $user = auth()->user();
                 $entity = $user->entities()->first();
@@ -232,27 +231,30 @@ class DataController extends Controller
 
                 $head = [...$head, ...$labels];
 
-                $sales = $entity->sales()->where(function ($q) use ($fuel, $zone) {
-                    if ($fuel) {
-                        $q->where('product', $fuel);
+                $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+                    if ($reqfuel) {
+                        $q->where('product', $reqfuel);
                     }
-                    if ($zone) {
-                        $q->where('way', $zone);
+                    if ($reqzone) {
+                        $q->where('way', $reqzone);
                     }
                 })->whereBetween('date', [$from, $to])->orderBy('date')->get();
 
                 foreach ($sales as $e) {
                     $m3 = ((float) $e->lata) / 1000;
 
-                    $zone = $zone ?? $e->way;
-                    $fuel = $fuel ?? $e->product;
+                    $zone = $reqzone ?? $e->way;
+                    $fuel = $reqfuelfuel ?? $e->product;
+                    $fuelObj = Fuel::where(compact('fuel'))->first();
 
-                    $startOfMonth = $e->date->copy()->startOfMonth();
-                    $endOfMonth   = $e->date->copy()->endOfMonth();
+                    $saledate = $e->date;
+                    $startOfMonth = $saledate->copy()->startOfMonth();
+                    $endOfMonth   = $saledate->copy()->endOfMonth();
 
                     $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel) {
                         $q->where('product', $fuel);
-                    })->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('qtym3') ?? 0);
+                    })->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+
                     $pmfc_struct = (float)@$structure->fuelprices()
                         ->whereHas('zone', fn($q) => $q->where('zone', $zone))
                         ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
@@ -262,31 +264,33 @@ class DataController extends Controller
                     $pmag_pmfc_socom = $ecart_pmf * $m3;
                     $pmag_marge_socom = $pmag_pmfc_socom * (10 / 100);
 
-                    $tx_reel = (float) $entity->rates()->where(function ($q) use ($from, $to) {
-                        $q->where(function ($q) use ($from, $to) {
-                            $q->where('from', '<=', $to)
-                                ->where('to', '>=', $from);
-                        })->orWhere(function ($q) use ($from, $to) {
-                            $q->whereNull('to')
-                                ->whereBetween('from', [$from, $to]);
+                    $tx_reel = (float) $entity->rates()->where(function ($q) use ($saledate) {
+                        $q->where(function ($q) use ($saledate) {
+                            $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                        })->orWhere(function ($q) use ($saledate) {
+                            $q->whereNull('to')->where('from', '<=', $saledate);
                         });
-                    })->first()?->usd_cdf;
+                    })->orderByDesc('from')->first()?->usd_cdf;
                     if (!$tx_reel) {
-                        $errors[] = "Aucun taux réel n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')}";
+                        $errors[] = "Aucun taux réel n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
                     }
                     $tx_str = $structure->usd_cdf;
                     if (!$tx_str) {
-                        $errors[] = "Aucun taux structure n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')}";
+                        $errors[] = "Aucun taux structure n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
                     }
 
-                    $variation_change = $tx_reel ?  ($tx_reel - $tx_str) / $tx_reel : 0;
+                    $variation_change = $tx_reel ? ($tx_reel - $tx_str) / $tx_reel : 0;
 
                     $charge_socom_str = (float)@$structure->fuelprices()
                         ->whereHas('zone', fn($q) => $q->where('zone', $zone))
-                        ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                        ->whereHas('fuel', function ($q) use ($fuelObj) {
+                            $q->where('fuel', $fuelObj->fuel);
+                            $q->where('fuel_type', $fuelObj->fuel_type);
+                        })
                         ->whereHas('label', fn($q) => $q->where('label', "Charges d'exploitation Sociétés commerciales"))->first()?->amount;
+
                     if (!$charge_socom_str) {
-                        $errors[] = "Aucune valeur Charge SOCOM n'a été trouvée dans la strucutre de prix #$structure->id $structure->name du {$structure->from?->format('d-m-Y')}";
+                        $errors[] = "Aucune valeur Charge SOCOM n'a été trouvée dans la strucutre de prix #$structure->id $structure->name du {$structure->from?->format('d-m-Y')} ($fuel, $zone)";
                     }
 
                     $marge_socom_str = (float)@$structure->fuelprices()
@@ -294,45 +298,46 @@ class DataController extends Controller
                         ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
                         ->whereHas('label', fn($q) => $q->where('label', "Marges Sociétés Commerciales (10% PMF)"))->first()?->amount;
                     if (!$marge_socom_str) {
-                        $errors[] = "Aucune valeur Marge SOCOM n'a été trouvée dans la strucutre de prix #$structure->id $structure->name du {$structure->from?->format('d-m-Y')}";
+                        $errors[] = "Aucune valeur Marge SOCOM n'a été trouvée dans la strucutre de prix #$structure->id $structure->name du {$structure->from?->format('d-m-Y')} ($fuel, $zone)";
                     }
 
-                    $ecart_change = $variation_change ? ($pmfc_struct + $charge_socom_str + $marge_socom_str) / $variation_change : 0;
+                    $ecart_change = $variation_change ? ($pmfc_struct + $charge_socom_str + $marge_socom_str) * $variation_change : 0;
 
                     $pmag_change_socom = $ecart_change * $m3;
 
+                    $d1 = $e->date->copy()->startOfMonth();
                     $pline = [
-                        ['v' => $e->id,],
-                        ['v' => $e->terminal,],
-                        ['v' => $e->date?->format('d-m-Y'),],
-                        ['v' => $e->locality,],
-                        ['v' => $e->way,],
-                        ['v' => $e->product,],
-                        ['v' => $e->delivery_note,],
-                        ['v' => $e->delivery_program,],
-                        ['v' => $e->client,],
-                        ['v' => $e->lata,],
-                        ['v' => $e->l15,],
-                        ['v' => $e->density,],
-                        ['v' => v($m3),],
-                        ['v' => v($pmfc_reel),],
-                        ['v' => v($pmfc_struct),],
+                        ['v' => $e->id],
+                        ['v' => $e->terminal],
+                        ['v' => $e->date?->format('d-m-Y')],
+                        ['v' => $e->locality],
+                        ['v' => $e->way],
+                        ['v' => $e->product],
+                        ['v' => $e->delivery_note],
+                        ['v' => $e->delivery_program],
+                        ['v' => $e->client],
+                        ['v' => $e->lata],
+                        ['v' => $e->l15],
+                        ['v' => $e->density],
+                        ['v' => v($m3)],
+                        ['v' => v($pmfc_reel), 'class' => 'secondarytitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
+                        ['v' => v($pmfc_struct)],
                         ['v' => v($ecart_pmf), 'class' => 'secondarytitle', 'title' => "PMFC REEL - PMFC STRUCTURE"],
                         ['v' => v($pmag_pmfc_socom),   'class' => 'bigtitlevalue', 'title' => "ECART PMFC * M3"],
                         ['v' => v($pmag_marge_socom),  'class' => 'bigtitlevalue', 'title' => '10% de PMAG PMFC SOCOM'],
-                        ['v' => v($tx_reel),],
-                        ['v' => v($tx_str),],
-                        ['v' => v($variation_change),],
-                        ['v' => v($charge_socom_str),],
-                        ['v' => v($marge_socom_str),],
-                        ['v' => v($ecart_change),],
-                        ['v' => v($pmag_change_socom), 'class' => 'bigtitlevalue'],
+                        ['v' => v($tx_reel)],
+                        ['v' => v($tx_str)],
+                        ['v' => v($variation_change), 'class' => 'secondarytitle', 'title' => '(Taux Réel - Taux Structure)/Taux Réel '],
+                        ['v' => v($charge_socom_str)],
+                        ['v' => v($marge_socom_str)],
+                        ['v' => v($ecart_change), 'class' => 'secondarytitle', 'title' => '(PMFC Structure + Charge SOCOM Structure + Marge SOCOM Structure ) * Variation Change'],
+                        ['v' => v($pmag_change_socom), 'class' => 'bigtitlevalue', 'title' => 'Ecart Change * M3'],
                     ];
-
 
                     $rows[] = $pline;
                 }
 
+                $errors = array_unique($errors);
                 return compact('head', 'rows', 'errors');
             }
         }

@@ -35,20 +35,6 @@
                                 <div class="col-xs-12 col-sm-6 col-md-12">
                                     <form id="ffilter" class="form-inline filters-form pull-right" role="form">
                                         <input type="hidden" name="type" value="greatbook">
-                                        {{-- <div class="form-group mb-1">
-                                            <div class="">
-                                                <label class="justify-content-start" for="dv222">Du</label>
-                                                <input class="form-control flatpickr2" id="dv222"
-                                                    value="{{ $d }}" name="date1" style="width:100px" />
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="dv22">Au</label>
-                                                <input class="form-control flatpickr2" id="dv22"
-                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
-                                            </div>
-                                        </div> --}}
                                         <div class="form-group mb-1">
                                             <div>
                                                 <label class="justify-content-start" for="">Structure de
@@ -73,28 +59,23 @@
                                         </div>
                                         <div class="form-group mb-1">
                                             <div>
-                                                <label class="justify-content-start" for="">Zone</label>
-                                                <select name="zone" class="form-control">
-                                                    <option value="">Toutes</option>
-                                                    @foreach (mainWays() as $e)
-                                                        <option @if (request('z') == $e) selected @endif>
-                                                            {{ $e }}
-                                                        </option>
-                                                    @endforeach
+                                                <label class="justify-content-start" for="">Type</label>
+                                                <select name="fuel_type" class="form-control">
+                                                    <option>TERRESTRE</option>
+                                                    <option>AVIATION</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group mb-1">
                                             <div>
+                                                <label class="justify-content-start" for="">Zone</label>
+                                                <select name="zone" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
                                                 <label class="justify-content-start">Produit</label>
-                                                <select name="fuel" class="form-control">
-                                                    <option value="">Tous</option>
-                                                    @foreach (mainfuels() as $e)
-                                                        <option @if (request('f') == $e) selected @endif>
-                                                            {{ $e }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <select name="fuel" class="form-control"></select>
                                             </div>
                                         </div>
                                     </form>
@@ -104,8 +85,9 @@
                     </div>
                     <x-dataloader />
                     <x-alert />
-                    <div class="card-body" style="min-height: 100vh">
+                    <div class="card-body" estyle="min-height: 100vh">
                         <div class="table-responsive" data></div>
+                        <div class="my-3 text-danger" errdiv></div>
                     </div>
                 </div>
             </div>
@@ -139,13 +121,11 @@
         }
 
         .secondarytitle {
+            text-align: center;
             font-weight: bold;
         }
     </style>
     <script>
-        $('#ffilter').change(function() {
-            getData();
-        })
         var table = null;
 
         function getData() {
@@ -221,8 +201,16 @@
                             },
                         ],
                     });
-
                     $('[tooltip]').tooltip();
+                    var e = '';
+                    if (data.errors) {
+                        data.errors.forEach(el => {
+                            e +=
+                                `<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`;
+                        });
+                    }
+                    $('[errdiv]').html(e);
+
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;
@@ -240,7 +228,43 @@
         }
 
 
+        var ff = $('#ffilter');
 
-        getData();
+        ff.change(function(e) {
+            var e = $(e.target)
+            if (e.attr('name') == 'fuel_type') {
+                getExtra();
+            } else {
+                getData();
+            }
+        });
+
+        function getExtra() {
+            var sel = $('[name="fuel_type"]');
+            var o = '';
+            var o2 = '';
+
+            if (sel.val() == 'TERRESTRE') {
+                ['Toutes', 'NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
+                    o += `<option ${e=='Toutes'?"value=''":''} >${e}</option>`;
+                });
+                ['Tous', 'ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
+                    o2 += `<option ${e=='Tous'?"value=''":''}>${e}</option>`;
+                });
+            }
+            if (sel.val() == 'AVIATION') {
+                ['Toutes', 'SUD', 'EST', 'OUEST'].forEach((e) => {
+                    o += `<option ${e=='Toutes'?"value=''":''}>${e}</option>`;
+                });
+                ['JET'].forEach((e) => {
+                    o2 += `<option>${e}</option>`;
+                });
+            }
+            $('[name=zone]').html(o);
+            $('[name=fuel]').html(o2);
+            getData();
+        }
+
+        getExtra();
     </script>
 @endsection

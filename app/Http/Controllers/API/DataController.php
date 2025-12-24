@@ -184,6 +184,7 @@ class DataController extends Controller
                 $structure = request('structure');
                 $reqzone = request('zone');
                 $reqfuel = request('fuel');
+                $items = request('items');
 
                 $user = auth()->user();
                 $entity = $user->entities()->first();
@@ -217,7 +218,7 @@ class DataController extends Controller
                 $labels = [
                     ['label' => 'PMFC REEL'],
                     ['label' => 'PMFC STRUCTURE'],
-                    ['label' => 'ECART PMFC'],
+                    ['label' => 'ECART PMF'],
                     ['label' => 'PMAG PMFC SOCOM', 'class' => "bigtitle"],
                     ['label' => 'PMAG MARGE SOCOM', 'class' => "bigtitle"],
                     ['label' => 'TAUX REEL BCC'],
@@ -338,6 +339,39 @@ class DataController extends Controller
                 }
 
                 $errors = array_unique($errors);
+
+                if ($items == 'item1') {
+                    $head = array_slice($head, 0, 17);
+                    $t = [];
+                    foreach ($rows as $r) {
+                        $t[] = array_slice($r, 0, 17);
+                    }
+                    $rows = $t;
+                }
+
+                if ($items == 'item2') {
+                    $head = array_slice($head, 0, 18);
+                    $t = [];
+                    foreach ($rows as $r) {
+                        $t[] = array_slice($r, 0, 18);
+                    }
+                    $rows = $t;
+                }
+
+                if ($items == 'item3') {
+                    $head0 = array_slice($head, 0, 16);
+                    $head1 = array_slice($head, 18);
+                    $head = [...$head0, ...$head1];
+
+                    $t = [];
+                    foreach ($rows as $r) {
+                        $head0 = array_slice($r, 0, 16);
+                        $head1 = array_slice($r, 18);
+                        $t[] = [...$head0, ...$head1];
+                    }
+                    $rows = $t;
+                }
+
                 return compact('head', 'rows', 'errors');
             }
         }

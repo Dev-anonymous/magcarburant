@@ -375,3 +375,12 @@ function v($v, $decimal = 3)
 {
     return number_format(round($v, $decimal), $decimal, ',', ' ');
 }
+
+function items()
+{
+    return  [
+        (object)['label' => 'PMAG PMFC SOCOM', 'val' => 'item1'],
+        (object)['label' => 'PMAG MARGE SOCOM', 'val' => 'item2'],
+        (object)['label' => 'PMAG CHANGE SOCOM', 'val' => 'item3'],
+    ];
+}

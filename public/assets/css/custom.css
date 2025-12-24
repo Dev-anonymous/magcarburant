@@ -170,6 +170,42 @@ input.form-control:focus {
     background-color: #ffffff !important;
 }
 
+/* Conteneur principal */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    background-color: #a8c8f0 !important;
+    border: 1px solid #9cb9d8 !important;
+    color: #1a3b5d !important;
+    border-radius: 0.25rem; /* optionnel, pour ressembler à bootstrap */
+    min-height: 38px; /* correspond à form-control */
+}
+
+/* Focus */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus
+    .select2-selection--multiple {
+    border-color: #6ca0d9 !important;
+    box-shadow: 0 0 3px rgba(108, 160, 217, 0.3) !important;
+    background-color: #ffffff !important;
+}
+
+/* Texte sélectionné */
+.select2-container--default .select2-selection__rendered {
+    color: #1a3b5d !important;
+    line-height: 36px; /* pour aligner verticalement */
+}
+
+/* Placeholder */
+.select2-container--default .select2-selection__placeholder {
+    color: #1a3b5d !important;
+    opacity: 0.7;
+}
+
+/* Flèche dropdown */
+.select2-container--default .select2-selection__arrow b {
+    border-color: #1a3b5d transparent transparent transparent !important;
+}
+
 /* theme des boutons */
 
 .btn-primary {

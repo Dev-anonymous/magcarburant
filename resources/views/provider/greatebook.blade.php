@@ -39,7 +39,7 @@
                                             <div>
                                                 <label class="justify-content-start" for="">Structure de
                                                     prix</label>
-                                                <select name="structure" class="form-control">
+                                                <select name="structure" class="form-control select2">
                                                     @foreach ($ps as $e)
                                                         @php
                                                             $au = $e->to;
@@ -59,8 +59,19 @@
                                         </div>
                                         <div class="form-group mb-1">
                                             <div>
+                                                <label class="justify-content-start" for="">Items</label>
+                                                <select name="items" class="form-control select2">
+                                                    <option value="">Tous</option>
+                                                    @foreach (items() as $e)
+                                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <div>
                                                 <label class="justify-content-start" for="">Type</label>
-                                                <select name="fuel_type" class="form-control">
+                                                <select name="fuel_type" class="form-control select22">
                                                     <option>TERRESTRE</option>
                                                     <option>AVIATION</option>
                                                 </select>
@@ -101,6 +112,7 @@
 
 @section('script')
     <x-datatable />
+    <x-select />
 
     <style>
         .table td,
@@ -189,12 +201,13 @@
                         // fixedColumns: {
                         //     leftColumns: 2
                         // },
-                        buttons: [{
-                                extend: 'colvis',
-                                text: 'Filtrer les paramètres',
-                                collectionLayout: 'fixed four-column',
-                                collectionTitle: 'Affichage des colonnes',
-                            },
+                        buttons: [
+                            // {
+                            //     extend: 'colvis',
+                            //     text: 'Filtrer les paramètres',
+                            //     collectionLayout: 'fixed four-column',
+                            //     collectionTitle: 'Affichage des colonnes',
+                            // },
                             {
                                 extend: 'excelHtml5',
                                 title: 'Export Excel',
@@ -260,8 +273,23 @@
                     o2 += `<option>${e}</option>`;
                 });
             }
-            $('[name=zone]').html(o);
-            $('[name=fuel]').html(o2);
+            var sz = $('[name=zone]').html(o);
+            var sf = $('[name=fuel]').html(o2);
+
+            try {
+                if (sz.hasClass('select2-hidden-accessible')) {
+                    sz.select2('destroy');
+                }
+            } catch (error) {}
+            sz.select2();
+
+            try {
+                if (sf.hasClass('select2-hidden-accessible')) {
+                    sf.select2('destroy');
+                }
+            } catch (error) {}
+            sf.select2();
+
             getData();
         }
 

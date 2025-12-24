@@ -90,7 +90,7 @@
                                         <div class="form-group mb-1">
                                             <div>
                                                 <label class="justify-content-start" for="">Type</label>
-                                                <select name="fuel_type" class="form-control">
+                                                <select name="fuel_type" class="form-control select2">
                                                     <option>TERRESTRE</option>
                                                     <option>AVIATION</option>
                                                 </select>
@@ -132,6 +132,7 @@
 
 @section('script')
     <x-flatpickr />
+    <x-select />
     <style>
         .noneditable td {
             border-top: 2px solid #ccc !important;
@@ -179,8 +180,18 @@
                     o2 += `<option>${e}</option>`;
                 });
             }
-            $('[name=zone]').html(o);
-            $('[name=fuel]').html(o2);
+            var sz = $('[name=zone]').html(o);
+            var sf = $('[name=fuel]').html(o2);
+
+            try {
+                sz.select2('destroy');
+            } catch (error) {}
+            sz.select2();
+
+            try {
+                sf.select2('destroy');
+            } catch (error) {}
+            sf.select2();
             getData();
         }
 

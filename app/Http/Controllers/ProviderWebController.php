@@ -101,6 +101,9 @@ class ProviderWebController extends Controller
 
     function analyse()
     {
-        return view('provider.analyse');
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+        $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
+        return view('provider.analyse', compact('ps'));
     }
 }

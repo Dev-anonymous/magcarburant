@@ -73,7 +73,7 @@
                                 <div class="col-xs-12 col-sm-6 col-md-12">
                                     <form id="ffilter" class="form-inline filters-form pull-right" role="form">
                                         <input type="hidden" name="type" value="balance">
-                                        <div class="form-group mb-1">
+                                        {{-- <div class="form-group mb-1">
                                             <div class="">
                                                 <label class="justify-content-start" for="dv222">Du</label>
                                                 <input class="form-control flatpickr2" id="dv222"
@@ -85,6 +85,28 @@
                                                 <label class="justify-content-start" for="dv22">Au</label>
                                                 <input class="form-control flatpickr2" id="dv22"
                                                     value="{{ $d2 }}" name="date2" style="width:100px" />
+                                            </div>
+                                        </div> --}}
+                                        <div class="form-group mb-1">
+                                            <div>
+                                                <label class="justify-content-start" for="">Structure de
+                                                    prix</label>
+                                                <select name="structure" class="form-control select2">
+                                                    @foreach ($ps as $e)
+                                                        @php
+                                                            $au = $e->to;
+                                                            if ($au) {
+                                                                $au = "au {$au->format('d-m-Y')}";
+                                                            } else {
+                                                                $au = '';
+                                                            }
+                                                        @endphp
+                                                        <option value="{{ $e->id }}"
+                                                            @if (request('stp') == $e->id) selected @endif>
+                                                            {{ "$e->name : Du {$e->from?->format('d-m-Y')} $au" }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="form-group mb-1">

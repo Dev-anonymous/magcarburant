@@ -274,3 +274,10 @@ graphique ventre/achat  3d ??
 				15	13.Prix de référence à appliquer (USD/L)	 1.33    	16/1000
 
 
+============================
+GL : enlever la couleur rouge, et mettre date du, date au (enlever le filtre structure de prix)
+Bilan : mettre date du , date au (enlever le filtre structure de prix)
+structure de prix CDF : formater les valeurs
+TVA nette à l'intérieur (TVAIr=TVAV-TVAI) : formule 18-21 au lieu de 18+21
+Voie et structure prix : autoriser les valeurs negatives
+

@@ -38,7 +38,7 @@ class FuelpriceController extends Controller
     public function update(Request $request, Fuelprice $fuelprice)
     {
         $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric',
         ]);
         $user = auth()->user();
         abort_if($user->user_role !== 'provider', 403, "No perm");

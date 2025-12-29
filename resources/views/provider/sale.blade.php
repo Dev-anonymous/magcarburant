@@ -213,7 +213,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">LAT</label>
+                                    <label class="mb-0">LATA</label>
                                     <input type="number" min="0" step="0.0001" class="form-control" required
                                         name="lata">
                                 </div>
@@ -339,7 +339,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">LAT</label>
+                                    <label class="mb-0">LATA</label>
                                     <input type="number" min="0" step="0.0001" class="form-control" required
                                         name="lata">
                                 </div>

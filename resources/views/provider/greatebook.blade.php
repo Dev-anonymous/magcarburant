@@ -23,76 +23,58 @@
             <div class="col-md-12">
                 <div class="card transparent">
                     <div class="card-header">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-                                <h4 class="card-title font-weight-bold">Grand livre</h4>
+                        @php
+                            $d = now()->startOfMonth()->toDateString();
+                            $d2 = now()->toDateString();
+                        @endphp
+                        <form id="ffilter" class="filters-form pull-right" role="form">
+                            <input type="hidden" name="type" value="greatbook">
+                            <div class="form-group mb-1">
+                                <label for="dv222" class="control-label d-block mb-0">Du</label>
+                                <input type="text" class="form-control flatpickr" id="dv222" name="date1"
+                                    value="{{ $d }}" style="min-width:120px;">
                             </div>
-                            @php
-                                $d = now()->startOfMonth()->toDateString();
-                                $d2 = now()->toDateString();
-                            @endphp
-                            @if (auth()->user()->user_role === 'provider')
-                                <div class="col-xs-12 col-sm-6 col-md-12">
-                                    <form id="ffilter" class="form-inline filters-form pull-right" role="form">
-                                        <input type="hidden" name="type" value="greatbook">
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Structure de
-                                                    prix</label>
-                                                <select name="structure" class="form-control select2">
-                                                    @foreach ($ps as $e)
-                                                        @php
-                                                            $au = $e->to;
-                                                            if ($au) {
-                                                                $au = "au {$au->format('d-m-Y')}";
-                                                            } else {
-                                                                $au = '';
-                                                            }
-                                                        @endphp
-                                                        <option value="{{ $e->id }}"
-                                                            @if (request('stp') == $e->id) selected @endif>
-                                                            {{ "$e->name : Du {$e->from?->format('d-m-Y')} $au" }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Items</label>
-                                                <select name="items" class="form-control select2">
-                                                    <option value="">Tous</option>
-                                                    @foreach (items() as $e)
-                                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Type</label>
-                                                <select name="fuel_type" class="form-control select22">
-                                                    <option>TERRESTRE</option>
-                                                    <option>AVIATION</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Zone</label>
-                                                <select name="zone" class="form-control"></select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start">Produit</label>
-                                                <select name="fuel" class="form-control"></select>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            @endif
-                        </div>
+                            <div class="form-group mb-1">
+                                <label for="dv22" class="control-label d-block mb-0">Au</label>
+                                <input type="text" class="form-control flatpickr" id="dv22" name="date2"
+                                    value="{{ $d2 }}" style="min-width:120px;">
+                            </div>
+                            <div class="form-group mb-1">
+                                <label for="items" class="control-label d-block mb-0">Items</label>
+                                <select name="items" id="items" class="form-control select2" style="min-width:150px;">
+                                    <option value="">Tous</option>
+                                    @foreach (items() as $e)
+                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            {{-- <div class="form-group mb-1">
+                                <label for="fuel_type" class="control-label d-block mb-0">Type</label>
+                                <select name="fuel_type" id="fuel_type" class="form-control select22"
+                                    style="min-width:150px;">
+                                    <option>TERRESTRE</option>
+                                    <option>AVIATION</option>
+                                </select>
+                            </div> --}}
+                            <div class="form-group mb-1">
+                                <label for="zone" class="control-label d-block mb-0">Zone</label>
+                                <select name="zone[]" id="zone" class="form-control" multiple
+                                    style="min-width:150px;">
+                                    @foreach (mainWays() as $e)
+                                        <option>{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label for="fuel" class="control-label d-block mb-0">Produit</label>
+                                <select name="fuel[]" id="fuel" class="form-control" multiple
+                                    style="min-width:150px;">
+                                    @foreach (mainfuels() as $e)
+                                        <option>{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </form>
                     </div>
                     <x-dataloader />
                     <x-alert />
@@ -112,7 +94,9 @@
 
 @section('script')
     <x-datatable />
+    <x-flatpickr />
     <x-select />
+
 
     <style>
         .table td,
@@ -125,19 +109,19 @@
             border-bottom: 2px solid #ccc !important;
         }
 
-        .bigtitle,
-        .bigtitlevalue {
-            text-align: center;
-            background: rgba(255, 0, 0, .175);
-            font-weight: bold;
-        }
-
-        .secondarytitle {
+        .bigtitle {
             text-align: center;
             font-weight: bold;
         }
     </style>
     <script>
+        flatpickr(".flatpickr", {
+            maxDate: "today",
+            locale: {
+                firstDayOfWeek: 1
+            }
+        });
+
         var table = null;
 
         function getData() {
@@ -211,6 +195,16 @@
                             {
                                 extend: 'excelHtml5',
                                 title: 'Export Excel',
+                                exportOptions: {
+                                    columns: ':not(.no-export)',
+                                    format: {
+                                        body: function(data, row, column, node) {
+                                            let num = parseFloat(data.toString().replace(/ /g,
+                                                '').replace(',', '.'));
+                                            return isNaN(num) ? data : num;
+                                        }
+                                    }
+                                }
                             },
                         ],
                     });
@@ -240,59 +234,104 @@
             })
         }
 
+        $('[name="zone[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucune zone',
+            nSelectedText: 'zones sélectionnées',
+            allSelectedText: 'Toutes les zones',
+            numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
+            selectAllText: 'Toutes',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
+
+        $('[name="fuel[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun produit',
+            nSelectedText: 'produits sélectionnés',
+            allSelectedText: 'Tous les produits',
+            numberDisplayed: 1,
+            selectAllText: 'Tous',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
+
 
         var ff = $('#ffilter');
 
+        let timer;
         ff.change(function(e) {
-            var e = $(e.target)
-            if (e.attr('name') == 'fuel_type') {
-                getExtra();
-            } else {
+            clearTimeout(timer);
+            var e = $(e.target);
+            timer = setTimeout(() => {
+                // if (e.attr('name') == 'fuel_type') {
+                //     getExtra();
+                // } else {
                 getData();
-            }
+                // }
+            }, 100); // 100ms après le dernier change
         });
 
-        function getExtra() {
-            var sel = $('[name="fuel_type"]');
-            var o = '';
-            var o2 = '';
 
-            if (sel.val() == 'TERRESTRE') {
-                ['Toutes', 'NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
-                    o += `<option ${e=='Toutes'?"value=''":''} >${e}</option>`;
-                });
-                ['Tous', 'ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
-                    o2 += `<option ${e=='Tous'?"value=''":''}>${e}</option>`;
-                });
-            }
-            if (sel.val() == 'AVIATION') {
-                ['Toutes', 'SUD', 'EST', 'OUEST'].forEach((e) => {
-                    o += `<option ${e=='Toutes'?"value=''":''}>${e}</option>`;
-                });
-                ['JET'].forEach((e) => {
-                    o2 += `<option>${e}</option>`;
-                });
-            }
-            var sz = $('[name=zone]').html(o);
-            var sf = $('[name=fuel]').html(o2);
+        getData();
 
-            try {
-                if (sz.hasClass('select2-hidden-accessible')) {
-                    sz.select2('destroy');
-                }
-            } catch (error) {}
-            sz.select2();
 
-            try {
-                if (sf.hasClass('select2-hidden-accessible')) {
-                    sf.select2('destroy');
-                }
-            } catch (error) {}
-            sf.select2();
+        // function getExtra() {
+        //     var sel = $('[name="fuel_type"]');
+        //     var o = '';
+        //     var o2 = '';
 
-            getData();
-        }
+        //     if (sel.val() == 'TERRESTRE') {
+        //         ['NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
+        //             o += `<option>${e}</option>`;
+        //         });
+        //         ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
+        //             o2 += `<option>${e}</option>`;
+        //         });
+        //     }
+        //     if (sel.val() == 'AVIATION') {
+        //         ['SUD', 'EST', 'OUEST'].forEach((e) => {
+        //             o += `<option>${e}</option>`;
+        //         });
+        //         ['JET'].forEach((e) => {
+        //             o2 += `<option>${e}</option>`;
+        //         });
+        //     }
 
-        getExtra();
+        //     var sz = $('[name="zone[]"]');
+        //     var sf = $('[name="fuel[]"]');
+
+        //     if (sz.data('multiselect')) sz.multiselect('destroy');
+        //     if (sf.data('multiselect')) sf.multiselect('destroy');
+
+        //     sz.html(o);
+        //     sf.html(o2);
+
+        //     sz.multiselect({
+        //         includeSelectAllOption: true,
+        //         nonSelectedText: 'Aucune zone',
+        //         nSelectedText: 'zones sélectionnées',
+        //         allSelectedText: 'Toutes les zones',
+        //         numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
+        //         selectAllText: 'Toutes',
+        //         buttonWidth: '100%',
+        //         buttonClass: 'btn btn-primary'
+        //     });
+
+        //     sf.multiselect({
+        //         includeSelectAllOption: true,
+        //         nonSelectedText: 'Aucun produit',
+        //         nSelectedText: 'produits sélectionnés',
+        //         allSelectedText: 'Tous les produits',
+        //         numberDisplayed: 1,
+        //         selectAllText: 'Tous',
+        //         buttonWidth: '100%',
+        //         buttonClass: 'btn btn-primary'
+        //     });
+
+        //     getData();
+        // }
+
+        // getExtra();
     </script>
 @endsection

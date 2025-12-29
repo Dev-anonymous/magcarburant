@@ -206,6 +206,33 @@ input.form-control:focus {
     border-color: #1a3b5d transparent transparent transparent !important;
 }
 
+/* Bouton principal du multiselect */
+.multiselect.btn {
+    background-color: #a8c8f0 !important;
+    color: #333 !important;
+    border: 1px solid #9cb9d8 !important;
+}
+
+/* Hover et focus */
+.multiselect.btn:hover,
+.multiselect.btn:focus {
+    background-color: #a8c8f0 !important;
+}
+
+/* Menu déroulant */
+.multiselect-container.dropdown-menu {
+    border: 1px solid #6ca0d9;
+}
+
+/* Option sélectionnée */
+.multiselect-container > li > a > label {
+    color: #333;
+}
+.multiselect-container > li.active > a > label {
+    background-color: #6ca0d9;
+    color: #fff;
+}
+
 /* theme des boutons */
 
 .btn-primary {

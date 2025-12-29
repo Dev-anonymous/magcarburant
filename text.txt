@@ -276,8 +276,13 @@ graphique ventre/achat  3d ??
 
 ============================
 GL : enlever la couleur rouge, et mettre date du, date au (enlever le filtre structure de prix)
+GL : filtre, possibilite de selectionner plusieurs element (zone, produit, type, ...)
 Bilan : mettre date du , date au (enlever le filtre structure de prix)
 structure de prix CDF : formater les valeurs
 TVA nette à l'intérieur (TVAIr=TVAV-TVAI) : formule 18-21 au lieu de 18+21
 Voie et structure prix : autoriser les valeurs negatives
+achat/vente : les valeurs m3, densite, arrondissement a 3 chiffre
+fenetre modal : reduire le temps de disparition 3 sec
+normaliser les decimales des nombres : 3 chiffre apres la virgule
+les tableaux : centrer les colonnes du milieu
 

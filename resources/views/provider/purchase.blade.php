@@ -77,7 +77,8 @@
                             <div class="row">
                                 <div class="col-xs-12 col-sm-6">
                                     <h4 class="card-title font-weight-bold">Historique des tous les achats</h4>
-                                </div>@php
+                                </div>
+                                @php
                                     $d = now()->startOfMonth()->toDateString();
                                     $d2 = now()->toDateString();
                                 @endphp

@@ -44,10 +44,7 @@ class ProviderWebController extends Controller
 
         $item = request('item');
         if ($item == 'gb') {
-            $user = auth()->user();
-            $entity = $user->entities()->first();
-            $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
-            return view('provider.greatebook', compact('ps'));
+            return view('provider.greatebook');
         }
 
         $stx = request('stx');

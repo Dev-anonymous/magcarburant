@@ -30,7 +30,7 @@ class AuthController extends Controller
         }
 
         $data = $validator->validate();
-        if (!Auth::attempt($data, request('remember') ? true : false)) {
+        if (!Auth::attempt($data, request()->has('remember'))) {
             return response([
                 'message' => "Email ou mot de passe incorrect"
             ], 422);

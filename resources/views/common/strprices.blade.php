@@ -386,25 +386,13 @@
             }
         });
 
-
-
-        // const formulas = {
-        //     D: "C-E-F-G-H-I-J",
-        //     O: "A+B+C+K+L+M+N+P",
-        //     W: "T+U+V",
-        //     X: "S-V",
-        //     Y: "W+X",
-        //     Z: "A+O+Q+Y",
-        //     AA: "Z*1000",
-        // };
-
         const Glfomulas = {
             terrestre_zone_nord: {
                 S: "J",
                 V: "T+U",
                 AD: "W+X+AA+AB",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AD+AL",
                 AN: "AM/1000"
@@ -414,7 +402,7 @@
                 V: "T+U",
                 AD: "W+X+AA+AB+Y+AC",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AD+AL",
                 AN: "AM/1000"
@@ -424,7 +412,7 @@
                 V: "T+U",
                 AD: "W+X+AA+AB+Y+AC",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AD+AL",
                 AN: "AM/1000"
@@ -434,7 +422,7 @@
                 V: "T+U",
                 AD: "W+X+Y+Z+AA+AB+AC",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AD+AL",
                 AN: "AM/1000"
@@ -443,7 +431,7 @@
                 S: "P",
                 V: "T+U",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AL",
                 AN: "AM/1000"
@@ -452,7 +440,7 @@
                 S: "P",
                 V: "T+U",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AL",
                 AN: "AM/1000"
@@ -461,7 +449,7 @@
                 S: "R+Q+L",
                 V: "T+U",
                 AJ: "AG+AH+AI",
-                AK: "AF+AI",
+                AK: "AF-AI",
                 AL: "AJ+AK",
                 AM: "G+S+V+AL",
                 AN: "AM/1000"

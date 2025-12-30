@@ -117,7 +117,7 @@ class SaleController extends Controller
                 'delivery_program'  => 'required|string',
                 'lata'  => 'required|numeric|min:0',
                 'l15'  => 'required|numeric|min:0',
-                'density'  => 'required|numeric|min:1',
+                'density'  => 'required|numeric|min:0.001',
                 'salefile' => 'nullable|array',
                 'salefile.*' => 'mimes:pdf|max:10240'
             ]);
@@ -324,7 +324,7 @@ class SaleController extends Controller
                 'delivery_program'  => 'required|string',
                 'lata'  => 'required|numeric|min:0',
                 'l15'  => 'required|numeric|min:0',
-                'density'  => 'required|numeric|min:1',
+                'density'  => 'required|numeric|min:0.001',
                 'salefile' => 'nullable|array',
                 'salefile.*' => 'mimes:pdf|max:10240'
             ]);

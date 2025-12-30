@@ -231,7 +231,14 @@
                 extend: 'excelHtml5',
                 title: 'Export Excel',
                 exportOptions: {
-                    columns: ':not(.no-export)'
+                    columns: ':not(.no-export)',
+                    format: {
+                        body: function(data, row, column, node) {
+                            let num = parseFloat(data.toString().replace(/ /g,
+                                '').replace(',', '.'));
+                            return isNaN(num) ? data : num;
+                        }
+                    }
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {

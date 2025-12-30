@@ -185,14 +185,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Prix Unitaire (en USD)</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Qantité TM</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="qtytm">
                                 </div>
                             </div>
@@ -201,14 +201,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Qantité M3</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="qtym3">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Densité</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="density">
                                 </div>
                             </div>
@@ -287,14 +287,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Prix Unitaire (en USD)</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Qantité TM</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="qtytm">
                                 </div>
                             </div>
@@ -303,14 +303,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Qantité M3</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="qtym3">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Densité</label>
-                                    <input type="number" min="1" step="0.0001" class="form-control" required
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
                                         name="density">
                                 </div>
                             </div>
@@ -547,7 +547,14 @@
                 extend: 'excelHtml5',
                 title: 'Export Excel',
                 exportOptions: {
-                    columns: ':not(.no-export)'
+                    columns: ':not(.no-export)',
+                    format: {
+                        body: function(data, row, column, node) {
+                            let num = parseFloat(data.toString().replace(/ /g,
+                                '').replace(',', '.'));
+                            return isNaN(num) ? data : num;
+                        }
+                    }
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
@@ -725,7 +732,7 @@
 
         function formatNumber(val) {
             return val
-                .toFixed(2)
+                .toFixed(3)
                 .replace('.', ',')
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }

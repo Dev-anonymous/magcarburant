@@ -39,7 +39,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  $entity->purchases()->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('unitprice * qtytm'));
+                    $data[] = round($entity->purchases()->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('unitprice * qtytm')), 3);
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -47,7 +47,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  $entity->purchases()->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3');
+                    $data[] = round($entity->purchases()->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
                     $labels[] = $el;
                 }
                 $chart2 = compact('labels', 'data');
@@ -71,7 +71,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata')  / 1000;
+                    $data[] =  round($entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata')  / 1000, 3);
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -79,7 +79,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  $entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata');
+                    $data[] = round($entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart2 = compact('labels', 'data');

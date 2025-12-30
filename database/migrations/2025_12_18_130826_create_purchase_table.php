@@ -14,10 +14,10 @@ return new class extends Migration {
             $table->string('product')->nullable();
             $table->string('provider')->nullable();
             $table->string('billnumber')->nullable();
-            $table->double('unitprice')->nullable();
-            $table->double('qtytm')->nullable();
-            $table->double('qtym3')->nullable();
-            $table->string('density')->nullable();
+            $table->decimal('unitprice', 12, 3)->nullable();
+            $table->decimal('qtytm', 12, 3)->nullable();
+            $table->decimal('qtym3', 12, 3)->nullable();
+            $table->decimal('density', 12, 3)->nullable();
 
             $table->unique('billnumber');
 

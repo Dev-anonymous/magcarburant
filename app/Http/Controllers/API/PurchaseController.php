@@ -44,6 +44,14 @@ class PurchaseController extends Controller
             ->addIndexColumn()
             ->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
+            })->editColumn('unitprice', function ($row) {
+                return v($row->unitprice);
+            })->editColumn('qtytm', function ($row) {
+                return v($row->qtytm);
+            })->editColumn('qtym3', function ($row) {
+                return v($row->qtym3);
+            })->editColumn('density', function ($row) {
+                return v($row->density);
             })->editColumn('purchasefile', function ($row) {
                 $f = '';
                 foreach ($row->purchasefiles as $i => $e) {
@@ -112,9 +120,9 @@ class PurchaseController extends Controller
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'provider'  => 'required|string|max:128',
                 'billnumber'  => 'required|string|unique:purchase,billnumber,' . $purchase->id,
-                'unitprice'  => 'required|numeric|min:1',
-                'qtytm'  => 'required|numeric|min:1',
-                'qtym3'  => 'required|numeric|min:1',
+                'unitprice'  => 'required|numeric|min:0.001',
+                'qtytm'  => 'required|numeric|min:0.001',
+                'qtym3'  => 'required|numeric|min:0.001',
                 'density'  => 'required|numeric',
                 'purchasefile' => 'nullable|array',
                 'purchasefile.*' => 'mimes:pdf|max:10240'
@@ -270,9 +278,9 @@ class PurchaseController extends Controller
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'provider'  => 'required|string|max:128',
                 'billnumber'  => 'required|string|unique:purchase',
-                'unitprice'  => 'required|numeric|min:1',
-                'qtytm'  => 'required|numeric|min:1',
-                'qtym3'  => 'required|numeric|min:1',
+                'unitprice'  => 'required|numeric|min:0.001',
+                'qtytm'  => 'required|numeric|min:0.001',
+                'qtym3'  => 'required|numeric|min:0.001',
                 'density'  => 'required|numeric',
                 'purchasefile' => 'nullable|array',
                 'purchasefile.*' => 'mimes:pdf|max:10240'

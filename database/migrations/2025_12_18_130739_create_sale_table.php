@@ -17,9 +17,9 @@ return new class extends Migration {
             $table->string('delivery_note')->nullable();
             $table->string('delivery_program')->nullable();
             $table->string('client')->nullable();
-            $table->string('lata')->nullable();
-            $table->string('l15')->nullable();
-            $table->string('density')->nullable();
+            $table->decimal('lata', 12, 3)->nullable();
+            $table->decimal('l15', 12, 3)->nullable();
+            $table->decimal('density', 12, 3)->nullable();
 
             $table->foreign('entity_id')
                 ->references('id')->on('entity')

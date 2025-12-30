@@ -692,7 +692,7 @@
                     setTimeout(() => {
                         rep.hide();
                         $('#mdladd,#mdledit').modal('hide');
-                    }, 3000);
+                    }, 2000);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;
@@ -731,7 +731,7 @@
                     setTimeout(() => {
                         rep.hide();
                         $('#mdldel').modal('hide');
-                    }, 3000);
+                    }, 2000);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

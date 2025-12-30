@@ -737,7 +737,6 @@
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }
 
-
         var chart1 = Highcharts.chart('chart1', {
             chart: {
                 type: 'pie',

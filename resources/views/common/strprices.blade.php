@@ -160,7 +160,7 @@
                                                                         $v = $labels[$labelName]['amount'] ?? 0;
                                                                         $v *= (float) $structure->usd_cdf;
                                                                     @endphp
-                                                                    <td>{{ $v ? $v : '' }}</td>
+                                                                    <td>{{ $v ? v($v) : '' }}</td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -173,130 +173,6 @@
                             @endforeach
                         </div>
                     @endforeach
-
-
-                    {{-- @foreach ($zones = [] as $zone)
-                            <div class="col-md-6 mb-3">
-                                <div class="carte autocalc m-2">
-                                    <div class="w-100" style="min-height: 820px">
-                                        <p info class="mb-2 text-danger font-weight-bold text-right" style="display:none;">
-                                            Vous pouvez maintenant modifier les prix
-                                        </p>
-                                        <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
-                                        <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover" style="width:100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        @foreach ($fuels as $fuel)
-                                                            <th>{{ $fuel->fuel }}</th>
-                                                        @endforeach
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($labels as $label)
-                                                        @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
-                                                        @php
-                                                            $noedit = in_array($label->tag, noteditable());
-                                                        @endphp
-                                                        <tr tag="{{ $label->tag }}"
-                                                            class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
-                                                            <td>{{ $label->tag }}</td>
-                                                            <td>{{ $label->label }}</td>
-                                                            @foreach ($fuels as $fuel)
-                                                                @php
-                                                                    $price = optional(
-                                                                        $fuelprices[$zone->id][$fuel->id][$label->id] ??
-                                                                            null,
-                                                                    )->first();
-                                                                @endphp
-                                                                <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
-                                                                    data-fuelprice-id="{{ $price->id }}"
-                                                                    data-zone="{{ $zone->zone }}"
-                                                                    data-label="{{ $label->label }}"
-                                                                    data-tag="{{ $label->tag }}">
-                                                                    {{ $price->amount }}
-                                                                </td>
-                                                            @endforeach
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <div class="">
-                                            @if (empty($structure->to))
-                                                @if (auth()->user()->user_role == 'provider')
-                                                    <div class="text-right">
-                                                        <button class="btn btn-sm btn-edit-table">
-                                                            <i class="material-icons md-18">edit</i>
-                                                            Modifier les prix
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="carte m-2 d-block">
-                                    <div class="w-100" style="min-height: 820px">
-                                        <h5 class="text-center font-weight-bold">ZONE {{ $zone->zone }}</h5>
-                                        <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover" style="width:100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th>{!! $tx
-                                                            ? "<small class='text-danger'>1 USD = $tx->usd_cdf CDF</small>"
-                                                            : "<small class='text-danger'>Aucun taux structure trouvé</small>" !!}</th>
-                                                        @foreach ($fuels as $fuel)
-                                                            <th>{{ $fuel->fuel }}</th>
-                                                        @endforeach
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($labels as $label)
-                                                        @continue($zone->zone !== 'OUEST' && $label->tag === 'L')
-                                                        @php
-                                                            $noedit = in_array($label->tag, noteditable());
-                                                        @endphp
-                                                        <tr tag="{{ $label->tag }}"
-                                                            class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
-                                                            <td>{{ $label->tag }}</td>
-                                                            <td>{{ $label->label }}</td>
-                                                            @foreach ($fuels as $fuel)
-                                                                @php
-                                                                    $price = optional(
-                                                                        $fuelprices[$zone->id][$fuel->id][$label->id] ??
-                                                                            null,
-                                                                    )->first();
-                                                                @endphp
-                                                                <td class="@if (!$noedit) editable-price @endif text-center @if (!$price) bg-danger @endif"
-                                                                    data-fuelprice-id="{{ $price->id }}"
-                                                                    data-zone="{{ $zone->zone }}"
-                                                                    data-label="{{ $label->label }}"
-                                                                    data-tag="{{ $label->tag }}">
-                                                                    @php
-                                                                        $v = $price->amount * (float) @$tx->usd_cdf;
-                                                                    @endphp
-                                                                    {{ $v ? $v : '' }}
-                                                                </td>
-                                                            @endforeach
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach --}}
                 </div>
             </div>
         </div>
@@ -351,6 +227,35 @@
     </style>
 
     <script>
+        function unformatFr(val) {
+            // retire espaces et convertit virgule en point pour parseFloat
+            return val.replace(/\s/g, '').replace(',', '.');
+        }
+
+        function formatFr(val) {
+            if (val === '' || val === null || isNaN(val)) return '';
+            return parseFloat(val).toLocaleString('fr-FR', {
+                minimumFractionDigits: 3,
+                maximumFractionDigits: 3
+            });
+        }
+
+        function formatAll() {
+            $('.editable-price').each(function() {
+                let td = $(this);
+                let val = td.text().trim();
+                td.text(formatFr(unformatFr(val)));
+            });
+        }
+
+        formatAll();
+
+        $('.editable-price').on('focus', function() {
+            let td = $(this);
+            td.text(unformatFr(td.text()));
+        });
+
+        // Activer l'édition
         $('.btn-edit-table').on('click', function() {
             let card = $(this).closest('.carte');
             card.find('.editable-price').attr('contenteditable', 'true');
@@ -457,14 +362,23 @@
         };
 
         function getRowValues(tag, table) {
-            return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => parseFloat($(td).text()) || 0).get();
+            return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => parseFloat(unformatFr($(td).text().trim())) || 0)
+                .get();
         }
 
         function setRowValues(tag, values, table) {
             const row = $(`tr[tag="${tag}"] td`, table).slice(2);
             row.each(function(i) {
-                $(this).text(values[i].toFixed(2));
+                var v = formatNumber(values[i]);
+                $(this).text(v);
             });
+        }
+
+        function formatNumber(val) {
+            return val
+                .toFixed(3)
+                .replace('.', ',')
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }
 
         function calculate() {
@@ -506,10 +420,6 @@
                                 parseFloat(rows[operands[j]][i]) || 0 :
                                 parseFloat(operands[j]) || 0;
 
-                            if (!rows[operands[j]]) {
-                                // console.log(rows, '---', operands, '---', j, operands[j], '==');
-                            }
-
                             if (op === "+") value += val;
                             else if (op === "-") value -= val;
                             else if (op === "*") value *= val;
@@ -533,7 +443,8 @@
 
         $('.editable-price').on('blur', function() {
             let td = $(this);
-            let price = td.text().trim();
+            let price = unformatFr(td.text().trim());
+
             let fuelpriceId = td.data('fuelprice-id');
             let zoneName = td.data('zone');
             let labelName = td.data('label');
@@ -542,6 +453,7 @@
             function isNumeric(value) {
                 return value !== null && value !== '' && !isNaN(value);
             }
+
             if (!price) {
                 td.css('background-color', '#fff8c4');
                 return;
@@ -553,18 +465,24 @@
                 return;
             }
 
+            let numericPrice = parseFloat(price);
+
             calculate();
 
-            td.css('background-color', 'lightblue');
-            td.css('opacity', '0.5');
+            td.css({
+                'background-color': 'lightblue',
+                'opacity': '0.5'
+            });
 
             $.ajax({
                 url: `{{ route('fuelprice.index') }}/${fuelpriceId}`,
                 type: 'PUT',
                 data: {
-                    price
+                    price: numericPrice
                 },
                 success: function(response) {
+                    td.text(formatFr(numericPrice));
+
                     td.css({
                         'background-color': '#54ee78',
                         'opacity': '1'
@@ -578,7 +496,7 @@
                     });
                     var m = err.responseJSON?.message;
                     alert(
-                        `Erreur enregistrement sur la zone ${zoneName}, [${tag}] ${labelName} ${m? ": "+m : ''}. (Pensez à vérifier votre connexion internet) `
+                        `Erreur enregistrement sur la zone ${zoneName}, [${tag}] ${labelName}${m ? ": "+m : ''}. (Pensez à vérifier votre connexion internet)`
                     );
                 }
             });

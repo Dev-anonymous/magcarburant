@@ -37,7 +37,7 @@
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
-                            <table id="table" class="table table-striped table-hover" style="width:100%">
+                            <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>ID</th>

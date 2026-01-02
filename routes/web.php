@@ -5,6 +5,8 @@ use App\Http\Controllers\ProviderWebController;
 use App\Http\Controllers\SudoWebController;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
+use App\Models\Purchase;
+use App\Models\Sale;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,21 @@ Route::get('def', function () {
     }
     if ('migrate' == $action) {
         Artisan::call('migrate');
+    }
+
+    foreach (Sale::all() as $e) {
+        $e->update([
+            'lata' => round($e->lata, 3),
+            'l15' => round($e->l15, 3),
+            'density' => round($e->density, 3),
+        ]);
+    }
+    foreach (Purchase::all() as $e) {
+        $e->update([
+            'qtytm' => round($e->qtytm, 3),
+            'qtym3' => round($e->qtym3, 3),
+            'density' => round($e->density, 3),
+        ]);
     }
 
     $out = Artisan::output();

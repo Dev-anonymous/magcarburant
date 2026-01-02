@@ -49,7 +49,7 @@
                                             <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
                                             <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" style="width:100%">
+                                                <table class="table table-striped table-hover text-nowrap" style="width:100%">
                                                     <thead>
                                                         <tr>
                                                             <th></th>
@@ -119,7 +119,7 @@
                                             <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
                                             <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" style="width:100%">
+                                                <table class="table table-striped table-hover text-nowrap" style="width:100%">
                                                     <thead>
                                                         <tr>
                                                             <th></th>

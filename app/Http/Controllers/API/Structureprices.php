@@ -52,7 +52,6 @@ class Structureprices extends Controller
                 return $t;
             })
             ->addColumn('action', function ($row) use ($user) {
-                $eb = "";
                 $data = e(json_encode([
                     'id' => $row->id,
                     'name' => $row->name,
@@ -60,14 +59,7 @@ class Structureprices extends Controller
                     'to' => $row->to?->format('Y-m-d'),
                     'usd_cdf' => $row->usd_cdf,
                 ]));
-                if (!$row->to) {
-                    $eb = "
-                        <a class='dropdown-item' href='#' bedit data='$data'>
-                            <i class='material-icons md-14 align-middle'>edit</i>
-                            <span class='align-middle'>Modifier</span>
-                        </a>
-                    ";
-                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -83,7 +75,10 @@ class Structureprices extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
+                            <a class='dropdown-item' href='#' bedit data='$data'>
+                                <i class='material-icons md-14 align-middle'>edit</i>
+                                <span class='align-middle'>Modifier</span>
+                            </a>
                             <a class="dropdown-item text-danger" href="#" bdel data='$data'>
                                 <i class="material-icons md-14 align-middle">delete</i>
                                 <span class="align-middle">Supprimer</span>
@@ -110,7 +105,7 @@ class Structureprices extends Controller
 
         if (request('action') == 'update') {
             $validated = $request->validate([
-                'from' => 'required|string|date|before_or_equal:today',
+                'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
@@ -126,10 +121,13 @@ class Structureprices extends Controller
             abort_if($entity->users_id != $user->id, 403, "No permission !!!");
 
             if ($str->to) {
+                DB::beginTransaction();
+                $str->update(['usd_cdf' => request('usd_cdf')]);
+                DB::commit();
                 return response()->json([
-                    'success' => false,
-                    'message' => "Cette structure est clôturée (valide du {$str->from->format('d-m-Y')} au {$str->to->format('d-m-Y')}) et ne peut plus être modifiée.",
-                ], 422);
+                    'success' => true,
+                    'message' => "La structure des prix a été mise à jour avec succès.",
+                ], 200);
             }
 
             $strActif = $entity->structureprices()
@@ -245,14 +243,9 @@ class Structureprices extends Controller
         $user = auth()->user();
         abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
 
-        if ($structureprice->to) {
-            $str = Structureprice::where('from', '>', $structureprice->to)->where('entity_id', $structureprice->entity->id)->first();
-            if ($str) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci.",
-                ], 422);
-            }
+        $last = $structureprice->entity->structureprices()->orderByDesc('from')->first();
+        if ($last->id !== $structureprice->id) {
+            return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci",], 422);
         }
 
         $structureprice->delete();

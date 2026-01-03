@@ -62,10 +62,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('rate.index') }}',
-                data: function(data) {
-                    data.type = "structure"
-                }
+                url: '{{ route('tx-structure.index') }}',
             },
             order: [
                 [0, "desc"]

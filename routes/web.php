@@ -25,20 +25,20 @@ Route::get('def', function () {
         Artisan::call('migrate');
     }
 
-    foreach (Sale::all() as $e) {
-        $e->update([
-            'lata' => round($e->lata, 3),
-            'l15' => round($e->l15, 3),
-            'density' => round($e->density, 3),
-        ]);
-    }
-    foreach (Purchase::all() as $e) {
-        $e->update([
-            'qtytm' => round($e->qtytm, 3),
-            'qtym3' => round($e->qtym3, 3),
-            'density' => round($e->density, 3),
-        ]);
-    }
+    // foreach (Sale::all() as $e) {
+    //     $e->update([
+    //         'lata' => round($e->lata, 3),
+    //         'l15' => round($e->l15, 3),
+    //         'density' => round($e->density, 3),
+    //     ]);
+    // }
+    // foreach (Purchase::all() as $e) {
+    //     $e->update([
+    //         'qtytm' => round($e->qtytm, 3),
+    //         'qtym3' => round($e->qtym3, 3),
+    //         'density' => round($e->density, 3),
+    //     ]);
+    // }
 
     $out = Artisan::output();
     dd(@$out);

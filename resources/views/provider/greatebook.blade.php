@@ -48,20 +48,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                            {{-- <div class="form-group mb-1">
-                                <label for="fuel_type" class="control-label d-block mb-0">Type</label>
-                                <select name="fuel_type" id="fuel_type" class="form-control select22"
-                                    style="min-width:150px;">
-                                    <option>TERRESTRE</option>
-                                    <option>AVIATION</option>
-                                </select>
-                            </div> --}}
                             <div class="form-group mb-1">
                                 <label for="zone" class="control-label d-block mb-0">Zone</label>
                                 <select name="zone[]" id="zone" class="form-control" multiple
                                     style="min-width:150px;">
                                     @foreach (mainWays() as $e)
-                                        <option>{{ $e }}</option>
+                                        <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -70,7 +62,7 @@
                                 <select name="fuel[]" id="fuel" class="form-control" multiple
                                     style="min-width:150px;">
                                     @foreach (mainfuels() as $e)
-                                        <option>{{ $e }}</option>
+                                        <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -235,7 +227,7 @@
 
         $('[name="zone[]"]').multiselect({
             includeSelectAllOption: true,
-            nonSelectedText: 'Aucune zone',
+            nonSelectedText: 'Aucun filtre',
             nSelectedText: 'zones sélectionnées',
             allSelectedText: 'Toutes les zones',
             numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
@@ -246,7 +238,7 @@
 
         $('[name="fuel[]"]').multiselect({
             includeSelectAllOption: true,
-            nonSelectedText: 'Aucun produit',
+            nonSelectedText: 'Aucun filtre',
             nSelectedText: 'produits sélectionnés',
             allSelectedText: 'Tous les produits',
             numberDisplayed: 1,

@@ -54,51 +54,42 @@ class RateController extends Controller
                 return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
             ->addColumn('action', function ($row) use ($user, $type, $isTx) {
-                if (!$row->to && $isTx) {
-                    $data = e(json_encode([
-                        'id' => $row->id,
-                        'from' => $row->from->format('Y-m-d'),
-                        'to' => $row->to?->format('Y-m-d'),
-                        'cdf_usd' => $row->cdf_usd,
-                        'usd_cdf' => $row->usd_cdf,
-                    ]));
-                    $t = <<<DATA
-                        <div class="dropdown">
-                            <a
-                                class="btn btn-primary2 btn-sm"
-                                href="#"
-                                role="button"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                            >
-                                <i class="material-icons md-18 align-middle"
-                                >more_vert</i
-                                >
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#" bedit data='$data'>
-                                    <i class="material-icons md-14 align-middle">edit</i>
-                                    <span class="align-middle">Modifier</span>
-                                </a>
-                            </div>
-                        </div>
-                    DATA;
-                    return $t;
-                }
+                $data = e(json_encode([
+                    'id' => $row->id,
+                    'from' => $row->from->format('Y-m-d'),
+                    'to' => $row->to?->format('Y-m-d'),
+                    'cdf_usd' => $row->cdf_usd,
+                    'usd_cdf' => $row->usd_cdf,
+                ]));
 
-                // if (!$isTx) {
-                //     if ($user->user_role == 'provider') {
-                //         $href = route('provider.accounting', ['stx' => $row->id]);
-                //     } else {
-                //         $href = route('sudo.provider', ['stx' => $row->id]);
-                //     }
-                //     $t = "<a class='btn btn-primary btn-sm' href='$href'>
-                //             <i class='material-icons md-14 align-middle'>settings</i>
-                //             <span class='align-middle'>Voies et Structures</span>
-                //         </a>";
-                //     return $t;
-                // }
+                $t = <<<DATA
+                    <div class="dropdown">
+                        <a
+                            class="btn btn-primary2 btn-sm"
+                            href="#"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        >
+                            <i class="material-icons md-18 align-middle"
+                            >more_vert</i
+                            >
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class='dropdown-item' href='#' bedit data='$data'>
+                                <i class='material-icons md-14 align-middle'>edit</i>
+                                <span class='align-middle'>Modifier</span>
+                            </a>
+                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
+                                <i class="material-icons md-14 align-middle">delete</i>
+                                <span class="align-middle">Supprimer</span>
+                            </a>
+                        </div>
+                    </div>
+                DATA;
+
+                return $t;
             })
             ->rawColumns(['action', 'rate'])
             ->make(true);
@@ -111,7 +102,7 @@ class RateController extends Controller
     {
         if (request('action') == 'update') {
             $validated = $request->validate([
-                'from' => 'required|string|date|before_or_equal:today',
+                'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
             ], [
@@ -134,10 +125,13 @@ class RateController extends Controller
             }
 
             if ($rate->to) {
+                DB::beginTransaction();
+                $rate->update(['usd_cdf' => request('usd_cdf')]);
+                DB::commit();
                 return response()->json([
-                    'success' => false,
-                    'message' => "Ce taux est clôturé (valide du {$rate->from->format('d-m-Y')} au {$rate->to->format('d-m-Y')}) et ne peut plus être modifié.",
-                ], 422);
+                    'success' => true,
+                    'message' => "Le taux a été mis à jour avec succès.",
+                ], 200);
             }
 
             $tauxActif = $entity->rates()
@@ -246,6 +240,19 @@ class RateController extends Controller
      */
     public function destroy(Rate $rate)
     {
-        //
+        $user = auth()->user();
+        abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
+
+        $last = $rate->entity->rates()->orderByDesc('from')->first();
+        if ($last->id !== $rate->id) {
+            return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer un taux du milieu, commencer par supprimer les dernièrs taux jusqu'à celui-ci",], 422);
+        }
+
+        $rate->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Vous avez supprimé le taux #$rate->id avec succès !",
+        ], 200);
     }
 }

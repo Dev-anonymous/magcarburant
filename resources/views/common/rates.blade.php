@@ -131,9 +131,9 @@
                             <label class="mb-0">Date validité au (optionnel)</label>
                             <input type="text" class="form-control" name="to">
                         </div>
-                        <p class="m-0 text-danger">
-                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les taux,
-                            rassurez-vous donc de configurer les taux avant de renseigner la date de clôture
+                        <p class="m-0 text-danger mb-3">
+                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les dates
+                            du taux. Si vous vous êtes trompé les dates, veuillez supprimer ce taux et le recréer.
                         </p>
                         <div class="mb-2">
                             <div class="input-group">
@@ -161,6 +161,41 @@
                                 Valider
                             </span>
                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdldel" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fdel>
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="mb-2 text-center">
+                            <h3 class="text-danger">
+                                Voulez-vous supprimer le taux <span shortname></span> ?
+                            </h3>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -250,6 +285,21 @@
                 $('[name="from"]', form).val(data.from);
                 $('[name="to"]', form).val(data.to);
                 $('[name="usd_cdf"]', form).val(data.usd_cdf);
+                if (data.to) {
+                    $('[name="from"]', form).attr('disabled', true);
+                    $('[name="to"]', form).attr('disabled', true);
+                } else {
+                    $('[name="from"]', form).attr('disabled', false);
+                    $('[name="to"]', form).attr('disabled', false);
+                }
+                mdl.modal('show');
+            });
+            $('[bdel]').off('click').click(function() {
+                var data = JSON.parse($(this).attr('data'));
+                var mdl = $('#mdldel');
+                var form = $('[fdel]', mdl);
+                $('[name="id"]', form).val(data.id);
+                $('[shortname]', form).html('#' + data.id);
                 mdl.modal('show');
             });
         });
@@ -299,6 +349,45 @@
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(
                             'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            })
+        });
+
+        $('[fdel]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var id = $('[name="id"]', form).val();
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('rate.index') }}/' + id,
+                method: 'delete',
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    setTimeout(() => {
+                        rep.hide();
+                        $('#mdldel').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-danger')
                         .show();
                 },
             }).always(function() {

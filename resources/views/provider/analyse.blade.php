@@ -5,8 +5,8 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Analyse</h2>
-                <p class="lead small m-0">Analyse et Bilan de vente des prodtuis</p>
+                <h2 class="font-weight-bold">Manque à Gagner des Sociétés Commerciales</h2>
+                <p class="lead small m-0">Analyse et Bilan MAG de tous les prodtuis et toutes les zones </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -24,116 +24,42 @@
             <div class="col-md-12">
                 <div class="card transparent">
                     <input type="hidden" name="type" value="balance">
-                    {{-- <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title font-weight-bold">
-                            Bilan d'analyse
-                        </h4>
-                        <div class="d-flex">
-                            @php
-                                $d = now()->startOfMonth()->toDateString();
-                                $d2 = now()->toDateString();
-                            @endphp
-                            <div class="mr-2">
-                                <label class="mb-0" for="dv222">Du</label>
-                                <input class="form-control flatpickr2" id="dv222" value="{{ $d }}"
-                                    name="date1" style="width: 100px">
+                    <div class="card-header">
+                        @php
+                            $d = now()->startOfMonth()->toDateString();
+                            $d2 = now()->toDateString();
+                        @endphp
+                        <form id="ffilter" class="filters-form pull-right" role="form">
+                            <input type="hidden" name="type" value="greatbook">
+                            <div class="form-group mb-1">
+                                <label for="dv222" class="control-label d-block mb-0">Du</label>
+                                <input type="text" class="form-control flatpickr" id="dv222" name="date1"
+                                    value="{{ $d }}" style="min-width:120px;">
                             </div>
-                            <div class="mr-2">
-                                <label class="mb-0" for="dv22">Au</label>
-                                <input class="form-control flatpickr2" id="dv22" value="{{ $d2 }}"
-                                    name="date2" style="width: 100px">
+                            <div class="form-group mb-1">
+                                <label for="dv22" class="control-label d-block mb-0">Au</label>
+                                <input type="text" class="form-control flatpickr" id="dv22" name="date2"
+                                    value="{{ $d2 }}" style="min-width:120px;">
                             </div>
-                            <div class="mr-2">
-                                <span for="">Zone</span>
-                                <select name="zone" class="form-control">
+                            <div class="form-group mb-1">
+                                <label for="zone" class="control-label d-block mb-0">Zone</label>
+                                <select name="zone[]" id="zone" class="form-control" multiple
+                                    style="min-width:150px;">
                                     @foreach (mainWays() as $e)
-                                        <option>{{ $e }}</option>
+                                        <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mr-2">
-                                <span for="">Produit</span>
-                                <select name="fuel" class="form-control">
+                            <div class="form-group mb-1">
+                                <label for="fuel" class="control-label d-block mb-0">Produit</label>
+                                <select name="fuel[]" id="fuel" class="form-control" multiple
+                                    style="min-width:150px;">
                                     @foreach (mainfuels() as $e)
-                                        <option>{{ $e }}</option>
+                                        <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
-                    </div> --}}
-                    <div class="card-header mb-3">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-                                <h4 class="card-title font-weight-bold">Bilan d'analyse</h4>
-                            </div>@php
-                                $d = now()->startOfMonth()->toDateString();
-                                $d2 = now()->toDateString();
-                            @endphp
-                            @if (auth()->user()->user_role === 'provider')
-                                <div class="col-xs-12 col-sm-6 col-md-12">
-                                    <form id="ffilter" class="form-inline filters-form pull-right" role="form">
-                                        <input type="hidden" name="type" value="balance">
-                                        {{-- <div class="form-group mb-1">
-                                            <div class="">
-                                                <label class="justify-content-start" for="dv222">Du</label>
-                                                <input class="form-control flatpickr2" id="dv222"
-                                                    value="{{ $d }}" name="date1" style="width:100px" />
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="dv22">Au</label>
-                                                <input class="form-control flatpickr2" id="dv22"
-                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
-                                            </div>
-                                        </div> --}}
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Structure de
-                                                    prix</label>
-                                                <select name="structure" class="form-control select2">
-                                                    @foreach ($ps as $e)
-                                                        @php
-                                                            $au = $e->to;
-                                                            if ($au) {
-                                                                $au = "au {$au->format('d-m-Y')}";
-                                                            } else {
-                                                                $au = '';
-                                                            }
-                                                        @endphp
-                                                        <option value="{{ $e->id }}"
-                                                            @if (request('stp') == $e->id) selected @endif>
-                                                            {{ "$e->name : Du {$e->from?->format('d-m-Y')} $au" }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Type</label>
-                                                <select name="fuel_type" class="form-control select2">
-                                                    <option>TERRESTRE</option>
-                                                    <option>AVIATION</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start" for="">Zone</label>
-                                                <select name="zone" class="form-control"></select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-1">
-                                            <div>
-                                                <label class="justify-content-start">Produit</label>
-                                                <select name="fuel" class="form-control"></select>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            @endif
-                        </div>
+                        </form>
                     </div>
                     <x-dataloader />
                     <x-alert />
@@ -162,7 +88,7 @@
         }
     </style>
     <script>
-        flatpickr(".flatpickr2", {
+        flatpickr(".flatpickr", {
             maxDate: "today",
             locale: {
                 firstDayOfWeek: 1
@@ -181,43 +107,27 @@
             }
         });
 
-        function getExtra() {
-            var sel = $('[name="fuel_type"]');
-            var o = '';
-            var o2 = '';
+        $('[name="zone[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun filtre',
+            nSelectedText: 'zones sélectionnées',
+            allSelectedText: 'Toutes les zones',
+            numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
+            selectAllText: 'Toutes',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
 
-            if (sel.val() == 'TERRESTRE') {
-                ['NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
-                    o += `<option>${e}</option>`;
-                });
-                ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
-                    o2 += `<option>${e}</option>`;
-                });
-            }
-            if (sel.val() == 'AVIATION') {
-                ['SUD', 'EST', 'OUEST'].forEach((e) => {
-                    o += `<option>${e}</option>`;
-                });
-                ['JET'].forEach((e) => {
-                    o2 += `<option>${e}</option>`;
-                });
-            }
-            var sz = $('[name=zone]').html(o);
-            var sf = $('[name=fuel]').html(o2);
-
-            try {
-                sz.select2('destroy');
-            } catch (error) {}
-            sz.select2();
-
-            try {
-                sf.select2('destroy');
-            } catch (error) {}
-            sf.select2();
-            getData();
-        }
-
-        getExtra();
+        $('[name="fuel[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun filtre',
+            nSelectedText: 'produits sélectionnés',
+            allSelectedText: 'Tous les produits',
+            numberDisplayed: 1,
+            selectAllText: 'Tous',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
 
         function getData() {
             ldr.show();
@@ -303,6 +213,6 @@
             })
         }
 
-        // getData();
+        getData();
     </script>
 @endsection

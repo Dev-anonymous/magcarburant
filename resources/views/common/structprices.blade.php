@@ -136,8 +136,8 @@
                             <input type="text" class="form-control" name="to" required>
                         </div>
                         <p class="m-0 text-danger mb-3">
-                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les prix de la
-                            structure, rassurez-vous donc de configurer les prix avant de renseigner la date de clôture
+                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les dates de la
+                            structure. Si vous vous êtes trompé les dates, veuillez supprimer cette structure et la recréer.
                         </p>
                         <h5>Taux structure</h5>
                         <div class="mb-2">
@@ -305,6 +305,13 @@
                 $('[name="to"]', form).val(data.to);
                 $('[name="cdf_usd"]', form).val(data.cdf_usd);
                 $('[name="usd_cdf"]', form).val(data.usd_cdf);
+                if (data.to) {
+                    $('[name="from"]', form).attr('disabled', true);
+                    $('[name="to"]', form).attr('disabled', true);
+                } else {
+                    $('[name="from"]', form).attr('disabled', false);
+                    $('[name="to"]', form).attr('disabled', false);
+                }
                 mdl.modal('show');
             });
             $('[bdel]').off('click').click(function() {

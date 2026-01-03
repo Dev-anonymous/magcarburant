@@ -49,7 +49,8 @@
                                             <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
                                             <h6 class="text-danger text-right">Les valeurs sont en USD</h6>
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover text-nowrap" style="width:100%">
+                                                <table class="table table-striped table-hover text-nowrap"
+                                                    style="width:100%">
                                                     <thead>
                                                         <tr>
                                                             <th></th>
@@ -99,16 +100,16 @@
                                                 </table>
                                             </div>
                                             <div class="">
-                                                @if (empty($structure->to))
-                                                    @if (auth()->user()->user_role == 'provider')
-                                                        <div class="text-right">
-                                                            <button class="btn btn-sm btn-edit-table">
-                                                                <i class="material-icons md-18">edit</i>
-                                                                Modifier les prix
-                                                            </button>
-                                                        </div>
-                                                    @endif
+                                                {{-- @if (empty($structure->to)) --}}
+                                                @if (auth()->user()->user_role == 'provider')
+                                                    <div class="text-right">
+                                                        <button class="btn btn-sm btn-edit-table">
+                                                            <i class="material-icons md-18">edit</i>
+                                                            Modifier les prix
+                                                        </button>
+                                                    </div>
                                                 @endif
+                                                {{-- @endif --}}
                                             </div>
                                         </div>
                                     </div>
@@ -119,7 +120,8 @@
                                             <h5 class="text-center font-weight-bold">ZONE {{ $zoneName }}</h5>
                                             <h6 class="text-danger text-right">Les valeurs sont en CDF</h6>
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover text-nowrap" style="width:100%">
+                                                <table class="table table-striped table-hover text-nowrap"
+                                                    style="width:100%">
                                                     <thead>
                                                         <tr>
                                                             <th></th>

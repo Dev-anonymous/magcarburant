@@ -384,3 +384,14 @@ function items()
         (object)['label' => 'PMAG CHANGE SOCOM', 'val' => 'item3'],
     ];
 }
+
+
+function findIndexByLabel(array $array, string $label): ?int
+{
+    foreach ($array as $index => $item) {
+        if (isset($item['label']) && $item['label'] === $label) {
+            return $index;
+        }
+    }
+    return null;
+}

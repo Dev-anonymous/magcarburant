@@ -91,118 +91,82 @@ class DataController extends Controller
             }
 
             if ($type == 'balance') {
-
                 $data = $this->greatBookData();
                 $dhead = $data['head'];
                 $drows = $data['rows'];
 
                 $head = ['PRODUITS', ...mainWays(), 'TOTAL'];
+                $rows = [];
 
-                $title = ['PMAG PMFC SOCOM', 'PMAG MARGE SOCOM', 'PMAG CHANGE SOCOM'];
+                $title = items();
+
+                $tabv = [];
+                $tabt = [];
+                foreach (mainWays() as $z) {
+                    $tabv["v_$z"] = 0;
+                    $tabt["t_$z"] = 0;
+                }
 
                 foreach ($title as $ti) {
-                    foreach (mainWays() as $zone) {
-                        $index = array_search($ti, array_column($head, 'label'), true);
-
-                        dd($dhead, $index, $dhead);
-                    }
-                }
-
-
-                dd($head,);
-
-                $from = request('date1') ?? nnow()->toDateString();
-                $to = request('date2') ?? $from;
-
-                $zone = request('zone');
-                $fuel = request('fuel');
-                $fuel_type = request('fuel_type');
-
-                $entity = $user->entities()->first();
-
-                $plages = Structureprice::where('entity_id', $entity->id)
-                    ->where(function ($q) use ($from, $to) {
-                        $q->where(function ($q) use ($from, $to) {
-                            $q->where('from', '<=', $to)
-                                ->where('to', '>=', $from);
-                        })
-                            ->orWhere(function ($q) use ($from, $to) {
-                                $q->whereNull('to')
-                                    ->whereBetween('from', [$from, $to]);
-                            });
-                    })
-                    // ->orderBy(DB::raw('`from`'), 'desc')
-                    ->get();
-
-                abort_if(!$plages->count(), 422, "Aucune structure de prix trouvée sur la plage de date sélectionnée.");
-
-                $data = [];
-                $labels = Label::whereNotIn('label', uneditable())
-                    ->whereHas('fuelprices', function ($q) use ($zone, $fuel_type) {
-                        $q->whereHas('zone', function ($q) use ($zone) {
-                            $q->where('zone', $zone);
-                        });
-                        $q->whereHas('fuel', function ($q) use ($fuel_type) {
-                            $q->where('fuel_type', $fuel_type);
-                        });
-                    })
-                    ->orderBy('tag')
-                    ->get();
-
-                $fuelOb =  Fuel::where('fuel', $fuel)->first();
-
-                foreach ($plages as $str) {
-                    $strfrom = $str->from;
-                    $strto = $str->to ?? nnow();
-
-                    $tab = [];
-                    $tot = 0;
-                    foreach ($labels as $lab) {
+                    // $line[] = $ti->label;
+                    foreach (mainfuels() as $fuel) {
                         $line = [];
-                        $line['label'] = $lab->label;
-
-                        $fprice = $str->fuelprices()->whereHas('zone', function ($q) use ($zone) {
-                            if ($zone) {
-                                $q->where('zone', $zone);
+                        $line[] = $fuel;
+                        $tot2 = 0;
+                        foreach (mainWays() as $zone) {
+                            $tot = 0;
+                            $index = findIndexByLabel($dhead, $ti->label);
+                            if (null !== $index) {
+                                foreach ($drows as $r) {
+                                    $v = (float) @$r[$index]['vv'];
+                                    $zo = $r[4]['v'];
+                                    $pro = $r[5]['v'];
+                                    if ($pro === $fuel && $zone === $zo) {
+                                        $tot += $v;
+                                    }
+                                }
+                                $line[] = v($tot);
+                                $tot2  += $tot;
+                                $v0 = (float) @$tabv["v_$z"];
+                                $tabv["v_$z"] =  $v0 + $tot;
                             }
-                        })->whereHas('fuel', function ($qq) use ($fuel) {
-                            if ($fuel) {
-                                $qq->where('fuel', $fuel);
-                            }
-                        })->where(['label_id' => $lab->id])->first();
-
-                        abort_if(!$fprice, 422, "Aucun prix ($fuelOb->fuel $fuelOb->fuel_type , $lab->label) trouvé sur la structure de prix de la date sélectionnée (ZONE $zone, structure $str->name #$str->id).");
-
-                        $amount = 0;
-                        $currency = 'USD';
-                        if ($fprice) {
-                            $amount = (float) $fprice->amount;
-                            $currency = $fprice->currency;
                         }
-                        if ('A' === $lab->tag) {
-                            $vol = Purchase::whereBetween('date', [$strfrom, $strto])->where('product', $fuel)->sum('qtym3');
-                        } else {
-                            $vol = Sale::where('way', $zone)->whereBetween('date', [$strfrom, $strto])->where('product', $fuel)->sum('lata'); // lata en litre
-                            $vol /= 1000; // m3
-                        }
-                        $t = $vol * $amount;
-                        $tot += $t;
-                        $line['struct_price'] = $amount;
-                        $line['struct_price_id'] = $str->id;
-                        $line['tag'] = $lab->tag;
-                        $line['vol'] = $vol;
-                        $line['tot'] = v($t);
-                        $line['zone'] = $zone;
-                        $line['fuel'] = $fuel;
-                        $line['date'] = "DU {$strfrom->format('d-m-Y')} AU {$strto->format('d-m-Y')}";
-
-                        $tab[] = $line;
+                        $line[] = v($tot2);
+                        $rows[] = $line;
                     }
 
-                    $data["$str->id###$str->name###ZONE $zone"] = $tab;
+                    $line0 = [];
+                    $line0[] = $ti->label;
+                    $t0 = 0;
+                    foreach ($tabv as $k => $v) {
+                        $line0[] = v($v);
+                        $t0 += $v;
+                        $tabv[$k] = 0;
+
+                        $z = array_values(array_filter(explode('v_', $k)))[0];
+                        $v0 = (float) $tabt["t_" . $z];
+                        $tabt["t_$z"] = $v0 + $v;
+                    }
+
+                    $line0[] = v($t0);
+                    $rows[] = $line0;
                 }
 
-                return response()->json($data);
+
+                $line0 = [];
+                $line0[] = "TOTAL GENERAL";
+                $t0 = 0;
+                foreach ($tabt as $k => $v) {
+                    $line0[] = v($v);
+                    $t0 += $v;
+                }
+
+                $line0[] = v($t0);
+                $rows[] = $line0;
+
+                array_unshift($rows, $head);
+
+                return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
             }
         }
     }
@@ -359,7 +323,7 @@ class DataController extends Controller
                 ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
                 ['v' => v($pmfc_struct)],
                 ['v' => v($ecart_pmf), 'class' => 'bigtitle', 'title' => "PMFC REEL - PMFC STRUCTURE"],
-                ['v' => v($pmag_pmfc_socom),   'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],
+                ['v' => v($pmag_pmfc_socom),  'vv' => $pmag_pmfc_socom,  'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],
                 ['v' => v($pmag_marge_socom),  'class' => 'bigtitle', 'title' => '10% de PMAG PMFC SOCOM'],
                 ['v' => v($tx_reel)],
                 ['v' => v($tx_str)],

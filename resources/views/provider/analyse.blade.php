@@ -30,7 +30,7 @@
                             $d2 = now()->toDateString();
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
-                            <input type="hidden" name="type" value="greatbook">
+                            <input type="hidden" name="type" value="balance">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
                                 <input type="text" class="form-control flatpickr" id="dv222" name="date1"
@@ -138,61 +138,29 @@
                 url: '{{ route('dashboard') }}',
                 data: data,
                 success: function(data) {
-                    var k = Object.keys(data);
-                    var h = '';
-                    k.forEach(key => {
-                        h += `
+
+                    var h = `
                     <table id="table" class="table table-striped table-hover text-nowrap"
                         style="width:100%">
                         <thead>
                             <tr>
-                                <td colspan=4>
-                                    <div class='text-center p-2'>
-                                        DATATITLE
+                                <td colspan=6>
+                                    <div class='text-center p-2 font-weight-bold'>
+                                        MANQUE A GAGNER SOCIETES COMMERCIALES USD
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <th>ITEM</th>
-                                <th class='text-center'>Prix Structure de Prix</th>
-                                <th class='text-center'>Volume Vendu M3</th>
-                                <th class='text-center'>MONTANT</th>
-                            </tr>
+
                         </thead>
                         <tbody>
                     `;
-                        var d = data[key];
-
-                        var li = null;
-                        var url =
-                            '{!! route('provider.accounting', [
-                                'item' => 'gb',
-                                'stp' => 'STRUCTURENAME',
-                                'f' => 'FUELNAME',
-                                'z' => 'ZONENAME',
-                                'tag' => 'TAGNAME',
-                            ]) !!}';
-                        d.forEach(line => {
-                            var u = url.split('STRUCTURENAME').join(line.struct_price_id)
-                                .split('FUELNAME').join(line.fuel)
-                                .split('ZONENAME').join(line.zone)
-                                .split('TAGNAME').join(line.tag);
-                            h += `
-                            <tr style="cursor:pointer" onclick="location.assign('${u}')" >
-                                <td>${line.label}</td>
-                                <td class='text-center'>${line.struct_price}</td>
-                                <td class='text-center'>${line.vol}</td>
-                                <td class='text-center font-weight-bold'>${line.tot}</td>
-                            </tr>
-                                `
-                            li = line;
-                        });
-                        h += `</tbody>
-                        </table>`;
-                        if (li) {
-                            var ti = `<h4>${li.fuel} | ${li.date} | ZONE ${li.zone}</h4>`;
-                            h = h.replace('DATATITLE', ti);
-                        }
+                    data.rows.forEach(row => {
+                        h += '<tr>'
+                        row.map(e => {
+                            h += `<td>${e}</td>`
+                        })
+                        h += '</tr>'
+                        console.log(row);
                     });
 
                     $('[data]').html(h);

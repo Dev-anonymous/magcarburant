@@ -81,6 +81,7 @@
 @section('script')
     <x-flatpickr />
     <x-select />
+    <x-datatable />
     <style>
         .title {
             font-weight: bold;
@@ -144,17 +145,17 @@
                 data: data,
                 success: function(data) {
                     var h = `
-                    <table id="table" class="table table-striped table-hover text-nowrap"
-                        style="width:100%">
-                        <thead>
-                            <tr>
-                                <td colspan=6 class='text-center font-weight-bold'>
-                                        MANQUE A GAGNER SOCIETES COMMERCIALES USD
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <h6 class='text-center font-weight-bold'>MANQUE A GAGNER SOCIETES COMMERCIALES USD</h6>
+                    <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                     `;
+
+                    h += '<thead><tr>';
+                    var tit = data.rows.shift();
+                    tit.map(e => {
+                        h += `<td class="${e.class??""}">${e.label}</td>`
+                    })
+                    h += '</tr></thead><tbody>';
+
                     data.rows.forEach(row => {
                         h += '<tr>'
                         row.map(e => {
@@ -168,6 +169,24 @@
                     $('[data]').html(h);
                     $('[data]').css('opacity', 1);
                     rep.hide();
+
+                    $('#table').DataTable({
+                        dom: 'Brt',
+                        ordering: false,
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            title: 'Export Excel',
+                            exportOptions: {
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        let num = parseFloat(data.toString().replace(/ /g,
+                                            '').replace(',', '.'));
+                                        return isNaN(num) ? data : num;
+                                    }
+                                }
+                            }
+                        }, ],
+                    });
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

@@ -148,20 +148,35 @@ class DataController extends Controller
                     }
 
                     $line0 = [];
-                    $line0[] = ['label' => $ti->label, 'class' => 'title1'];
+                    $line0[] = [
+                        'label' => $ti->label,
+                        'class' => 'title1',
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'title' => "Afficher la valeur $ti->label de toutes les zones",
+                    ];
                     $t0 = 0;
 
                     foreach ($tabv as $k => $v) {
-                        $line0[] = ['label' => v($v), 'class' => 'title1'];
+                        $z = array_values(array_filter(explode('v_', $k)))[0];
+                        $line0[] = [
+                            'label' => v($v),
+                            'class' => 'title1',
+                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
+                            'title' => "Afficher la valeur $ti->label de la zone $z",
+                        ];
                         $t0 += $v;
                         $tabv[$k] = 0;
 
-                        $z = array_values(array_filter(explode('v_', $k)))[0];
                         $v0 = (float) $tabt["t_$z"];
                         $tabt["t_$z"] = $v0 + $v;
                     }
 
-                    $line0[] = ['label' => v($t0), 'class' => 'title1'];
+                    $line0[] = [
+                        'label' => v($t0),
+                        'class' => 'title1',
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'title' => "Afficher la valeur $ti->label de toutes les zones",
+                    ];
                     $rows[] = $line0;
                 }
 

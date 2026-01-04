@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
             Route::get('apps', 'apps')->name('provider.apps');
             Route::get('sale', 'sale')->name('provider.sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
-            ROute::prefix('accounting')->group(function () {
+            Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
                 Route::get('analyse', 'analyse')->name('provider.analyse');
             });

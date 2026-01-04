@@ -259,6 +259,23 @@
             }, 100);
         });
 
+        var date1 = '{{ request('date1') }}';
+        var date2 = '{{ request('date2') }}';
+        var item = '{{ request('el') }}';
+        var zone = '{{ request('z') }}';
+        if (date1.length) {
+            $('[name="date1"]').val(date1);
+        }
+        if (date2.length) {
+            $('[name="date2"]').val(date2);
+        }
+        if (item.length) {
+            $('[name="items"]').val(item).change();
+        }
+        if (zone.length) {
+            $('[name="zone[]"]').val([zone]).change();
+        }
+
         getData();
     </script>
 @endsection

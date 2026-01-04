@@ -92,6 +92,10 @@
             font-weight: bold;
             background: #cccccc70;
         }
+
+        td[href] {
+            cursor: pointer;
+        }
     </style>
     <script>
         flatpickr(".flatpickr", {
@@ -157,9 +161,9 @@
                     h += '</tr></thead><tbody>';
 
                     data.rows.forEach(row => {
-                        h += '<tr>'
+                        h += `<tr>`
                         row.map(e => {
-                            h += `<td class="${e.class??""}">${e.label}</td>`
+                            h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
                         })
                         h += '</tr>'
                     });
@@ -187,6 +191,14 @@
                             }
                         }, ],
                     });
+
+                    $('td[href]').click(function() {
+                        event.preventDefault();
+                        var h = $(this).attr('href');
+                        location.assign(h);
+                    });
+                    $('td[title]').tooltip();
+
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

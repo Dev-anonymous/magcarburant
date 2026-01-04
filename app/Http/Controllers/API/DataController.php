@@ -92,6 +92,9 @@ class DataController extends Controller
 
             if ($type == 'balance') {
                 $data = $this->greatBookData();
+                $zones = (array) request('zone');
+                $fuels = (array) request('fuel');
+
                 $dhead = $data['head'];
                 $drows = $data['rows'];
 
@@ -102,7 +105,7 @@ class DataController extends Controller
                             'label' => $z,
                             'class' => 'title'
                         ];
-                    }, mainWays()),
+                    }, $zones),
                     [['label' => 'TOTAL', 'class' => 'title']]
                 );
 
@@ -112,17 +115,17 @@ class DataController extends Controller
 
                 $tabv = [];
                 $tabt = [];
-                foreach (mainWays() as $z) {
+                foreach ($zones as $z) {
                     $tabv["v_$z"] = 0;
                     $tabt["t_$z"] = 0;
                 }
 
                 foreach ($title as $ti) {
-                    foreach (mainfuels() as $fuel) {
+                    foreach ($fuels as $fuel) {
                         $line = [];
                         $line[] = ['label' => $fuel];
                         $tot2 = 0;
-                        foreach (mainWays() as $zone) {
+                        foreach ($zones as $zone) {
                             $tot = 0;
                             $index = findIndexByLabel($dhead, $ti->label);
                             if (null !== $index) {
@@ -145,33 +148,32 @@ class DataController extends Controller
                     }
 
                     $line0 = [];
-                    $line0[] = ['label'=>$ti->label, 'class'=>'title1'];
+                    $line0[] = ['label' => $ti->label, 'class' => 'title1'];
                     $t0 = 0;
 
                     foreach ($tabv as $k => $v) {
-                        $line0[] = ['label' => v($v), 'class'=>'title1'];
+                        $line0[] = ['label' => v($v), 'class' => 'title1'];
                         $t0 += $v;
                         $tabv[$k] = 0;
 
                         $z = array_values(array_filter(explode('v_', $k)))[0];
-                        $v0 = (float) $tabt["t_" . $z];
+                        $v0 = (float) $tabt["t_$z"];
                         $tabt["t_$z"] = $v0 + $v;
                     }
 
-                    $line0[] = ['label' => v($t0), 'class'=>'title1'];
+                    $line0[] = ['label' => v($t0), 'class' => 'title1'];
                     $rows[] = $line0;
                 }
 
-
                 $line0 = [];
-                $line0[] = ['label'=>"TOTAL GENERAL", 'class'=>'title1'];
+                $line0[] = ['label' => "TOTAL GENERAL", 'class' => 'title1'];
                 $t0 = 0;
                 foreach ($tabt as $k => $v) {
-                    $line0[] = ['label' => v($v), 'class'=>'title1'];
+                    $line0[] = ['label' => v($v), 'class' => 'title1'];
                     $t0 += $v;
                 }
 
-                $line0[] = ['label' => v($t0), 'class'=>'title1'];
+                $line0[] = ['label' => v($t0), 'class' => 'title1'];
                 $rows[] = $line0;
                 array_unshift($rows, $head);
 
@@ -332,15 +334,15 @@ class DataController extends Controller
                 ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
                 ['v' => v($pmfc_struct)],
                 ['v' => v($ecart_pmf), 'class' => 'bigtitle', 'title' => "PMFC REEL - PMFC STRUCTURE"],
-                ['v' => v($pmag_pmfc_socom),  'vv' => $pmag_pmfc_socom,  'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],
-                ['v' => v($pmag_marge_socom),  'class' => 'bigtitle', 'title' => '10% de PMAG PMFC SOCOM'],
+                ['v' => v($pmag_pmfc_socom), 'vv' => $pmag_pmfc_socom,  'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],
+                ['v' => v($pmag_marge_socom), 'vv' => $pmag_marge_socom, 'class' => 'bigtitle', 'title' => '10% de PMAG PMFC SOCOM'],
                 ['v' => v($tx_reel)],
                 ['v' => v($tx_str)],
                 ['v' => v($variation_change), 'class' => 'bigtitle', 'title' => '(Taux Réel - Taux Structure)/Taux Réel '],
                 ['v' => v($charge_socom_str)],
                 ['v' => v($marge_socom_str)],
                 ['v' => v($ecart_change), 'class' => 'bigtitle', 'title' => '(PMFC Structure + Charge SOCOM Structure + Marge SOCOM Structure ) * Variation Change'],
-                ['v' => v($pmag_change_socom), 'class' => 'bigtitle', 'title' => 'Ecart Change * M3'],
+                ['v' => v($pmag_change_socom), 'vv' => $pmag_change_socom, 'class' => 'bigtitle', 'title' => 'Ecart Change * M3'],
             ];
 
             $rows[] = $pline;

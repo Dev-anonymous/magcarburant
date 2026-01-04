@@ -103,13 +103,13 @@
 
         var ff = $('#ffilter');
 
+        let timer;
         ff.change(function(e) {
-            var e = $(e.target)
-            if (e.attr('name') == 'fuel_type') {
-                getExtra();
-            } else {
+            clearTimeout(timer);
+            var e = $(e.target);
+            timer = setTimeout(() => {
                 getData();
-            }
+            }, 100);
         });
 
         $('[name="zone[]"]').multiselect({

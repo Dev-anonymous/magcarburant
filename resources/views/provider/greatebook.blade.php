@@ -255,74 +255,10 @@
             clearTimeout(timer);
             var e = $(e.target);
             timer = setTimeout(() => {
-                // if (e.attr('name') == 'fuel_type') {
-                //     getExtra();
-                // } else {
                 getData();
-                // }
-            }, 100); // 100ms après le dernier change
+            }, 100);
         });
 
-
         getData();
-
-
-        // function getExtra() {
-        //     var sel = $('[name="fuel_type"]');
-        //     var o = '';
-        //     var o2 = '';
-
-        //     if (sel.val() == 'TERRESTRE') {
-        //         ['NORD', 'SUD', 'EST', 'OUEST'].forEach((e) => {
-        //             o += `<option>${e}</option>`;
-        //         });
-        //         ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI'].forEach((e) => {
-        //             o2 += `<option>${e}</option>`;
-        //         });
-        //     }
-        //     if (sel.val() == 'AVIATION') {
-        //         ['SUD', 'EST', 'OUEST'].forEach((e) => {
-        //             o += `<option>${e}</option>`;
-        //         });
-        //         ['JET'].forEach((e) => {
-        //             o2 += `<option>${e}</option>`;
-        //         });
-        //     }
-
-        //     var sz = $('[name="zone[]"]');
-        //     var sf = $('[name="fuel[]"]');
-
-        //     if (sz.data('multiselect')) sz.multiselect('destroy');
-        //     if (sf.data('multiselect')) sf.multiselect('destroy');
-
-        //     sz.html(o);
-        //     sf.html(o2);
-
-        //     sz.multiselect({
-        //         includeSelectAllOption: true,
-        //         nonSelectedText: 'Aucune zone',
-        //         nSelectedText: 'zones sélectionnées',
-        //         allSelectedText: 'Toutes les zones',
-        //         numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
-        //         selectAllText: 'Toutes',
-        //         buttonWidth: '100%',
-        //         buttonClass: 'btn btn-primary'
-        //     });
-
-        //     sf.multiselect({
-        //         includeSelectAllOption: true,
-        //         nonSelectedText: 'Aucun produit',
-        //         nSelectedText: 'produits sélectionnés',
-        //         allSelectedText: 'Tous les produits',
-        //         numberDisplayed: 1,
-        //         selectAllText: 'Tous',
-        //         buttonWidth: '100%',
-        //         buttonClass: 'btn btn-primary'
-        //     });
-
-        //     getData();
-        // }
-
-        // getExtra();
     </script>
 @endsection

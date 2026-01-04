@@ -82,9 +82,14 @@
     <x-flatpickr />
     <x-select />
     <style>
-        .noneditable td {
-            border-top: 2px solid #ccc !important;
-            border-bottom: 2px solid #ccc !important;
+        .title {
+            font-weight: bold;
+            background: #ccc;
+        }
+
+        .title1 {
+            font-weight: bold;
+            background: #cccccc70;
         }
     </style>
     <script>
@@ -138,30 +143,27 @@
                 url: '{{ route('dashboard') }}',
                 data: data,
                 success: function(data) {
-
                     var h = `
                     <table id="table" class="table table-striped table-hover text-nowrap"
                         style="width:100%">
                         <thead>
                             <tr>
-                                <td colspan=6>
-                                    <div class='text-center p-2 font-weight-bold'>
+                                <td colspan=6 class='text-center font-weight-bold'>
                                         MANQUE A GAGNER SOCIETES COMMERCIALES USD
-                                    </div>
                                 </td>
                             </tr>
-
                         </thead>
                         <tbody>
                     `;
                     data.rows.forEach(row => {
                         h += '<tr>'
                         row.map(e => {
-                            h += `<td>${e}</td>`
+                            h += `<td class="${e.class??""}">${e.label}</td>`
                         })
                         h += '</tr>'
-                        console.log(row);
                     });
+
+                    h += '</tbody></table>'
 
                     $('[data]').html(h);
                     $('[data]').css('opacity', 1);

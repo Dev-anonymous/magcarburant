@@ -95,7 +95,17 @@ class DataController extends Controller
                 $dhead = $data['head'];
                 $drows = $data['rows'];
 
-                $head = ['PRODUITS', ...mainWays(), 'TOTAL'];
+                $head = array_merge(
+                    [['label' => 'PRODUITS', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => $z,
+                            'class' => 'title'
+                        ];
+                    }, mainWays()),
+                    [['label' => 'TOTAL', 'class' => 'title']]
+                );
+
                 $rows = [];
 
                 $title = items();
@@ -108,10 +118,9 @@ class DataController extends Controller
                 }
 
                 foreach ($title as $ti) {
-                    // $line[] = $ti->label;
                     foreach (mainfuels() as $fuel) {
                         $line = [];
-                        $line[] = $fuel;
+                        $line[] = ['label' => $fuel];
                         $tot2 = 0;
                         foreach (mainWays() as $zone) {
                             $tot = 0;
@@ -125,21 +134,22 @@ class DataController extends Controller
                                         $tot += $v;
                                     }
                                 }
-                                $line[] = v($tot);
+                                $line[] = ['label' => v($tot)];
                                 $tot2  += $tot;
-                                $v0 = (float) @$tabv["v_$z"];
-                                $tabv["v_$z"] =  $v0 + $tot;
+                                $v0 = (float) @$tabv["v_$zone"];
+                                $tabv["v_$zone"] =  $v0 + $tot;
                             }
                         }
-                        $line[] = v($tot2);
+                        $line[] = ['label' => v($tot2)];
                         $rows[] = $line;
                     }
 
                     $line0 = [];
-                    $line0[] = $ti->label;
+                    $line0[] = ['label'=>$ti->label, 'class'=>'title1'];
                     $t0 = 0;
+
                     foreach ($tabv as $k => $v) {
-                        $line0[] = v($v);
+                        $line0[] = ['label' => v($v), 'class'=>'title1'];
                         $t0 += $v;
                         $tabv[$k] = 0;
 
@@ -148,22 +158,21 @@ class DataController extends Controller
                         $tabt["t_$z"] = $v0 + $v;
                     }
 
-                    $line0[] = v($t0);
+                    $line0[] = ['label' => v($t0), 'class'=>'title1'];
                     $rows[] = $line0;
                 }
 
 
                 $line0 = [];
-                $line0[] = "TOTAL GENERAL";
+                $line0[] = ['label'=>"TOTAL GENERAL", 'class'=>'title1'];
                 $t0 = 0;
                 foreach ($tabt as $k => $v) {
-                    $line0[] = v($v);
+                    $line0[] = ['label' => v($v), 'class'=>'title1'];
                     $t0 += $v;
                 }
 
-                $line0[] = v($t0);
+                $line0[] = ['label' => v($t0), 'class'=>'title1'];
                 $rows[] = $line0;
-
                 array_unshift($rows, $head);
 
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);

@@ -87,7 +87,8 @@
                                                                         $v = $labels[$labelName]['amount'] ?? 0;
                                                                         $fpi = $labels[$labelName]['id'] ?? 0;
                                                                     @endphp
-                                                                    <td class="@if (!$noedit) editable-price @endif text-center @if (!$fpi) bg-danger @endif"
+                                                                    <td data-fpi="usd_{{ $fpi }}"
+                                                                        class="@if (!$noedit) editable-price @endif text-center @if (!$fpi) bg-danger @endif"
                                                                         data-fuelprice-id="{{ $fpi }}"
                                                                         data-zone="{{ $zoneName }}"
                                                                         data-label="{{ $labelName }}"
@@ -156,13 +157,18 @@
                                                             <tr tag="{{ $tag }}"
                                                                 class="text-nowrap @if ($noedit) noneditable font-weight-bold @endif">
                                                                 <td>{{ $tag }}</td>
-                                                                <td class="text-nowrap">{{ $labelName }}</td>
+                                                                <td class="text-nowrap">
+                                                                    {{ $labelName }}</td>
                                                                 @foreach ($fuels as $fuelName => $labels)
                                                                     @php
                                                                         $v = $labels[$labelName]['amount'] ?? 0;
                                                                         $v *= (float) $structure->usd_cdf;
+                                                                        $fpi = $labels[$labelName]['id'] ?? 0;
                                                                     @endphp
-                                                                    <td>{{ $v ? v($v) : '' }}</td>
+                                                                    <td data-fpi="cdf_{{ $fpi }}"
+                                                                        @if (!$noedit) tx='{{ $structure->usd_cdf }}' @endif>
+                                                                        {{-- {{ $v ? v($v) : '' }} --}}
+                                                                    </td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -364,8 +370,20 @@
         };
 
         function getRowValues(tag, table) {
-            return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => parseFloat(unformatFr($(td).text().trim())) || 0)
-                .get();
+            return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => {
+                if ($(td).attr('tx')) {
+                    var fpi = $(td).data('fpi');
+                    fpi = fpi.split('_')[1];
+                    var id = 'usd_' + fpi;
+                    var usdTd = $(`[data-fpi="${id}"]`);
+                    var v = parseFloat(unformatFr(usdTd.text().trim()));
+                    var tx = parseFloat($(td).attr('tx'));
+                    var t = tx * v || 0;
+                    $(td).text(formatFr(t));
+                    return t;
+                }
+                return parseFloat(unformatFr($(td).text().trim())) || 0
+            }).get();
         }
 
         function setRowValues(tag, values, table) {

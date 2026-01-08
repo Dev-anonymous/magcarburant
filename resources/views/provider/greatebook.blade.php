@@ -274,6 +274,7 @@
         }
         if (zone.length) {
             $('[name="zone[]"]').val([zone]).change();
+            $('[name="zone[]"]').multiselect('refresh');
         }
 
         getData();

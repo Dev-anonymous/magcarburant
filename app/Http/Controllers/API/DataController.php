@@ -152,7 +152,7 @@ class DataController extends Controller
                         'label' => $ti->label,
                         'class' => 'title1',
                         'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher la valeur $ti->label de toutes les zones",
+                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $t0 = 0;
 
@@ -162,7 +162,7 @@ class DataController extends Controller
                             'label' => v($v),
                             'class' => 'title1',
                             'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
-                            'title' => "Afficher la valeur $ti->label de la zone $z",
+                            'title' => "Afficher les valeurs $ti->label de la zone $z",
                         ];
                         $t0 += $v;
                         $tabv[$k] = 0;
@@ -175,20 +175,36 @@ class DataController extends Controller
                         'label' => v($t0),
                         'class' => 'title1',
                         'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher la valeur $ti->label de toutes les zones",
+                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $rows[] = $line0;
                 }
 
                 $line0 = [];
-                $line0[] = ['label' => "TOTAL GENERAL", 'class' => 'title1'];
+                $line0[] = [
+                    'label' => "TOTAL GENERAL",
+                    'class' => 'title1',
+                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => 'Afficher les détails pour toutes les zones'
+                ];
                 $t0 = 0;
                 foreach ($tabt as $k => $v) {
-                    $line0[] = ['label' => v($v), 'class' => 'title1'];
+                    $z = array_values(array_filter(explode('t_', $k)))[0];
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => 'title1',
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
+                        'title' => "Afficher le Total de la zone $z",
+                    ];
                     $t0 += $v;
                 }
 
-                $line0[] = ['label' => v($t0), 'class' => 'title1'];
+                $line0[] = [
+                    'label' => v($t0),
+                    'class' => 'title1',
+                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => 'Afficher les détails pour toutes les zones'
+                ];
                 $rows[] = $line0;
                 array_unshift($rows, $head);
 

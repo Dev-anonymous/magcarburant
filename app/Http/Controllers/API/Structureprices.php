@@ -18,9 +18,9 @@ class Structureprices extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['sudo', 'provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['sudo', 'petrolier']), 403, "No permission");
 
-        if ($user->user_role == 'provider') {
+        if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else {
             $entity = Entity::find(request('entity_id'));
@@ -40,7 +40,7 @@ class Structureprices extends Controller
                 return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
             ->addColumn('view', function ($row) use ($user) {
-                if ($user->user_role == 'provider') {
+                if ($user->user_role == 'petrolier') {
                     $href = route('provider.accounting', ['stx' => $row->id]);
                 } else {
                     $href = route('sudo.provider', ['stx' => $row->id]);
@@ -87,7 +87,7 @@ class Structureprices extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'provider') {
+                if ($user->user_role == 'petrolier') {
                     return $t;
                 }
             })
@@ -101,7 +101,7 @@ class Structureprices extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        abort_if($user->user_role !== 'provider', 403, "No permission");
+        abort_if($user->user_role !== 'petrolier', 403, "No permission");
 
         if (request('action') == 'update') {
             $validated = $request->validate([

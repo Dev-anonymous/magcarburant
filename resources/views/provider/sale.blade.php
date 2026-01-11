@@ -75,7 +75,7 @@
                                     $d = now()->startOfMonth()->toDateString();
                                     $d2 = now()->toDateString();
                                 @endphp
-                                @if (auth()->user()->user_role === 'provider')
+                                @if (auth()->user()->user_role === 'petrolier')
                                     <div class="col-xs-12 col-sm-6">
                                         <form class="form-inline filters-form pull-right" role="form">
                                             <div class="form-group mb-1">

@@ -21,9 +21,9 @@ class PurchaseController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
 
-        if ($user->user_role == 'provider') {
+        if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else {
             abort(403);
@@ -95,7 +95,7 @@ class PurchaseController extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'provider') {
+                if ($user->user_role == 'petrolier') {
                     return $t;
                 }
             })
@@ -109,7 +109,7 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
 
         if (request('action') == 'update') {
             $id = request('id');
@@ -159,7 +159,7 @@ class PurchaseController extends Controller
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if ($user->user_role == 'provider') {
+            if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -266,7 +266,7 @@ class PurchaseController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            if ($user->user_role == 'provider') {
+            if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -329,7 +329,7 @@ class PurchaseController extends Controller
     public function destroy(Purchase $purchase)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
         $entity = $user->entities()->first();
         abort_if($entity->id != $purchase->entity_id, 403, "Not permit");
 

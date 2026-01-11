@@ -21,9 +21,9 @@ class SaleController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
 
-        if ($user->user_role == 'provider') {
+        if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else {
             abort(403);
@@ -87,7 +87,7 @@ class SaleController extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'provider') {
+                if ($user->user_role == 'petrolier') {
                     return $t;
                 }
             })
@@ -157,7 +157,7 @@ class SaleController extends Controller
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if ($user->user_role == 'provider') {
+            if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -306,7 +306,7 @@ class SaleController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            if ($user->user_role == 'provider') {
+            if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -375,7 +375,7 @@ class SaleController extends Controller
     public function destroy(Sale $sale)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['provider']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
         $entity = $user->entities()->first();
         abort_if($entity->id != $sale->entity_id, 403, "Not permit");
 

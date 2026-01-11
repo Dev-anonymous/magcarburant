@@ -144,7 +144,7 @@
                                     </ul>
                                 </li>
                             @endif
-                            @if ($role === 'provider')
+                            @if ($role === 'petrolier')
                                 {{-- <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
                                     <a href="{{ route('provider.home') }}">
                                         <i class="material-icons">dashboard</i>

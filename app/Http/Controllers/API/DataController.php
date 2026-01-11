@@ -21,7 +21,7 @@ class DataController extends Controller
 
         $type = request('type');
 
-        if ($user->user_role == 'provider') {
+        if ($user->user_role == 'petrolier') {
             if ($type == 'purchase') {
                 $date = request('date');
                 $date = explode(' to ', $date);

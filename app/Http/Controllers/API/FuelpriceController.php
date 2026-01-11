@@ -41,7 +41,7 @@ class FuelpriceController extends Controller
             'price' => 'required|numeric',
         ]);
         $user = auth()->user();
-        abort_if($user->user_role !== 'provider', 403, "No perm");
+        abort_if($user->user_role !== 'petrolier', 403, "No perm");
         abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
         // abort_if($fuelprice->structureprice->to != null, 403, "Vous ne pouvez plus modifier les prix sur une structure dont la date de fin est déjà renseignée.");
         abort_if($fuelprice->zone->zone !==  "OUEST" && $fuelprice->label->tag === 'L', 403, "Can't edit");

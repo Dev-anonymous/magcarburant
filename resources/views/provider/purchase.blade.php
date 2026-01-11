@@ -108,11 +108,13 @@
                         </div>
                         <div class="py-4">
                             <div class="table-responsive">
-                                <table id="table" class="table table-striped table-hover text-center text-nowrap" style="width:100%">
+                                <table id="table" class="table table-striped table-hover text-center text-nowrap"
+                                    style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
                                             <th>Date</th>
+                                            <th>Voie</th>
                                             <th class="text-nowrap">Produit</th>
                                             <th>Fournisseur</th>
                                             <th class="text-nowrap">N° Facture</th>
@@ -149,6 +151,17 @@
                 <form class="was-validated" fadd>
                     <div class="modal-body">
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        <option value="">Sélectionnez une voie</option>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Produit</label>
@@ -251,6 +264,17 @@
                     <input type="hidden" name="action" value="update">
                     <div class="modal-body">
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        <option value="">Sélectionnez une voie</option>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Produit</label>
@@ -501,6 +525,10 @@
                     data: 'date',
                     name: 'date'
                 },
+                 {
+                    data: 'way',
+                    name: 'way'
+                },
                 {
                     data: 'product',
                     name: 'product'
@@ -575,6 +603,7 @@
 
                 $('[name="id"]', form).val(data.id);
                 $('[name="product"]', form).val(data.product);
+                $('[name="way"]', form).val(data.way);
                 $('[name="provider"]', form).val(data.provider);
                 $('[name="billnumber"]', form).val(data.billnumber);
                 $('[name="unitprice"]', form).val(data.unitprice);

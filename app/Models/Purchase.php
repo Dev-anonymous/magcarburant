@@ -16,13 +16,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $entity_id
  * @property Carbon|null $date
+ * @property string $way
  * @property string|null $product
  * @property string|null $provider
  * @property string|null $billnumber
  * @property float|null $unitprice
  * @property float|null $qtytm
  * @property float|null $qtym3
- * @property string|null $density
+ * @property float|null $density
  * 
  * @property Entity $entity
  * @property Collection|Purchasefile[] $purchasefiles
@@ -39,12 +40,14 @@ class Purchase extends Model
 		'date' => 'datetime',
 		'unitprice' => 'float',
 		'qtytm' => 'float',
-		'qtym3' => 'float'
+		'qtym3' => 'float',
+		'density' => 'float'
 	];
 
 	protected $fillable = [
 		'entity_id',
 		'date',
+		'way',
 		'product',
 		'provider',
 		'billnumber',

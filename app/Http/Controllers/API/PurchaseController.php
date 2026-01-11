@@ -118,6 +118,7 @@ class PurchaseController extends Controller
             $validated = $request->validate([
                 'date' => 'required|string|date|before_or_equal:today',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
+                'way' => 'required|string|in:' . implode(',', mainWays()),
                 'provider'  => 'required|string|max:128',
                 'billnumber'  => 'required|string|unique:purchase,billnumber,' . $purchase->id,
                 'unitprice'  => 'required|numeric|min:0.001',
@@ -172,76 +173,99 @@ class PurchaseController extends Controller
             $errors = [];
             foreach ($sheet as $index => $row) {
                 $rowNumber = $index + 2;
-                $colA = trim($row[0] ?? null);
-                $colB = trim($row[1] ?? null);
-                $colC = trim($row[2] ?? null);
-                $colD = trim($row[3] ?? null);
-                $colE = trim($row[4] ?? null);
-                $colF = trim($row[5] ?? null);
-                $colG = trim($row[6] ?? null);
-                $colH = trim($row[7] ?? null);
+                $colA = trim($row[0] ?? null); // date
+                $colB = trim($row[1] ?? null); // zone
+                $colC = trim($row[2] ?? null); // product
+                $colD = trim($row[3] ?? null); // provider
+                $colE = trim($row[4] ?? null); // billnumber
+                $colF = trim($row[5] ?? null); // unitprice
+                $colG = trim($row[6] ?? null); // qtytm
+                $colH = trim($row[7] ?? null); // qtym3
+                $colI = trim($row[8] ?? null); // density
 
-                $row = array_splice($row, 0, 8);
+                $row = array_splice($row, 0, 9);
 
                 if (empty(array_filter($row))) {
                     continue;
                 }
+
                 $lineErrors = [];
 
+                // Date
                 if (empty($colA)) {
                     $lineErrors[] = "Cellule A$rowNumber : veuillez renseigner la date de l'achat";
-                }
-                try {
-                    if (is_numeric($colA)) {
-                        $colA = Date::excelToDateTimeObject($colA)->format('Y-m-d');
-                    } else {
-                        $colA = Carbon::parse(str_replace('/', '-', $colA))->format('Y-m-d');
+                } else {
+                    try {
+                        if (is_numeric($colA)) {
+                            $colA = Date::excelToDateTimeObject($colA)->format('Y-m-d');
+                        } else {
+                            $colA = Carbon::parse(str_replace('/', '-', $colA))->format('Y-m-d');
+                        }
+                        $date = Carbon::parse($colA);
+                        if ($date->gt(Carbon::today())) {
+                            $lineErrors[] = "Cellule A$rowNumber : la date d'achat {$date->format('d-m-Y')} ne doit pas être > aujourd'hui";
+                        }
+                    } catch (\Throwable $th) {
+                        $lineErrors[] = "Cellule A$rowNumber : la date est invalide ou au mauvais format";
                     }
-                    $date = Carbon::parse($colA);
-                    if ($date->gt(Carbon::today())) {
-                        $lineErrors[] = "Cellule A$rowNumber : la date d'achat {$date->format('d-m-Y')} ne doit pas être > aujourd'hui";
-                    }
-                } catch (\Throwable $th) {
-                    $lineErrors[] = "Cellule A$rowNumber : la date est invalide ou au mauvais format";
                 }
+
+                // Zone
                 if (empty($colB)) {
-                    $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner le nom du produit";
+                    $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner la zone";
                 } else {
-                    if (!in_array($colB,  mainfuels(), true)) {
-                        $lineErrors[] = "Cellule D$rowNumber : le produit \"$colB\" n'est pas reconnu";
+                    if (!in_array($colB, mainWays())) {
+                        $lineErrors[] = "Cellule B$rowNumber : La zone \"$colB\" n'est pas valide";
                     }
                 }
+
+                // Product
                 if (empty($colC)) {
-                    $lineErrors[] = "Cellule C$rowNumber : veuillez renseigner le nom du fournisseur";
-                }
-                if (empty($colD)) {
-                    $lineErrors[] = "Cellule D$rowNumber : veuillez renseigner le numéro facture";
+                    $lineErrors[] = "Cellule C$rowNumber : veuillez renseigner le nom du produit";
                 } else {
-                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colD])->exists();
-                    if ($exi) {
-                        $lineErrors[] = "Cellule D$rowNumber : l'achat avec le numéro facture $colD est déjà enregistré";
+                    if (!in_array($colC, mainfuels(), true)) {
+                        $lineErrors[] = "Cellule C$rowNumber : le produit \"$colC\" n'est pas reconnu";
                     }
                 }
-                foreach (['E' => $colE, 'F' => $colF, 'G' => $colG, 'H' => $colH] as $colName => $value) {
+
+                // Provider
+                if (empty($colD)) {
+                    $lineErrors[] = "Cellule D$rowNumber : veuillez renseigner le nom du fournisseur";
+                }
+
+                // Billnumber
+                if (empty($colE)) {
+                    $lineErrors[] = "Cellule E$rowNumber : veuillez renseigner le numéro facture";
+                } else {
+                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE])->exists();
+                    if ($exi) {
+                        $lineErrors[] = "Cellule E$rowNumber : l'achat avec le numéro facture $colE est déjà enregistré";
+                    }
+                }
+
+                // Numeric checks (unitprice, qtytm, qtym3, density)
+                foreach (['F' => $colF, 'G' => $colG, 'H' => $colH, 'I' => $colI] as $colName => $value) {
                     if (!is_numeric($value) || $value < 0) {
                         $lineErrors[] = "Cellule $colName$rowNumber : la valeur doit être un nombre >= 0";
                     }
                 }
+
                 if (!empty($lineErrors)) {
-                    $errors[] =  implode("; ", $lineErrors);
+                    $errors[] = implode("; ", $lineErrors);
                     continue;
                 }
 
                 $insert[] = [
                     'entity_id' => $entity->id,
                     'date' => $colA,
-                    'product' => $colB,
-                    'provider' => $colC,
-                    'billnumber' => $colD,
-                    'unitprice' => $colE,
-                    'qtytm' => $colF,
-                    'qtym3' => $colG,
-                    'density' => $colH,
+                    'way' => $colB,
+                    'product' => $colC,
+                    'provider' => $colD,
+                    'billnumber' => $colE,
+                    'unitprice' => $colF,
+                    'qtytm' => $colG,
+                    'qtym3' => $colH,
+                    'density' => $colI,
                 ];
             }
 
@@ -276,6 +300,7 @@ class PurchaseController extends Controller
             $validated = $request->validate([
                 'date' => 'required|string|date|before_or_equal:today',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
+                'way' => 'required|string|in:' . implode(',', mainWays()),
                 'provider'  => 'required|string|max:128',
                 'billnumber'  => 'required|string|unique:purchase',
                 'unitprice'  => 'required|numeric|min:0.001',

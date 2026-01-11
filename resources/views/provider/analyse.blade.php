@@ -64,9 +64,8 @@
                     <x-dataloader />
                     <x-alert />
                     <div class="card-body" style="min-height: 300px">
-                        <div class="table-responsive" data>
-
-                        </div>
+                        <div class="table-responsive" data></div>
+                        <div class="my-3 text-danger" errdiv></div>
                     </div>
                 </div>
             </div>
@@ -198,7 +197,14 @@
                         location.assign(h);
                     });
                     $('td[title]').tooltip();
-
+                    var e = '';
+                    if (data.errors) {
+                        data.errors.forEach(el => {
+                            e +=
+                                `<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`;
+                        });
+                    }
+                    $('[errdiv]').html(e);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

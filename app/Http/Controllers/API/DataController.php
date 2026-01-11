@@ -280,14 +280,15 @@ class DataController extends Controller
                 });
             })->orderByDesc('from')->first();
 
-            if (!$structure) {
-                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
-            }
-
             $m3 = ((float) $e->lata) / 1000;
 
             $zone = $e->way;
             $fuel = $e->product;
+
+            if (!$structure) {
+                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
             $fuelObj = Fuel::where(compact('fuel'))->first();
 
             $startOfMonth = $saledate->copy()->startOfMonth();
@@ -295,7 +296,7 @@ class DataController extends Controller
 
             $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel) {
                 $q->where('product', $fuel);
-            })->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+            })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
 
             $pmfc_struct = (float)@$structure?->fuelprices()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
@@ -362,7 +363,7 @@ class DataController extends Controller
                 ['v' => v($e->l15)],
                 ['v' => v($e->density)],
                 ['v' => v($m3)],
-                ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
+                ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $zone) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
                 ['v' => v($pmfc_struct)],
                 ['v' => v($ecart_pmf), 'class' => 'bigtitle', 'title' => "PMFC REEL - PMFC STRUCTURE"],
                 ['v' => v($pmag_pmfc_socom), 'vv' => $pmag_pmfc_socom,  'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],

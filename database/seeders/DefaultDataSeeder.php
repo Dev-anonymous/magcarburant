@@ -20,23 +20,23 @@ class DefaultDataSeeder extends Seeder
     public function run(): void
     {
         $entities = [
-            ['TOTAL', 'TOTAL ENERGIES SA'],
-            ['ENGEN', 'ENGEN RDC SA'],
-            ['COBIL', 'COBIL SA'],
-            ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo'],
-            ['LEREXCOM', 'LEREXCOM'],
-            ['SEP CONGO', 'SEP CONGO'],
-            ['SPSA', 'SPSA COBIL'],
-            ['SOCIR', 'SOCIR'],
-            ['GPDPP', 'GPDPP'],
-            ['FEC', 'Fédération des Entreprises du Congo'],
-            ['MINECO', 'Ministère de l\'Économie'],
-            ['PRIMATURE', 'Primature (Cabinet du Premier Ministre)'],
-            ['PRESIDENCE', 'Présidence de la République'],
-            ['MINHYD', 'Ministère des Hydrocarbures'],
-            ['DGDA', 'Direction Générale des Douanes et Accises'],
-            ['DGI', 'Direction Générale des Impôts'],
-            ['AUTHENTIX', 'AUTHENTIX']
+            ['TOTAL', 'TOTAL ENERGIES SA', 'petrolier'],
+            ['ENGEN', 'ENGEN RDC SA', 'petrolier'],
+            ['COBIL', 'COBIL SA', 'petrolier'],
+            ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo', 'petrolier'],
+            ['LEREXCOM', 'LEREXCOM', 'logisticien'],
+            ['SEP CONGO', 'SEP CONGO', 'logisticien'],
+            ['SPSA', 'SPSA COBIL', 'logisticien'],
+            ['SOCIR', 'SOCIR', 'logisticien'],
+            ['GPDPP', 'GPDPP', 'etatique'],
+            ['FEC', 'Fédération des Entreprises du Congo', 'etatique'],
+            ['MINECO', 'Ministère de l\'Économie', 'etatique'],
+            ['PRIMATURE', 'Primature (Cabinet du Premier Ministre)', 'etatique'],
+            ['PRESIDENCE', 'Présidence de la République', 'etatique'],
+            ['MINHYD', 'Ministère des Hydrocarbures', 'etatique'],
+            ['DGDA', 'Direction Générale des Douanes et Accises', 'etatique'],
+            ['DGI', 'Direction Générale des Impôts', 'etatique'],
+            ['AUTHENTIX', 'AUTHENTIX', 'etatique'],
         ];
 
         DB::beginTransaction();
@@ -49,7 +49,7 @@ class DefaultDataSeeder extends Seeder
                     $u->name = $el[0];
                     $u->email = $email;
                     $u->password = Hash::make('mdp@123');
-                    $u->user_role = 'provider';
+                    $u->user_role = $el[2];
                     $u->save();
                 }
 

@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Fournisseurs')
+@section('title', 'Utilisateurs')
 @section('body')
     <div class="container-fluid">
-        <h2>Fournisseurs (<span nb></span>)</h2>
+        <h2>Utilisateurs (<span nb></span>)</h2>
         <div class="d-flex justify-content-between">
-            <p class="lead">Gesion des fournisseurs</p>
+            <p class="lead">Gesion d'tilisateurs</p>
             <div class="m-2">
                 <div class="d-flex">
                     <div class="mr-2">
@@ -14,7 +14,7 @@
                     <div class="">
                         <button class="btn btn-sm btn-primary mt-3" data-toggle="modal" data-target="#mdladd">
                             <i class="material-icons md-24">add_circle_outline</i>
-                            Nouveau fournisseur
+                            Nouvel utilisateur
                         </button>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Nouveau fournisseur</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Nouvel utilisateur</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -48,17 +48,26 @@
                 <form class="was-validated" fadd>
                     <div class="modal-body">
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Sigle du founisseur (Shortname) </label>
+                            <label for="">Type d'utilisateur</label>
+                            <select name="user_role" class="form-control" required>
+                                <option value="">Sélectionnez le type de compte</option>
+                                @foreach (userroles() as $e)
+                                    <option>{{ $e }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname) </label>
                             <input type="text" class="form-control" id="validationCustom01" placeholder="Ex: ENGEN"
                                 name="shortname" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Nom complet du founisseur </label>
+                            <label class="mb-0" for="validationCustom01">Nom complet de l'utilisateur </label>
                             <input type="text" class="form-control" id="validationCustom01"
                                 placeholder="Ex: ENGEN DRC SA" name="longname" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Email du founisseur </label>
+                            <label class="mb-0" for="validationCustom01">Email de l'utilisateur </label>
                             <input type="email" class="form-control" id="validationCustom01"
                                 placeholder="Ex: admin@engensa.com" name="email" required>
                         </div>
@@ -68,7 +77,7 @@
                                 value="mdp@123" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Logo du founisseur (optionnel)</label>
+                            <label class="mb-0" for="validationCustom01">Logo de l'utilisateur (optionnel)</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="customFile" name="logo">
                                 <label class="custom-file-label" for="customFile">Logo</label>
@@ -97,7 +106,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Modification infos fournisseur</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Modification infos de l'utilisateur</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -107,22 +116,22 @@
                     <input type="hidden" name="action" value="update">
                     <div class="modal-body">
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Sigle du founisseur (Shortname) </label>
+                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname) </label>
                             <input type="text" class="form-control" id="validationCustom01" placeholder="Ex: ENGEN"
                                 name="shortname" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Nom complet du founisseur </label>
+                            <label class="mb-0" for="validationCustom01">Nom complet de l'utilisateur </label>
                             <input type="text" class="form-control" id="validationCustom01"
                                 placeholder="Ex: ENGEN DRC SA" name="longname" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Email du founisseur </label>
+                            <label class="mb-0" for="validationCustom01">Email de l'utilisateur </label>
                             <input type="email" class="form-control" id="validationCustom01"
                                 placeholder="Ex: admin@engensa.com" name="email" required>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Logo du founisseur (optionnel) </label>
+                            <label class="mb-0" for="validationCustom01">Logo de l'utilisateur (optionnel) </label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="customFile" name="logo">
                                 <label class="custom-file-label" for="customFile">Logo</label>
@@ -238,9 +247,12 @@
                                     <div class="card-img text-center p-2">
                                         <img src="${e.logo}" style="width:70px" class="img-responsive center-block">
                                     </div>
-                                    <div class="card-caption text-center">
+                                    <div class="card-caption text-center mb-2">
                                         <h4>${e.shortname}</h4>
                                         <p>${e.longname}</p>
+                                    </div>
+                                    <div class="card-caption text-center border-top">
+                                        <small>Type de compte : ${e.user?.user_role.toUpperCase()}</small>
                                     </div>
                                 </div>
                             </div>

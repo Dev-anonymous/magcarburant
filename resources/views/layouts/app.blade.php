@@ -23,8 +23,8 @@
                             <button class="btn btn-link appcol pl-0" type="button" data-toggle="sidebar" sidebarbtn>
                                 <i class="material-icons align-middle md-36">short_text</i>
                             </button>
-                            <button onclick="location.assign('{{ route('login') }}')" class="btn btn-primary btn-sm appcol"
-                                type="button">
+                            <button onclick="location.assign('{{ route('login') }}')"
+                                class="btn btn-primary btn-sm appcol" type="button">
                                 <i class="material-icons align-middle md-18">home</i>
                                 Accueil
                             </button>
@@ -135,11 +135,11 @@
                                         data-target="#lizone1" aria-controls="lizone1" aria-expanded="false"
                                         class="collapsed">
                                         <i class="material-icons">domain</i>
-                                        <span class="drawer-menu-text"> Gestion fournisseurs</span>
+                                        <span class="drawer-menu-text"> Gestion d'utilisateurs</span>
                                     </a>
                                     <ul class="collapse" id="lizone1">
                                         <li class="drawer-menu-item @if (Route::is('sudo.provider')) active @endif">
-                                            <a href="{{ route('sudo.provider') }}">Fournisseurs</a>
+                                            <a href="{{ route('sudo.provider') }}">Utilisateurs</a>
                                         </li>
                                     </ul>
                                 </li>

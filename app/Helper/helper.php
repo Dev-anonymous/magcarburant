@@ -385,7 +385,6 @@ function items()
     ];
 }
 
-
 function findIndexByLabel(array $array, string $label): ?int
 {
     foreach ($array as $index => $item) {
@@ -394,4 +393,10 @@ function findIndexByLabel(array $array, string $label): ?int
         }
     }
     return null;
+}
+
+
+function userroles()
+{
+    return ['petrolier', 'logisticien', 'etatique'];
 }

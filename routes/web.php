@@ -5,10 +5,10 @@ use App\Http\Controllers\ProviderWebController;
 use App\Http\Controllers\SudoWebController;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
-use App\Models\Purchase;
-use App\Models\Sale;
+use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
@@ -40,6 +40,36 @@ Route::get('def', function () {
     //     ]);
     // }
 
+    $entities = [
+        ['TOTAL', 'TOTAL ENERGIES SA', 'petrolier'],
+        ['ENGEN', 'ENGEN RDC SA', 'petrolier'],
+        ['COBIL', 'COBIL SA', 'petrolier'],
+        ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo', 'petrolier'],
+        ['LEREXCOM', 'LEREXCOM', 'logisticien'],
+        ['SEP CONGO', 'SEP CONGO', 'logisticien'],
+        ['SPSA', 'SPSA COBIL', 'logisticien'],
+        ['SOCIR', 'SOCIR', 'logisticien'],
+        ['GPDPP', 'GPDPP', 'etatique'],
+        ['FEC', 'Fédération des Entreprises du Congo', 'etatique'],
+        ['MINECO', 'Ministère de l\'Économie', 'etatique'],
+        ['PRIMATURE', 'Primature (Cabinet du Premier Ministre)', 'etatique'],
+        ['PRESIDENCE', 'Présidence de la République', 'etatique'],
+        ['MINHYD', 'Ministère des Hydrocarbures', 'etatique'],
+        ['DGDA', 'Direction Générale des Douanes et Accises', 'etatique'],
+        ['DGI', 'Direction Générale des Impôts', 'etatique'],
+        ['AUTHENTIX', 'AUTHENTIX', 'etatique'],
+    ];
+
+    DB::transaction(function () use ($entities) {
+        User::where(['user_role' => 'provider'])->update(['user_role' => 'sudo']);
+        foreach ($entities as $el) {
+            User::where(['name' => $el[0]])->update(['user_role' => $el[2]]);
+        }
+    });
+    DB::statement("
+                ALTER TABLE users
+                MODIFY user_role ENUM('sudo', 'petrolier', 'logisticien', 'etatique') NOT NULL
+            ");
     $out = Artisan::output();
     dd(@$out);
 });
@@ -50,7 +80,7 @@ Route::get('', function () {
         if ($role === 'sudo') {
             return redirect(route('sudo.home'));
         }
-        if ($role === 'provider') {
+        if ($role === 'petrolier') {
             return redirect(route('provider.home'));
         }
     }

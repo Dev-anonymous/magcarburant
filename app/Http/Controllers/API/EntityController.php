@@ -17,7 +17,7 @@ class EntityController extends Controller
      */
     public function index()
     {
-        $data = Entity::whereHas('user', fn($q) => $q->where('user_role', 'provider'))->orderBy('shortname')->with('user')->get()->map(function ($el) {
+        $data = Entity::whereHas('user', fn($q) => $q->whereIn('user_role', ['etatique', 'petrolier', 'logisticien']))->orderBy('shortname')->with('user')->get()->map(function ($el) {
             $el->logo = $el->logo ? asset('storage/' . $el->logo) : asset('assets/images/entity.png');
             return $el;
         });
@@ -86,6 +86,7 @@ class EntityController extends Controller
                 'email' => 'required|string|max:60|unique:users',
                 'longname'  => 'required|string|max:128',
                 'password'  => 'nullable|string|max:128',
+                'user_role'  => 'required|in:' . implode(',', userroles()),
                 'logo'      => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
@@ -97,7 +98,7 @@ class EntityController extends Controller
 
             DB::beginTransaction();
             $user = new User();
-            $user->user_role = 'provider';
+            $user->user_role = $validated['user_role'];
             $user->name = $validated['shortname'];
             $user->email = $validated['email'];
             $user->password = Hash::make($validated['password']);

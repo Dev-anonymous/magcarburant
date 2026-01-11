@@ -60,6 +60,10 @@ Route::get('def', function () {
         ['AUTHENTIX', 'AUTHENTIX', 'etatique'],
     ];
 
+    DB::statement("
+                ALTER TABLE users
+                MODIFY user_role ENUM('sudo', 'provider', 'petrolier', 'logisticien', 'etatique') NOT NULL
+            ");
     DB::transaction(function () use ($entities) {
         User::where(['user_role' => 'provider'])->update(['user_role' => 'sudo']);
         foreach ($entities as $el) {

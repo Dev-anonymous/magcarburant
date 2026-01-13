@@ -108,6 +108,7 @@ Route::middleware('auth')->group(function () {
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
                 Route::get('analyse', 'analyse')->name('provider.analyse');
+                Route::get('claim', 'claim')->name('provider.claim');
             });
         });
     });

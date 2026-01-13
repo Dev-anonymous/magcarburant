@@ -47,6 +47,11 @@ class ProviderWebController extends Controller
             return view('provider.greatebook');
         }
 
+        $item = request('item');
+        if ($item == 'cc') {
+            return view('provider.greatebookCR');
+        }
+
         $stx = request('stx');
         if ($stx) {
             $entity = auth()->user()->entities()->first();
@@ -102,5 +107,13 @@ class ProviderWebController extends Controller
         $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.analyse', compact('ps'));
+    }
+
+    function claim()
+    {
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+        $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
+        return view('provider.claim', compact('ps'));
     }
 }

@@ -385,6 +385,15 @@ function items()
     ];
 }
 
+function itemsCR()
+{
+    return  [
+        (object)['label' => 'Stock de Sécurité 1', 'val' => 'item1'],
+        (object)['label' => 'Stock de Sécurité 2', 'val' => 'item2'],
+        (object)['label' => 'Stock de Sécurité', 'val' => 'item3'],
+    ];
+}
+
 function findIndexByLabel(array $array, string $label): ?int
 {
     foreach ($array as $index => $item) {

@@ -22,7 +22,7 @@ class DataController extends Controller
         $type = request('type');
 
         if ($user->user_role == 'petrolier') {
-            if ($type == 'purchase') {
+            if ($type === 'purchase') {
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
@@ -54,7 +54,7 @@ class DataController extends Controller
 
                 return compact('totalTm', 'totalM3', 'totalAmount', 'chart1', 'chart2');
             }
-            if ($type == 'sale') {
+            if ($type === 'sale') {
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
@@ -86,11 +86,15 @@ class DataController extends Controller
 
                 return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
-            if ($type == 'greatbook') {
+            if ($type === 'greatbook') {
                 return $this->greatBookData();
             }
 
-            if ($type == 'balance') {
+            if ($type === 'greatbookcr') {
+                return $this->greatBookCrData();
+            }
+
+            if ($type === 'balance') {
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -410,6 +414,150 @@ class DataController extends Controller
                 $head0 = array_slice($r, 0, 16);
                 $head1 = array_slice($r, 18);
                 $t[] = [...$head0, ...$head1];
+            }
+            $rows = $t;
+        }
+
+        return compact('head', 'rows', 'errors');
+    }
+
+    private function greatBookCrData()
+    {
+        $reqzone = (array) request('zone');
+        $reqfuel = (array) request('fuel');
+        $items = request('items');
+
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+
+        $from = request('date1') ?? nnow()->toDateString();
+        $to = request('date2') ?? nnow()->toDateString();;
+
+        $head = [
+            ['label' => 'ID'],
+            ['label' => 'Terminal'],
+            ['label' => 'Date'],
+            ['label' => 'Localité'],
+            ['label' => 'Voie'],
+            ['label' => 'Produit'],
+            ['label' => 'Bon de livraison'],
+            ['label' => 'Programme de livraison'],
+            ['label' => 'Client'],
+            ['label' => 'LATA'],
+            ['label' => 'L15'],
+            ['label' => 'Densité'],
+            ['label' => 'M3'],
+        ];
+
+        $rows = [];
+        $errors = [];
+
+        $labels = [
+            ['label' => 'Stock de Sécurité 1', 'class' => "bigtitle"],
+            ['label' => 'Stock de Sécurité 2', 'class' => "bigtitle"],
+            ['label' => 'Stock de Sécurité', 'class' => "bigtitle"],
+            ['label' => 'Montant Stock de Sécurité', 'class' => "bigtitle"],
+        ];
+
+        $head = [...$head, ...$labels];
+
+        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+            if (count($reqfuel)) {
+                $q->whereIn('product', $reqfuel);
+            }
+            if (count($reqzone)) {
+                $q->whereIn('way', $reqzone);
+            }
+        })->whereBetween('date', [$from, $to])->orderBy('date')->get();
+
+        foreach ($sales as $e) {
+            $saledate = $e->date;
+            $structure = Structureprice::where(function ($q) use ($saledate) {
+                $q->where(function ($q) use ($saledate) {
+                    $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                })->orWhere(function ($q) use ($saledate) {
+                    $q->whereNull('to')->where('from', '<=', $saledate);
+                });
+            })->orderByDesc('from')->first();
+
+            $m3 = ((float) $e->lata) / 1000;
+
+            $zone = $e->way;
+            $fuel = $e->product;
+
+            if (!$structure) {
+                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $fuelObj = Fuel::where(compact('fuel'))->first();
+
+            $startOfMonth = $saledate->copy()->startOfMonth();
+            $endOfMonth   = $saledate->copy()->endOfMonth();
+
+            $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel) {
+                $q->where('product', $fuel);
+            })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+
+            $ss_1 = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 1'))->first()?->amount;
+
+            $ss_2 = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 2'))->first()?->amount;
+            $ss = $ss_1 + $ss_2;
+            $mss = $ss * $m3;
+
+            $d1 = $e->date->copy()->startOfMonth();
+            $pline = [
+                ['v' => $e->id],
+                ['v' => $e->terminal],
+                ['v' => $e->date?->format('d-m-Y')],
+                ['v' => $e->locality],
+                ['v' => $e->way],
+                ['v' => $e->product],
+                ['v' => $e->delivery_note],
+                ['v' => $e->delivery_program],
+                ['v' => $e->client],
+                ['v' => v($e->lata)],
+                ['v' => v($e->l15)],
+                ['v' => v($e->density)],
+                ['v' => v($m3)],
+                ['v' => v($ss_1), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 1 $fuel (zone $zone) de la structure du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($ss_2), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 2 $fuel (zone $zone) de la structure du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($ss), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 1 + Stock de Sécurité 2 $fuel (zone $zone)"],
+                ['v' => v($mss), 'class' => 'bigtitle', 'title' => "(Stock de Sécurité 1 + Stock de Sécurité 2) * M3 $fuel (zone $zone)"],
+            ];
+            $rows[] = $pline;
+        }
+
+        $errors = array_values(array_unique($errors));
+
+        if ($items == 'item1') {
+            $head = array_slice($head, 0, 14);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 14);
+            }
+            $rows = $t;
+        }
+
+        if ($items == 'item2') {
+            $head = array_slice($head, 0, 15);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 15);
+            }
+            $rows = $t;
+        }
+
+        if ($items == 'item3') {
+            $head = array_slice($head, 0, 16);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 16);
             }
             $rows = $t;
         }

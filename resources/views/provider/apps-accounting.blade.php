@@ -24,7 +24,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'cc']) }}')">
+                    onclick="location.assign('{{ route('provider.claim') }}')">
                     <div class="w-100">
                         <div class="d-flex align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -37,6 +37,32 @@
                                 {{-- <p class="m-0">Gestion de la comptabilité</p> --}}
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'gb']) }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000000">
+                        <path
+                            d="M132-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h696q24 0 42 18t18 42v600q0 24-18 42t-42 18H132Zm0-60h696v-600H132v600Zm68-100h200v-80H200v80Zm382-80 198-198-57-57-141 142-57-57-56 57 113 113Zm-382-80h200v-80H200v80Zm0-160h200v-80H200v80Zm-68 420v-600 600Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Grand Livre MAG</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'cc']) }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000000">
+                        <path
+                            d="M132-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h696q24 0 42 18t18 42v600q0 24-18 42t-42 18H132Zm0-60h696v-600H132v600Zm68-100h200v-80H200v80Zm382-80 198-198-57-57-141 142-57-57-56 57 113 113Zm-382-80h200v-80H200v80Zm0-160h200v-80H200v80Zm-68 420v-600 600Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Grand Livre CC</h4>
                     </div>
                 </div>
             </div>
@@ -65,19 +91,6 @@
                     <div class="p-2">
                         <h4 class="font-weight-bold">Taux structures</h4>
                         {{-- <p class="m-0">Gestion des statistiques</p> --}}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'gb']) }}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                        fill="#000000">
-                        <path
-                            d="M132-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h696q24 0 42 18t18 42v600q0 24-18 42t-42 18H132Zm0-60h696v-600H132v600Zm68-100h200v-80H200v80Zm382-80 198-198-57-57-141 142-57-57-56 57 113 113Zm-382-80h200v-80H200v80Zm0-160h200v-80H200v80Zm-68 420v-600 600Z" />
-                    </svg>
-                    <div class="p-2">
-                        <h4 class="font-weight-bold">Grand Livre MAG</h4>
                     </div>
                 </div>
             </div>

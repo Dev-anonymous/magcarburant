@@ -23,14 +23,13 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card transparent">
-                    <input type="hidden" name="type" value="balance">
                     <div class="card-header">
                         @php
                             $d = now()->startOfMonth()->toDateString();
                             $d2 = now()->toDateString();
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
-                            <input type="hidden" name="type" value="balance">
+                            <input type="hidden" name="type" value="balancecr">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
                                 <input type="text" class="form-control flatpickr" id="dv222" name="date1"

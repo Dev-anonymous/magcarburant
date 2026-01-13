@@ -23,7 +23,6 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card transparent">
-                    <input type="hidden" name="type" value="balance">
                     <div class="card-header">
                         @php
                             $d = now()->startOfMonth()->toDateString();

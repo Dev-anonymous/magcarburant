@@ -199,8 +199,10 @@
                             },
                         ],
                     });
+
+                    $('.tooltip').remove();
                     $('[tooltip]').tooltip();
-                    
+
                     var e = '';
                     if (data.errors) {
                         data.errors.forEach(el => {

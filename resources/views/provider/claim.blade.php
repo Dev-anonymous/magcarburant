@@ -196,6 +196,7 @@
                         var h = $(this).attr('href');
                         location.assign(h);
                     });
+                    $('.tooltip').remove();
                     $('td[title]').tooltip();
                     var e = '';
                     if (data.errors) {

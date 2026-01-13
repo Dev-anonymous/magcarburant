@@ -449,11 +449,10 @@
                     }
 
                     // console.log(formula, length);
-
                     setRowValues(tag, result, table);
                     rows[tag] = result; // mise à jour pour les formules suivantes
-                    $(`tr[tag="${tag}"]`, table).attr('title', `${tag}=${formula}`).off('tooltip')
-                        .tooltip();
+                    $('.tooltip').remove();
+                    $(`tr[tag="${tag}"]`, table).attr('title', `${tag}=${formula}`).tooltip();
                 });
             });
         }

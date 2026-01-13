@@ -199,6 +199,7 @@
                             },
                         ],
                     });
+                    $('.tooltip').remove();
                     $('[tooltip]').tooltip();
                     var e = '';
                     if (data.errors) {

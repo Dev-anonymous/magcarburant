@@ -276,7 +276,7 @@ class DataController extends Controller
 
         foreach ($sales as $e) {
             $saledate = $e->date;
-            $structure = Structureprice::where(function ($q) use ($saledate) {
+            $structure = $entity->structureprices()->where(function ($q) use ($saledate) {
                 $q->where(function ($q) use ($saledate) {
                     $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
                 })->orWhere(function ($q) use ($saledate) {
@@ -298,7 +298,7 @@ class DataController extends Controller
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel) {
+            $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
                 $q->where('product', $fuel);
             })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
 
@@ -472,7 +472,7 @@ class DataController extends Controller
 
         foreach ($sales as $e) {
             $saledate = $e->date;
-            $structure = Structureprice::where(function ($q) use ($saledate) {
+            $structure = $entity->structureprices()->where(function ($q) use ($saledate) {
                 $q->where(function ($q) use ($saledate) {
                     $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
                 })->orWhere(function ($q) use ($saledate) {
@@ -494,7 +494,7 @@ class DataController extends Controller
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            $pmfc_reel = (float) (Purchase::where(function ($q) use ($fuel) {
+            $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
                 $q->where('product', $fuel);
             })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
 

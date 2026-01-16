@@ -137,6 +137,7 @@ class DataController extends Controller
                                     $v = (float) @$r[$index]['vv'];
                                     $zo = $r[4]['v'];
                                     $pro = $r[5]['v'];
+                                    abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                                     if ($pro === $fuel && $zone === $zo) {
                                         $tot += $v;
                                     }
@@ -215,7 +216,7 @@ class DataController extends Controller
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
             }
 
-            if ($type === 'balance') {
+            if ($type === 'balancecr') {
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -224,113 +225,163 @@ class DataController extends Controller
                 $drows = $data['rows'];
 
                 $head = array_merge(
-                    [['label' => 'PRODUITS', 'class' => 'title']],
+                    [['label' => 'ITEMS', 'class' => 'title']],
                     array_map(function ($z) {
                         return [
                             'label' => $z,
                             'class' => 'title'
                         ];
-                    }, $zones),
+                    }, $fuels),
                     [['label' => 'TOTAL', 'class' => 'title']]
                 );
 
+                $n = count($head);
+                // array_unshift($head, [['label' => 'PERTES ET MANQUES A GAGNER', 'colspan' => $n]]);
+                // array_unshift($head, [['label' => 'CROISEMENT DES CREANCES USD', 'colspan' => $n]]);
+
+                $tabVar = [];
+                foreach ($fuels as $z) {
+                    $tabVar["pmag_ste_petro_$z"] = 0;
+                    $tabVar["tot_pmag_$z"] = 0;
+                    $tabVar["livr_excedent_$z"] = 0;
+                    $tabVar["tot_creance_ste_$z"] = 0;
+                }
+
                 $rows = [];
-
-                $title = items();
-
-                $tabv = [];
-                $tabt = [];
-                foreach ($zones as $z) {
-                    $tabv["v_$z"] = 0;
-                    $tabt["t_$z"] = 0;
-                }
-
-                foreach ($title as $ti) {
-                    foreach ($fuels as $fuel) {
-                        $line = [];
-                        $line[] = ['label' => $fuel];
-                        $tot2 = 0;
-                        foreach ($zones as $zone) {
-                            $tot = 0;
-                            $index = findIndexByLabel($dhead, $ti->label);
-                            if (null !== $index) {
-                                foreach ($drows as $r) {
-                                    $v = (float) @$r[$index]['vv'];
-                                    $zo = $r[4]['v'];
-                                    $pro = $r[5]['v'];
-                                    if ($pro === $fuel && $zone === $zo) {
-                                        $tot += $v;
-                                    }
-                                }
-                                $line[] = ['label' => v($tot)];
-                                $tot2  += $tot;
-                                $v0 = (float) @$tabv["v_$zone"];
-                                $tabv["v_$zone"] =  $v0 + $tot;
-                            }
-                        }
-                        $line[] = ['label' => v($tot2)];
-                        $rows[] = $line;
-                    }
-
-                    $line0 = [];
-                    $line0[] = [
-                        'label' => $ti->label,
-                        'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
-                    ];
-                    $t0 = 0;
-
-                    foreach ($tabv as $k => $v) {
-                        $z = array_values(array_filter(explode('v_', $k)))[0];
-                        $line0[] = [
-                            'label' => v($v),
-                            'class' => 'title1',
-                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
-                            'title' => "Afficher les valeurs $ti->label de la zone $z",
-                        ];
-                        $t0 += $v;
-                        $tabv[$k] = 0;
-
-                        $v0 = (float) $tabt["t_$z"];
-                        $tabt["t_$z"] = $v0 + $v;
-                    }
-
-                    $line0[] = [
-                        'label' => v($t0),
-                        'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
-                    ];
-                    $rows[] = $line0;
-                }
 
                 $line0 = [];
                 $line0[] = [
-                    'label' => "TOTAL GENERAL",
-                    'class' => 'title1',
-                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
-                    'title' => 'Afficher les détails pour toutes les zones'
+                    'label' => 'PMAG DES SOCIETES PETROLIERES',
+                    // 'class' => 'title1',
+                    // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                    // 'title' => "Afficher les valeurs $ti->label de toutes les zones",
                 ];
-                $t0 = 0;
-                foreach ($tabt as $k => $v) {
-                    $z = array_values(array_filter(explode('t_', $k)))[0];
+
+                $tg = 0;
+                $tot = 0;
+                $title = items();
+                $lb = [];
+                array_map(function ($item) use (&$lb) {
+                    $lb[] = $item->label;
+                }, $title);
+                $lb = implode(' + ', $lb);
+
+                foreach ($fuels as $k => $fuel) {
+                    foreach ($title as $ti) {
+                        $index = findIndexByLabel($dhead, $ti->label);
+                        if (null !== $index) {
+                            foreach ($drows as $r) {
+                                $v = (float) @$r[$index]['vv'];
+                                $zo = @$r[4]['v'];
+                                $pro = @$r[5]['v'];
+                                abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                                abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                                if ($pro === $fuel && in_array($zo, $zones)) {
+                                    $tot += $v;
+                                }
+                            }
+                        }
+                    }
+
+                    incr($tabVar, "pmag_ste_petro_$fuel", $tot);
+                    incr($tabVar, "tot_pmag_$fuel", $tot);
+
+                    $tg += $tot;
                     $line0[] = [
-                        'label' => v($v),
-                        'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
-                        'title' => "Afficher le Total de la zone $z",
+                        'label' => v($tot),
+                        // 'class' => 'title1',
+                        // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'title' => "Somme de $lb du produit $fuel pour les zones : " . implode(', ', $zones),
                     ];
-                    $t0 += $v;
                 }
 
                 $line0[] = [
-                    'label' => v($t0),
+                    'label' => v($tg),
                     'class' => 'title1',
-                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
-                    'title' => 'Afficher les détails pour toutes les zones'
+                    // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                    'title' => "Total pour tous les produits.",
+                ];
+
+                $rows[] = $line0;
+
+                $line00 = [];
+                foreach ($line0 as $k => $v) {
+                    if (0 == $k) {
+                        $line00[] = [
+                            'label' => "TOTAL PMAG",
+                            'class' => 'title1',
+                        ];
+                        continue;
+                    }
+                    $v['class'] = 'title1';
+                    $line00[] = $v;
+                }
+
+                $rows[] = $line00;
+
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => 'LIVRAISONS EXCÉDENTAIRES',
+                ];
+
+                foreach ($fuels as $k => $fuel) {
+                    $line0[] = [
+                        'label' => '0',
+                    ];
+                }
+                $line0[] = [
+                    'label' => '0',
                 ];
                 $rows[] = $line0;
+
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => 'TOTAL CREANCE  DE LA SOCIETE SUR L\'ETAT',
+                    'class' => 'title1',
+                ];
+
+                $tg = 0;
+                foreach ($fuels as $fuel) {
+                    $tpmag = $tabVar["tot_pmag_$fuel"];
+                    $livrex = $tabVar["livr_excedent_$fuel"];
+                    $t = $tpmag + $livrex;
+                    $line0[] = [
+                        'label' => v($t),
+                        'class' => 'title1',
+                        'title' => "TOTAL PMAG + LIVRAISONS EXCÉDENTAIRES du produit $fuel"
+                    ];
+                    $tg += $t;
+                }
+
+                $line0[] = [
+                    'label' => v($tg),
+                    'class' => 'title1',
+                ];
+
+                $rows[] = $line0;
+
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "CREANCES DE L'ETAT SUR LA SOCIETE",
+                    'class' => 'title1',
+                ];
+                foreach ($fuels as $fuel) {
+                    $line0[] = [
+                        'label' => "",
+                        'class' => 'title1',
+                    ];
+                }
+                $line0[] = [
+                    'label' => "",
+                    'class' => 'title1',
+                ];
+                $rows[] = $line0;
+
+                // dd($tabVar);
+
                 array_unshift($rows, $head);
 
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);

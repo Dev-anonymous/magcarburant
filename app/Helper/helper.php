@@ -409,3 +409,10 @@ function userroles()
 {
     return ['petrolier', 'logisticien', 'etatique'];
 }
+
+function incr(&$tab, $key,  $val)
+{
+    $v = (float)$tab[$key];
+    $v += $val;
+    $tab[$key] = $v;
+}

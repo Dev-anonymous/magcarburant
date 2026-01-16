@@ -147,7 +147,8 @@
                 data: data,
                 success: function(data) {
                     var h = `
-                    <h6 class='text-center font-weight-bold'>MANQUE A GAGNER SOCIETES COMMERCIALES USD</h6>
+                    <h6 class='text-center font-weight-bold'>CROISEMENT DES CREANCES USD</h6>
+                    <h6 class='text-center font-weight-bold'>PERTES ET MANQUES A GAGNER</h6>
                     <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                     `;
 

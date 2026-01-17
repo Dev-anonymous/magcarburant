@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $logo
  * 
  * @property User $user
+ * @property Collection|Delivery[] $deliveries
  * @property Collection|Purchase[] $purchases
  * @property Collection|Rate[] $rates
  * @property Collection|Sale[] $sales
@@ -45,6 +46,11 @@ class Entity extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'users_id');
+	}
+
+	public function deliveries()
+	{
+		return $this->hasMany(Delivery::class);
 	}
 
 	public function purchases()

@@ -86,6 +86,35 @@ class DataController extends Controller
 
                 return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
+
+            if ($type === 'delivery') {
+                $date = request('date');
+                $date = explode(' to ', $date);
+                $date = array_filter($date);
+                $from = @$date[0] ?? nnow()->toDateString();
+                $to = @$date[1] ?? $from;
+
+                $entity = $user->entities()->first();
+                $base = $entity->deliveries()->whereBetween('date', [$from, $to]);
+
+                $labels = [];
+                $data = [];
+                foreach (mainfuels() as $el) {
+                    $data[] =  round($entity->deliveries()->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
+                    $labels[] = $el;
+                }
+                $chart1 = compact('labels', 'data');
+
+                $labels = [];
+                $data = [];
+                foreach (mainWays() as $el) {
+                    $data[] = round($entity->deliveries()->where('way', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
+                    $labels[] = $el;
+                }
+                $chart2 = compact('labels', 'data');
+
+                return compact('chart1', 'chart2');
+            }
             if ($type === 'greatbook') {
                 return $this->greatBookData();
             }

@@ -109,6 +109,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
                 Route::get('analyse', 'analyse')->name('provider.analyse');
                 Route::get('claim', 'claim')->name('provider.claim');
+                Route::get('delivery', 'delivery')->name('provider.delivery');
             });
         });
     });

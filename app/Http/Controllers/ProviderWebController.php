@@ -116,4 +116,9 @@ class ProviderWebController extends Controller
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.claim', compact('ps'));
     }
+
+    function delivery()
+    {
+        return view('provider.delivery');
+    }
 }

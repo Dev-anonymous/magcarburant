@@ -82,24 +82,22 @@ Route::get('def', function () {
     //         ");
     $out = Artisan::output();
 
-    DB::beginTransaction();
-    $total = Entity::where('shortname', 'TOTAL')->first();
-    $auth = Entity::where('shortname', 'AUTHENTIX')->first();
+    // DB::beginTransaction();
+    // $total = Entity::where('shortname', 'TOTAL')->first();
+    // $auth = Entity::where('shortname', 'AUTHENTIX')->first();
 
-    $total->sales()->delete();
-    $total->purchases()->delete();
-    $total->structureprices()->delete();
-    $total->rates()->delete();
-    $total->deliveries()->delete();
+    // $total->sales()->delete();
+    // $total->purchases()->delete();
+    // $total->structureprices()->delete();
+    // $total->rates()->delete();
+    // $total->deliveries()->delete();
 
-    Sale::query()->update(['entity_id' => $total->id]);
-    Purchase::query()->update(['entity_id' => $total->id]);
-    Structureprice::query()->update(['entity_id' => $total->id]);
-    Rate::query()->update(['entity_id' => $total->id]);
-    Delivery::query()->update(['entity_id' => $total->id]);
-    DB::commit();
-
-    dd($auth->sales()->get());
+    // Sale::query()->update(['entity_id' => $total->id]);
+    // Purchase::query()->update(['entity_id' => $total->id]);
+    // Structureprice::query()->update(['entity_id' => $total->id]);
+    // Rate::query()->update(['entity_id' => $total->id]);
+    // Delivery::query()->update(['entity_id' => $total->id]);
+    // DB::commit();
 
     echo (@$out);
 });

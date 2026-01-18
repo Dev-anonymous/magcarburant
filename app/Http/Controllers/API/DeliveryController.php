@@ -139,7 +139,7 @@ class DeliveryController extends Controller
                 }
 
                 if (!empty($insertFiles)) {
-                    foreach ($delivery->salefiles as $f) {
+                    foreach ($delivery->deliveryfiles as $f) {
                         File::delete("storage/" . $f->file);
                         $f->delete();
                     }

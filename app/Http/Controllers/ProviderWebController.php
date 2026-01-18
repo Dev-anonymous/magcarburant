@@ -99,11 +99,6 @@ class ProviderWebController extends Controller
 
     function sale()
     {
-        dd([
-            'check' => Auth::check(),
-            'via_remember' => Auth::viaRemember(),
-        ]);
-
         return view('provider.sale');
     }
 

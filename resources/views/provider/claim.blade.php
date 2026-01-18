@@ -148,8 +148,9 @@
         function calcul() {
             var stock_non_reverse = $('[stock_non_reverse]');
             var stock_reverse = $('[stock_reverse]');
-            stock_reverse.each((i,e) => {
+            stock_reverse.each((i, e) => {
                 var v = $(e).attr('stock_reverse');
+                $(e).attr('contenteditable', v != 'total');
                 console.log(e, v);
             })
             var total_creance_etat = $('[total_creance_etat]');

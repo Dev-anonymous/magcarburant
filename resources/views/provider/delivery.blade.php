@@ -49,13 +49,13 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par produit (M³)</h5>
+                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par produit (LATA)</h5>
                                     <div id="chart1"></div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par zone (M³)</h5>
+                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par zone (LATA)</h5>
                                     <div id="chart2"></div>
                                 </div>
                             </div>

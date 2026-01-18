@@ -99,6 +99,8 @@ Route::get('def', function () {
     Delivery::query()->update(['entity_id' => $total->id]);
     DB::commit();
 
+    dd($auth->sales()->get());
+
     echo (@$out);
 });
 

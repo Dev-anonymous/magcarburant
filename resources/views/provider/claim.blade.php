@@ -102,6 +102,10 @@
         td[href] {
             cursor: pointer;
         }
+
+        [contenteditable="true"] {
+            background: #fff8c4;
+        }
     </style>
     <script>
         flatpickr(".flatpickr", {
@@ -152,7 +156,7 @@
                 var v = $(e).attr('stock_reverse');
                 $(e).attr('contenteditable', v != 'total');
                 console.log(e, v);
-            })
+            });
             var total_creance_etat = $('[total_creance_etat]');
             var solde_croisement = $('[solde_croisement]');
         }

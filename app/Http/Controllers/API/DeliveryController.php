@@ -42,7 +42,8 @@ class DeliveryController extends Controller
         return DataTables::of($deliveries)
             ->addIndexColumn()
             ->addColumn('total', function ($row) {
-                return v($row->qtym3 * $row->unitprice);
+                $v= v(($row->lata/1000) * $row->unitprice);
+                return "<span title='(LATA/1000)*Prix unitaire' tooltip>$v</span>";
             })->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('deliveryfile', function ($row) {
@@ -92,7 +93,7 @@ class DeliveryController extends Controller
                     return $t;
                 }
             })
-            ->rawColumns(['action', 'deliveryfile'])
+            ->rawColumns(['action', 'deliveryfile', 'total'])
             ->make(true);
     }
 
@@ -116,7 +117,7 @@ class DeliveryController extends Controller
                 'locality'  => 'required|string',
                 'delivery_note'  => 'required|string',
                 'delivery_program'  => 'required|string',
-                'qtym3'  => 'required|numeric|min:0.001',
+                'lata'  => 'required|numeric|min:0.001',
                 'unitprice'  => 'required|numeric|min:0.001',
                 'deliveryfile' => 'nullable|array',
                 'deliveryfile.*' => 'mimes:pdf|max:10240'
@@ -304,7 +305,7 @@ class DeliveryController extends Controller
                     'delivery_note'    => $colF,
                     'delivery_program' => $colG,
                     'client'           => $colH,
-                    'qtym3'             => $colI,
+                    'lata'             => $colI,
                     'unitprice'              => $colJ,
                 ];
             }
@@ -346,7 +347,7 @@ class DeliveryController extends Controller
                 'locality'  => 'required|string',
                 'delivery_note'  => 'required|string',
                 'delivery_program'  => 'required|string',
-                'qtym3'  => 'required|numeric|min:0.001',
+                'lata'  => 'required|numeric|min:0.001',
                 'unitprice'  => 'required|numeric|min:0.001',
                 'deliveryfile' => 'nullable|array',
                 'deliveryfile.*' => 'mimes:pdf|max:10240'

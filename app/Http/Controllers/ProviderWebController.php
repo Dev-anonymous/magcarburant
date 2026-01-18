@@ -9,6 +9,7 @@ use App\Models\Rate;
 use App\Models\Structureprice;
 use App\Models\Zone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProviderWebController extends Controller
@@ -98,6 +99,11 @@ class ProviderWebController extends Controller
 
     function sale()
     {
+        dd([
+            'check' => Auth::check(),
+            'via_remember' => Auth::viaRemember(),
+        ]);
+
         return view('provider.sale');
     }
 

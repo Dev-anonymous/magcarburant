@@ -116,8 +116,8 @@
                                             <th>Bon de livraison</th>
                                             <th>Programme de livraison</th>
                                             <th class="text-nowrap">Client</th>
-                                            <th class="text-nowrap">Quantité M3</th>
-                                            <th class="text-nowrap">Prix unitaire</th>
+                                            <th class="text-nowrap">LATA</th>
+                                            <th class="text-nowrap">Prix unitaire /M3</th>
                                             <th class="text-nowrap">Total</th>
                                             <th class="text-nowrap no-export">Factures</th>
                                             <th class="no-export"></th>
@@ -216,16 +216,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Quantité livrée en M3</label>
+                                    <label class="mb-0">Quantité livrée en LATA</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
-                                        name="qtym3">
+                                        name="lata">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Prix unitaire</label>
+                                    <label class="mb-0">Prix unitaire /M3</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>
@@ -335,16 +335,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Quantité livrée en M3</label>
+                                    <label class="mb-0">Quantité livrée en LATA</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
-                                        name="qtym3">
+                                        name="lata">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Prix unitaire</label>
+                                    <label class="mb-0">Prix unitaire /M3</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>
@@ -564,8 +564,8 @@
                     name: 'client'
                 },
                 {
-                    data: 'qtym3',
-                    name: 'qtym3'
+                    data: 'lata',
+                    name: 'lata'
                 },
                 {
                     data: 'unitprice',
@@ -576,6 +576,7 @@
                     name: 'total',
                     orderable: false,
                     searchable: false,
+                    className: 'cursor'
                 },
                 {
                     data: 'deliveryfile',
@@ -630,7 +631,7 @@
                 $('[name="locality"]', form).val(data.locality);
                 $('[name="delivery_note"]', form).val(data.delivery_note);
                 $('[name="delivery_program"]', form).val(data.delivery_program);
-                $('[name="qtym3"]', form).val(data.qtym3);
+                $('[name="lata"]', form).val(data.lata);
                 $('[name="unitprice"]', form).val(data.unitprice);
                 mdl.modal('show');
             });
@@ -642,6 +643,9 @@
                 $('[shortname]', form).html(data.name);
                 mdl.modal('show');
             });
+
+            $('.tooltip').remove();
+            $('[tooltip]').tooltip();
         });
 
         $('.flatpickr2').change(function() {

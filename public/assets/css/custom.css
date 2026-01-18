@@ -285,3 +285,8 @@ input.form-control:focus {
     background-color: #d4e3f5 !important;
     color: #1a3b5d !important;
 }
+
+
+.cursor {
+    cursor: pointer;
+}

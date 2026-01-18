@@ -100,7 +100,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  round($entity->deliveries()->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
+                    $data[] =  round($entity->deliveries()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -108,7 +108,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainWays() as $el) {
-                    $data[] = round($entity->deliveries()->where('way', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
+                    $data[] = round($entity->deliveries()->where('way', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart2 = compact('labels', 'data');

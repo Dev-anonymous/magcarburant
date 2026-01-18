@@ -49,7 +49,8 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="">
-                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par produit (LATA)</h5>
+                                    <h5 class="card-title text-center mb-4">Répartition des livraisons par produit (LATA)
+                                    </h5>
                                     <div id="chart1"></div>
                                 </div>
                             </div>
@@ -819,7 +820,7 @@
                     fontWeight: 'normal'
                 },
                 labelFormatter: function() {
-                    return this.name + ' : ' + formatNumber(this.y) + ' M³';
+                    return this.name + ' : ' + formatNumber(this.y);
                 }
             },
             title: {
@@ -913,7 +914,7 @@
                     color: '#1a3b5d'
                 },
                 labelFormatter: function() {
-                    return this.name + ' : ' + formatNumber(this.y) + ' M³';
+                    return this.name + ' : ' + formatNumber(this.y);
                 }
             },
             title: {

@@ -6,7 +6,8 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Croisement des créances</h2>
-                <p class="lead small m-0">Analyse et Bilan Croisement des créances de tous les prodtuis et toutes les zones </p>
+                <p class="lead small m-0">Analyse et Bilan Croisement des créances de tous les prodtuis et toutes les zones
+                </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -91,6 +92,13 @@
             background: #cccccc70;
         }
 
+        .title2 {
+            font-style: italic;
+            font-weight: bold;
+            /* background: gray; */
+            font-size: 10px;
+        }
+
         td[href] {
             cursor: pointer;
         }
@@ -137,6 +145,17 @@
             buttonClass: 'btn btn-primary'
         });
 
+        function calcul() {
+            var stock_non_reverse = $('[stock_non_reverse]');
+            var stock_reverse = $('[stock_reverse]');
+            stock_reverse.each((i,e) => {
+                var v = $(e).attr('stock_reverse');
+                console.log(e, v);
+            })
+            var total_creance_etat = $('[total_creance_etat]');
+            var solde_croisement = $('[solde_croisement]');
+        }
+
         function getData() {
             ldr.show();
 
@@ -148,7 +167,6 @@
                 success: function(data) {
                     var h = `
                     <h6 class='text-center font-weight-bold'>CROISEMENT DES CREANCES USD</h6>
-                    <h6 class='text-center font-weight-bold'>PERTES ET MANQUES A GAGNER</h6>
                     <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                     `;
 
@@ -161,8 +179,12 @@
 
                     data.rows.forEach(row => {
                         h += `<tr>`
+
                         row.map(e => {
-                            h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
+                            var tag = e.tag ?? null;
+                            var value = e.value ?? null;
+                            console.log(tag, value);
+                            h += `<td ${tag?`${tag}="${value}"` : ''} ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
                         })
                         h += '</tr>'
                     });
@@ -206,6 +228,8 @@
                         });
                     }
                     $('[errdiv]').html(e);
+
+                    calcul();
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

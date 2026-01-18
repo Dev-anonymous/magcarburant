@@ -246,14 +246,37 @@ class DataController extends Controller
             }
 
             if ($type === 'balancecr') {
+                $entity = $user->entities()->first();
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
 
+                $from = request('date1') ?? nnow()->toDateString();
+                $to = request('date2') ?? nnow()->toDateString();
+
                 $dhead = $data['head'];
                 $drows = $data['rows'];
 
-                $head = array_merge(
+                ///////////////////////
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "PERTES ET MANQUES A GAGNER",
+                    'class' => 'title2',
+                ];
+                foreach ($fuels as $fuel) {
+                    $line0[] = [
+                        'label' => "",
+                    ];
+                }
+                $line0[] = [
+                    'label' => "",
+                ];
+
+                $head = $line0;
+                $rows = [];
+
+                $rows[] = array_merge(
                     [['label' => 'ITEMS', 'class' => 'title']],
                     array_map(function ($z) {
                         return [
@@ -264,10 +287,6 @@ class DataController extends Controller
                     [['label' => 'TOTAL', 'class' => 'title']]
                 );
 
-                $n = count($head);
-                // array_unshift($head, [['label' => 'PERTES ET MANQUES A GAGNER', 'colspan' => $n]]);
-                // array_unshift($head, [['label' => 'CROISEMENT DES CREANCES USD', 'colspan' => $n]]);
-
                 $tabVar = [];
                 foreach ($fuels as $z) {
                     $tabVar["pmag_ste_petro_$z"] = 0;
@@ -276,8 +295,8 @@ class DataController extends Controller
                     $tabVar["tot_creance_ste_$z"] = 0;
                 }
 
-                $rows = [];
 
+                ///////////////////////
                 $line0 = [];
                 $line0[] = [
                     'label' => 'PMAG DES SOCIETES PETROLIERES',
@@ -286,8 +305,6 @@ class DataController extends Controller
                     // 'title' => "Afficher les valeurs $ti->label de toutes les zones",
                 ];
 
-                $tg = 0;
-                $tot = 0;
                 $title = items();
                 $lb = [];
                 array_map(function ($item) use (&$lb) {
@@ -295,7 +312,9 @@ class DataController extends Controller
                 }, $title);
                 $lb = implode(' + ', $lb);
 
+                $tot = 0;
                 foreach ($fuels as $k => $fuel) {
+                    $t = 0;
                     foreach ($title as $ti) {
                         $index = findIndexByLabel($dhead, $ti->label);
                         if (null !== $index) {
@@ -306,18 +325,18 @@ class DataController extends Controller
                                 abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                                 abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                                 if ($pro === $fuel && in_array($zo, $zones)) {
-                                    $tot += $v;
+                                    $t += round($v, 3); //
                                 }
                             }
                         }
                     }
 
-                    incr($tabVar, "pmag_ste_petro_$fuel", $tot);
-                    incr($tabVar, "tot_pmag_$fuel", $tot);
+                    incr($tabVar, "pmag_ste_petro_$fuel", $t);
+                    incr($tabVar, "tot_pmag_$fuel", $t);
 
-                    $tg += $tot;
+                    $tot += $t;
                     $line0[] = [
-                        'label' => v($tot),
+                        'label' => v($t),
                         // 'class' => 'title1',
                         // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Somme de $lb du produit $fuel pour les zones : " . implode(', ', $zones),
@@ -325,13 +344,16 @@ class DataController extends Controller
                 }
 
                 $line0[] = [
-                    'label' => v($tg),
+                    'label' => v($tot),
                     'class' => 'title1',
                     // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                     'title' => "Total pour tous les produits.",
                 ];
 
                 $rows[] = $line0;
+
+                ///////////////////////
+
 
                 $line00 = [];
                 foreach ($line0 as $k => $v) {
@@ -347,6 +369,7 @@ class DataController extends Controller
                 }
 
                 $rows[] = $line00;
+                ///////////////////////
 
 
                 $line0 = [];
@@ -354,15 +377,24 @@ class DataController extends Controller
                     'label' => 'LIVRAISONS EXCÉDENTAIRES',
                 ];
 
+                $tot = 0;
                 foreach ($fuels as $k => $fuel) {
+                    $delivery = $entity->deliveries()->where('product', $fuel)->whereBetween('date', [$from, $to])->sum('lata');
+                    $delivery = round($delivery, 3);
+                    $tot += $delivery;
                     $line0[] = [
-                        'label' => '0',
+                        'label' => v($delivery),
+                        'title' => "Somme LATA des livraisons excédentaires du produit $fuel pour les zones : " . implode(', ', $zones),
                     ];
+                    incr($tabVar, "livr_excedent_$fuel", $delivery);
                 }
                 $line0[] = [
-                    'label' => '0',
+                    'label' => v($tot),
+                    'title' => "Total LATA des livraisons excédentaires des produits.",
+
                 ];
                 $rows[] = $line0;
+                ///////////////////////
 
 
                 $line0 = [];
@@ -390,26 +422,131 @@ class DataController extends Controller
                 ];
 
                 $rows[] = $line0;
+                ///////////////////////
 
 
                 $line0 = [];
                 $line0[] = [
                     'label' => "CREANCES DE L'ETAT SUR LA SOCIETE",
+                    'class' => 'title2',
+                ];
+                foreach ($fuels as $fuel) {
+                    $line0[] = [
+                        'label' => "",
+                    ];
+                }
+                $line0[] = [
+                    'label' => "",
+                ];
+                $rows[] = $line0;
+
+
+                ///////////////////////
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => 'STOCK DE SÉCURITÉ COLLECTÉ NON REVERSÉ',
+                ];
+
+                $data2 = $this->greatBookCrData();
+                $dhead2 = $data2['head'];
+                $drows2 = $data2['rows'];
+
+                $tot = 0;
+                foreach ($fuels as $k => $fuel) {
+                    $index = findIndexByLabel($dhead2, 'Montant Stock de Sécurité');
+                    abort_if(!$index, 422, "Can't process:  \"Montant Stock de Sécurité\" not found for fuel -> $fuel");
+                    $t = 0;
+                    foreach ($drows2 as $r) {
+                        $v = (float) @$r[$index]['vv'];
+                        $zo = @$r[4]['v'];
+                        $pro = @$r[5]['v'];
+                        abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                        abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                        if ($pro === $fuel && in_array($zo, $zones)) {
+                            $t += round($v, 3); //
+                        }
+                    }
+                    $line0[] = [
+                        'label' => v($t),
+                        'title' => "Montant Stock de Sécurité du produit $fuel",
+                        'tag' => 'stock_non_reverse',
+                        'value' => $fuel,
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'title' => "Total Montant Stock de Sécurité des produits.",
+                    'tag' => 'stock_non_reverse',
+                    'value' => "total",
+                ];
+                $rows[] = $line0;
+
+                //////////////////////
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "STOCK DE SÉCURITÉ COLLECTÉ REVERSÉ",
+                    // 'class' => 'title2',
+                ];
+                foreach ($fuels as $fuel) {
+                    $line0[] = [
+                        'label' => "",
+                        'tag' => 'stock_reverse',
+                        'value' => $fuel,
+                    ];
+                }
+                $line0[] = [
+                    'label' => "",
+                    'tag' => 'stock_reverse',
+                    'value' => "total",
+                ];
+                $rows[] = $line0;
+                ///////////////////////
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL CREANCES DE L'ETAT SUR LA SOCIETE",
                     'class' => 'title1',
                 ];
                 foreach ($fuels as $fuel) {
                     $line0[] = [
                         'label' => "",
                         'class' => 'title1',
+                        'tag' => 'total_creance_etat',
+                        'value' => $fuel,
                     ];
                 }
                 $line0[] = [
                     'label' => "",
                     'class' => 'title1',
+                    'tag' => 'total_creance_etat',
+                    'value' => 'total',
                 ];
                 $rows[] = $line0;
+                ///////////////////////
 
-                // dd($tabVar);
+                $line0 = [];
+                $line0[] = [
+                    'label' => "SOLDE CROISEMENT",
+                    'class' => 'title1',
+                ];
+                foreach ($fuels as $fuel) {
+                    $line0[] = [
+                        'label' => "",
+                        'class' => 'title1',
+                        'tag' => 'solde_croisement',
+                        'value' => $fuel,
+                    ];
+                }
+                $line0[] = [
+                    'label' => "",
+                    'class' => 'title1',
+                    'tag' => 'solde_croisement',
+                    'value' => 'total',
+                ];
+                $rows[] = $line0;
+                ///////////////////////
 
                 array_unshift($rows, $head);
 
@@ -428,7 +565,7 @@ class DataController extends Controller
         $entity = $user->entities()->first();
 
         $from = request('date1') ?? nnow()->toDateString();
-        $to = request('date2') ?? nnow()->toDateString();;
+        $to = request('date2') ?? nnow()->toDateString();
 
         $head = [
             ['label' => 'ID'],
@@ -729,7 +866,7 @@ class DataController extends Controller
                 ['v' => v($ss_1), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 1 $fuel (zone $zone) de la structure du {$structure?->from?->format('d-m-Y')}"],
                 ['v' => v($ss_2), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 2 $fuel (zone $zone) de la structure du {$structure?->from?->format('d-m-Y')}"],
                 ['v' => v($ss), 'class' => 'bigtitle', 'title' => "Stock de Sécurité 1 + Stock de Sécurité 2 $fuel (zone $zone)"],
-                ['v' => v($mss), 'class' => 'bigtitle', 'title' => "(Stock de Sécurité 1 + Stock de Sécurité 2) * M3 $fuel (zone $zone)"],
+                ['v' => v($mss), 'vv' => $mss, 'class' => 'bigtitle', 'title' => "(Stock de Sécurité 1 + Stock de Sécurité 2) * M3 $fuel (zone $zone)"],
             ];
             $rows[] = $pline;
         }

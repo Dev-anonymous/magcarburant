@@ -399,7 +399,7 @@ class DataController extends Controller
 
                 $line0 = [];
                 $line0[] = [
-                    'label' => 'TOTAL CREANCE  DE LA SOCIETE SUR L\'ETAT',
+                    'label' => "TOTAL CREANCE  DE LA SOCIETE SUR L'ETAT",
                     'class' => 'title1',
                 ];
 
@@ -411,6 +411,8 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($t),
                         'class' => 'title1',
+                        'tag' => 'total_creance_societe',
+                        'value' => $fuel,
                         'title' => "TOTAL PMAG + LIVRAISONS EXCÉDENTAIRES du produit $fuel"
                     ];
                     $tg += $t;
@@ -419,6 +421,8 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($tg),
                     'class' => 'title1',
+                    'tag' => 'total_creance_societe',
+                    'value' => 'total',
                 ];
 
                 $rows[] = $line0;
@@ -515,6 +519,7 @@ class DataController extends Controller
                         'class' => 'title1',
                         'tag' => 'total_creance_etat',
                         'value' => $fuel,
+                        'title' => "St. Séc Collecté non versé + St. Séc Collecté versé ($fuel)"
                     ];
                 }
                 $line0[] = [
@@ -522,6 +527,7 @@ class DataController extends Controller
                     'class' => 'title1',
                     'tag' => 'total_creance_etat',
                     'value' => 'total',
+                    'title' => 'Total Créance'
                 ];
                 $rows[] = $line0;
                 ///////////////////////
@@ -537,6 +543,7 @@ class DataController extends Controller
                         'class' => 'title1',
                         'tag' => 'solde_croisement',
                         'value' => $fuel,
+                        'title' => "Total créance de la société sur l'état - Total créance de l'état sur la société ($fuel)"
                     ];
                 }
                 $line0[] = [
@@ -544,6 +551,7 @@ class DataController extends Controller
                     'class' => 'title1',
                     'tag' => 'solde_croisement',
                     'value' => 'total',
+                    'title' => 'Total croisement'
                 ];
                 $rows[] = $line0;
                 ///////////////////////

@@ -166,9 +166,10 @@ class DataController extends Controller
                                     $v = (float) @$r[$index]['vv'];
                                     $zo = $r[4]['v'];
                                     $pro = $r[5]['v'];
+                                    abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                                     abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                                     if ($pro === $fuel && $zone === $zo) {
-                                        $tot += $v;
+                                        $tot += round($v, 3); //
                                     }
                                 }
                                 $line[] = ['label' => v($tot)];

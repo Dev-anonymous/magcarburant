@@ -69,39 +69,50 @@
                 <div class="col-12 p-0">
                     <div class="card transparent">
                         <div class="card-header">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-6">
-                                    <h4 class="card-title font-weight-bold">Historique des toutes les livraisons
-                                        excédentaires</h4>
-                                </div>@php
-                                    $d = now()->startOfMonth()->toDateString();
-                                    $d2 = now()->toDateString();
-                                @endphp
-                                @if (auth()->user()->user_role === 'petrolier')
-                                    <div class="col-xs-12 col-sm-6">
-                                        <form class="form-inline filters-form pull-right" role="form">
-                                            <div class="form-group mb-1">
-                                                <label class="mr-2" for="dv222">Du</label>
-                                                <input class="form-control flatpickr2" id="dv222"
-                                                    value="{{ $d }}" name="date1" style="width:100px" />
-                                            </div>
-                                            <div class="form-group mb-1">
-                                                <label class="mr-2" for="dv22">Au</label>
-                                                <input class="form-control flatpickr2" id="dv22"
-                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
-                                            </div>
-                                            <div class="form-group mb-1">
-                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
-                                                    data-target="#mdlChose">
-                                                    <i class="material-icons md-18">add_circle_outline</i> Nouvelle
-                                                    livraison excédentaire
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                @endif
-                            </div>
+                            @php
+                                $d = now()->startOfMonth()->toDateString();
+                                $d2 = now()->toDateString();
+                            @endphp
+                            <form id="ffilter" class="filters-form pull-right" role="form">
+                                <input type="hidden" name="type" value="greatbook">
+                                <div class="form-group mb-1">
+                                    <label for="dv222" class="control-label d-block mb-0">Du</label>
+                                    <input type="text" class="form-control flatpickr" id="dv222" name="date1"
+                                        value="{{ $d }}" style="min-width:120px;">
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label for="dv22" class="control-label d-block mb-0">Au</label>
+                                    <input type="text" class="form-control flatpickr" id="dv22" name="date2"
+                                        value="{{ $d2 }}" style="min-width:120px;">
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label for="zone" class="control-label d-block mb-0">Zone</label>
+                                    <select name="zone[]" id="zone" class="form-control" multiple
+                                        style="min-width:150px;">
+                                        @foreach (mainWays() as $e)
+                                            <option selected>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label for="fuel" class="control-label d-block mb-0">Produit</label>
+                                    <select name="fuel[]" id="fuel" class="form-control" multiple
+                                        style="min-width:150px;">
+                                        @foreach (mainfuels() as $e)
+                                            <option selected>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mb-1">
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                        data-target="#mdlChose">
+                                        <i class="material-icons md-18">add_circle_outline</i> Nouvelle
+                                        livraison excédentaire
+                                    </button>
+                                </div>
+                            </form>
                         </div>
+
                         <div class="py-4">
                             <div class="table-responsive">
                                 <table id="table" class="table table-striped table-hover text-center text-nowrap"
@@ -486,7 +497,7 @@
     <x-datatable />
     <x-flatpickr />
     <x-chart />
-
+    <x-select />
 
     <script>
         flatpickr(".flatpickr", {
@@ -495,18 +506,49 @@
                 firstDayOfWeek: 1
             }
         });
-        flatpickr(".flatpickr2", {
-            maxDate: "today",
-            locale: {
-                firstDayOfWeek: 1
-            }
+
+        $('[name="zone[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun filtre',
+            nSelectedText: 'zones sélectionnées',
+            allSelectedText: 'Toutes les zones',
+            numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
+            selectAllText: 'Toutes',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
+
+        $('[name="fuel[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun filtre',
+            nSelectedText: 'produits sélectionnés',
+            allSelectedText: 'Tous les produits',
+            numberDisplayed: 1,
+            selectAllText: 'Tous',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
         });
 
         $('[btnmdl]').click(function() {
             $('.modal.show').modal('hide');
             var t = $(this).data('target');
             $(`${t}`).modal('show');
-        })
+        });
+
+
+        var date1 = '{{ request('date1') }}';
+        var date2 = '{{ request('date2') }}';
+        var fuel = '{{ request('fuel') }}';
+        if (date1.length) {
+            $('[name="date1"]').val(date1).change();
+        }
+        if (date2.length) {
+            $('[name="date2"]').val(date2).change();
+        }
+        if (fuel.length) {
+            $('[name="fuel[]"]').val([fuel]).change();
+            $('[name="fuel[]"]').multiselect('refresh');
+        }
 
         var dtObj = $('#table').DataTable({
             processing: true,
@@ -514,6 +556,8 @@
             ajax: {
                 url: '{{ route('delivery.index') }}',
                 data: function(d) {
+                    d.zones = $('[name="zone[]"]').val();
+                    d.fuels = $('[name="fuel[]"]').val();
                     d.entity_id = '{{ @$entity->id }}';
                     d.date = $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val();
                 }
@@ -649,9 +693,16 @@
             $('[tooltip]').tooltip();
         });
 
-        $('.flatpickr2').change(function() {
-            dtObj.ajax.reload(null, false);
-            dashboard();
+        var ff = $('#ffilter');
+
+        let timer;
+        ff.change(function(e) {
+            clearTimeout(timer);
+            var e = $(e.target);
+            timer = setTimeout(() => {
+                dtObj.ajax.reload(null, false);
+                dashboard();
+            }, 100);
         });
 
         $('#mdledit').on('shown.bs.modal', function() {
@@ -758,6 +809,8 @@
                 url: '{{ route('dashboard') }}',
                 data: {
                     type: 'delivery',
+                    zones: $('[name="zone[]"]').val(),
+                    fuels: $('[name="fuel[]"]').val(),
                     date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },
                 success: function(data) {

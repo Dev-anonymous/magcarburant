@@ -29,28 +29,28 @@ class ProviderWebController extends Controller
             return view('common.rates', compact('entity'));
         }
 
-        $item = request('item');
         if ($item == 'stx') {
             $user = auth()->user();
             $entity = $user->entities()->first();
             return view('provider.structrates', compact('entity'));
         }
 
-        $item = request('item');
         if ($item == 'pricestr') {
             $user = auth()->user();
             $entity = $user->entities()->first();
             return view('common.structprices', compact('entity'));
         }
 
-        $item = request('item');
         if ($item == 'gb') {
             return view('provider.greatebook');
         }
 
-        $item = request('item');
         if ($item == 'cc') {
             return view('provider.greatebookCR');
+        }
+
+        if ($item == 'pf') {
+            return view('provider.greatebookparafisc');
         }
 
         $stx = request('stx');

@@ -265,19 +265,19 @@
         var date1 = '{{ request('date1') }}';
         var date2 = '{{ request('date2') }}';
         var item = '{{ request('el') }}';
-        var zone = '{{ request('z') }}';
+        var fuel = '{{ request('fuel') }}';
         if (date1.length) {
-            $('[name="date1"]').val(date1);
+            $('[name="date1"]').val(date1).change();
         }
         if (date2.length) {
-            $('[name="date2"]').val(date2);
+            $('[name="date2"]').val(date2).change();
         }
         if (item.length) {
             $('[name="items"]').val(item).change();
         }
-        if (zone.length) {
-            $('[name="zone[]"]').val([zone]).change();
-            $('[name="zone[]"]').multiselect('refresh');
+        if (fuel.length) {
+            $('[name="fuel[]"]').val([fuel]).change();
+            $('[name="fuel[]"]').multiselect('refresh');
         }
 
         getData();

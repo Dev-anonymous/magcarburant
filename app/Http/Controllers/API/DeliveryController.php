@@ -36,13 +36,15 @@ class DeliveryController extends Controller
         $date = array_filter($date);
         $from = @$date[0] ?? nnow()->toDateString();
         $to = @$date[1] ?? $from;
+        $zones = (array) request('zones');
+        $fuels = (array) request('fuels');
 
-        $deliveries->whereBetween('date', [$from, $to]);
+        $deliveries->whereBetween('date', [$from, $to])->whereIn('product', $fuels)->whereIn('way', $zones);
 
         return DataTables::of($deliveries)
             ->addIndexColumn()
             ->addColumn('total', function ($row) {
-                $v= v(($row->lata/1000) * $row->unitprice);
+                $v = v(($row->lata / 1000) * $row->unitprice);
                 return "<span title='(LATA/1000)*Prix unitaire' tooltip>$v</span>";
             })->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');

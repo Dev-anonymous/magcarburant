@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Grand livre MAG')
+@section('title', 'Grand livre Fiscalité.')
 @section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Grand livre MAG</h2>
-                <p class="lead small m-0">Grand Livre de Manque à Gagner des ventes des produits</p>
+                <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité</h2>
+                <p class="lead small m-0">Grand Livre Fiscalité & Parafiscalité sur les ventes des produits</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -28,7 +28,7 @@
                             $d2 = now()->toDateString();
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
-                            <input type="hidden" name="type" value="greatbook">
+                            <input type="hidden" name="type" value="greatbookfisc">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
                                 <input type="text" class="form-control flatpickr" id="dv222" name="date1"
@@ -43,7 +43,7 @@
                                 <label for="items" class="control-label d-block mb-0">Items</label>
                                 <select name="items" id="items" class="form-control select2" style="min-width:150px;">
                                     <option value="">Tous</option>
-                                    @foreach (items() as $e)
+                                    @foreach (itemsCR() as $e)
                                         <option value="{{ $e->val }}">{{ $e->label }}</option>
                                     @endforeach
                                 </select>
@@ -199,8 +199,10 @@
                             },
                         ],
                     });
+
                     $('.tooltip').remove();
                     $('[tooltip]').tooltip();
+
                     var e = '';
                     if (data.errors) {
                         data.errors.forEach(el => {
@@ -260,28 +262,23 @@
             }, 100);
         });
 
-        var date1 = '{{ request('date1') }}';
-        var date2 = '{{ request('date2') }}';
-        var item = '{{ request('el') }}';
-        var zone = '{{ request('z') }}';
-        var fuel = '{{ request('fuel') }}';
-        if (date1.length) {
-            $('[name="date1"]').val(date1).change();
-        }
-        if (date2.length) {
-            $('[name="date2"]').val(date2).change();
-        }
-        if (item.length) {
-            $('[name="items"]').val(item).change();
-        }
-        if (zone.length) {
-            $('[name="zone[]"]').val([zone]).change();
-            $('[name="zone[]"]').multiselect('refresh');
-        }
-        if (fuel.length) {
-            $('[name="fuel[]"]').val([fuel]).change();
-            $('[name="fuel[]"]').multiselect('refresh');
-        }
+        // var date1 = '{{ request('date1') }}';
+        // var date2 = '{{ request('date2') }}';
+        // var item = '{{ request('el') }}';
+        // var fuel = '{{ request('fuel') }}';
+        // if (date1.length) {
+        //     $('[name="date1"]').val(date1).change();
+        // }
+        // if (date2.length) {
+        //     $('[name="date2"]').val(date2).change();
+        // }
+        // if (item.length) {
+        //     $('[name="items"]').val(item).change();
+        // }
+        // if (fuel.length) {
+        //     $('[name="fuel[]"]').val([fuel]).change();
+        //     $('[name="fuel[]"]').multiselect('refresh');
+        // }
 
         getData();
     </script>

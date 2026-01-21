@@ -93,6 +93,8 @@ class DataController extends Controller
                 $date = array_filter($date);
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
+                $zones = (array) request('zones');
+                $fuels = (array) request('fuels');
 
                 $entity = $user->entities()->first();
                 $base = $entity->deliveries()->whereBetween('date', [$from, $to]);
@@ -100,7 +102,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  round($entity->deliveries()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $data[] =  round($entity->deliveries()->where('product', $el)->whereBetween('date', [$from, $to])->whereIn('product', $fuels)->whereIn('way', $zones)->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -108,7 +110,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainWays() as $el) {
-                    $data[] = round($entity->deliveries()->where('way', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $data[] = round($entity->deliveries()->where('way', $el)->whereBetween('date', [$from, $to])->whereIn('product', $fuels)->whereIn('way', $zones)->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart2 = compact('labels', 'data');
@@ -338,8 +340,7 @@ class DataController extends Controller
                     $tot += $t;
                     $line0[] = [
                         'label' => v($t),
-                        // 'class' => 'title1',
-                        // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
                         'title' => "Somme de $lb du produit $fuel pour les zones : " . implode(', ', $zones),
                     ];
                 }
@@ -347,8 +348,8 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($tot),
                     'class' => 'title1',
-                    // 'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                    'title' => "Total pour tous les produits.",
+                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails PMAG de toutes les zones",
                 ];
 
                 $rows[] = $line0;
@@ -362,6 +363,8 @@ class DataController extends Controller
                         $line00[] = [
                             'label' => "TOTAL PMAG",
                             'class' => 'title1',
+                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                            'title' => "Afficher les détails PMAG de toutes les zones",
                         ];
                         continue;
                     }
@@ -376,6 +379,8 @@ class DataController extends Controller
                 $line0 = [];
                 $line0[] = [
                     'label' => 'LIVRAISONS EXCÉDENTAIRES',
+                    'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails",
                 ];
 
                 $tot = 0;
@@ -386,12 +391,16 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($delivery),
                         'title' => "Somme LATA des livraisons excédentaires du produit $fuel pour les zones : " . implode(', ', $zones),
+                        'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                        'title' => "Afficher les détails des livraisons excédentaires du prduit $fuel",
                     ];
                     incr($tabVar, "livr_excedent_$fuel", $delivery);
                 }
                 $line0[] = [
                     'label' => v($tot),
                     'title' => "Total LATA des livraisons excédentaires des produits.",
+                    'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails",
 
                 ];
                 $rows[] = $line0;
@@ -451,6 +460,8 @@ class DataController extends Controller
                 $line0 = [];
                 $line0[] = [
                     'label' => 'STOCK DE SÉCURITÉ COLLECTÉ NON REVERSÉ',
+                    'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails de tous les produits.",
                 ];
 
                 $data2 = $this->greatBookCrData();
@@ -472,11 +483,14 @@ class DataController extends Controller
                             $t += round($v, 3); //
                         }
                     }
+                    $tot += $t;
                     $line0[] = [
                         'label' => v($t),
                         'title' => "Montant Stock de Sécurité du produit $fuel",
                         'tag' => 'stock_non_reverse',
                         'value' => $fuel,
+                        'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                        'title' => "Afficher les détails pour le produit $fuel.",
                     ];
                 }
                 $line0[] = [
@@ -484,6 +498,7 @@ class DataController extends Controller
                     'title' => "Total Montant Stock de Sécurité des produits.",
                     'tag' => 'stock_non_reverse',
                     'value' => "total",
+                    'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                 ];
                 $rows[] = $line0;
 

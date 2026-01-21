@@ -125,6 +125,10 @@ class DataController extends Controller
                 return $this->greatBookCrData();
             }
 
+            if ($type === 'greatbookfisc') {
+                return $this->greatBookFiscData();
+            }
+
             if ($type === 'balance') {
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
@@ -628,12 +632,8 @@ class DataController extends Controller
         $head = [...$head, ...$labels];
 
         $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
-            if (count($reqfuel)) {
-                $q->whereIn('product', $reqfuel);
-            }
-            if (count($reqzone)) {
-                $q->whereIn('way', $reqzone);
-            }
+            $q->whereIn('product', $reqfuel);
+            $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();
 
         foreach ($sales as $e) {
@@ -824,12 +824,8 @@ class DataController extends Controller
         $head = [...$head, ...$labels];
 
         $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
-            if (count($reqfuel)) {
-                $q->whereIn('product', $reqfuel);
-            }
-            if (count($reqzone)) {
-                $q->whereIn('way', $reqzone);
-            }
+            $q->whereIn('product', $reqfuel);
+            $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();
 
         foreach ($sales as $e) {
@@ -923,6 +919,251 @@ class DataController extends Controller
             }
             $rows = $t;
         }
+
+        return compact('head', 'rows', 'errors');
+    }
+
+    private function greatBookFiscData()
+    {
+        $reqzone = (array) request('zone');
+        $reqfuel = (array) request('fuel');
+        $items = request('items');
+
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+
+        $from = request('date1') ?? nnow()->toDateString();
+        $to = request('date2') ?? nnow()->toDateString();
+
+        $head = [
+            ['label' => 'ID'],
+            ['label' => 'Terminal'],
+            ['label' => 'Date'],
+            ['label' => 'Localité'],
+            ['label' => 'Voie'],
+            ['label' => 'Produit'],
+            ['label' => 'Bon de livraison'],
+            ['label' => 'Programme de livraison'],
+            ['label' => 'Client'],
+            ['label' => 'LATA'],
+            ['label' => 'L15'],
+            ['label' => 'Densité'],
+            ['label' => 'M3'],
+        ];
+
+        $rows = [];
+        $errors = [];
+
+        $labels = [
+            ['label' => 'Stock de Sécurité 1'],
+            ['label' => 'Stock de Sécurité 2'],
+            ['label' => 'Stock de Sécurité'],
+            ['label' => 'Montant Stock de Sécurité'],
+            ['label' => 'Eff. reconst. et Sto. Stratégiques'],
+            ['label' => 'Montant Eff. reconst. et Sto. Strat.'],
+            ['label' => 'FONER'],
+            ['label' => 'Montant FONER'],
+            ['label' => 'Marquage moléculaire'],
+            ['label' => 'Montant Marq. molécul.'],
+            ['label' => 'Interventions Economiques'],
+            ['label' => 'Montant Interv. Eco.'],
+            ['label' => 'CRP & Comité de suivi des Prix des produits Petroliers'],
+            ['label' => 'Montant CRP & Comité ...'],
+            ['label' => 'TVA à la vente (TVAV)'],
+            ['label' => 'Montant TVAV'],
+            ['label' => 'Droits de douane (10% PMF Commercial)'],
+            ['label' => 'Montant Droits de douane'],
+            ['label' => 'Droits de consommation (25%, 15%, 0% du PMFF)'],
+            ['label' => 'Montant Droits de consommation'],
+            ['label' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)'],
+            ['label' => 'Montant TVAI'],
+            ['label' => 'TVA nette à l\'intérieur (TVAIr=TVAV-TVAI)'],
+            ['label' => 'Montant TVAIr'],
+        ];
+
+        $head = [...$head, ...$labels];
+
+        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+            $q->whereIn('product', $reqfuel);
+            $q->whereIn('way', $reqzone);
+        })->whereBetween('date', [$from, $to])->orderBy('date')->get();
+
+        foreach ($sales as $e) {
+            $saledate = $e->date;
+            $structure = $entity->structureprices()->where(function ($q) use ($saledate) {
+                $q->where(function ($q) use ($saledate) {
+                    $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                })->orWhere(function ($q) use ($saledate) {
+                    $q->whereNull('to')->where('from', '<=', $saledate);
+                });
+            })->orderByDesc('from')->first();
+
+            $m3 = ((float) $e->lata) / 1000;
+
+            $zone = $e->way;
+            $fuel = $e->product;
+
+            if (!$structure) {
+                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $fuelObj = Fuel::where(compact('fuel'))->first();
+
+            $ss_1 = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 1'))->first()?->amount;
+
+            $ss_2 = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 2'))->first()?->amount;
+            $ss = $ss_1 + $ss_2;
+            $mss = $ss * $m3;
+
+            $effort_reconst = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Effort de reconstruction et Stock Stratégiques'))->first()?->amount;
+            $mt_effort_reconst = $effort_reconst * $m3;
+
+            $foner = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "FONER (Fonds National d'Entretien Routier)"))->first()?->amount;
+            $mt_foner = $foner * $m3;
+
+            $marquage_molecu = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "Marquage moléculaire"))->first()?->amount;
+            $mt_marquage_molecu = $marquage_molecu * $m3;
+
+            $intervention_eco = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "Interventions Economiques"))->first()?->amount;
+            $mt_intervention_eco = $intervention_eco * $m3;
+
+            $cpr_comite_suivi = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
+            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
+
+            $cpr_comite_suivi = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
+            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
+
+            $tva_vente = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "TVA à la vente (TVAV) pour calcul"))->first()?->amount;
+            $mt_tva_vente = $tva_vente * $m3;
+
+            $droit_douane = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "Droits de douane (10% PMF Commercial)"))->first()?->amount;
+            $mt_droit_douane = $droit_douane * $m3;
+
+
+            $droit_consom = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "Droits de consommation (25%, 15%, 0% du PMFF)"))->first()?->amount;
+            $mt_droit_consom = $droit_consom * $m3;
+
+            $tva_import = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)"))->first()?->amount;
+            $mt_tva_import = $tva_import * $m3;
+
+            $tva_interieur = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"))->first()?->amount;
+            $mt_tva_interieur = $tva_interieur * $m3;
+
+            $pline = [
+                ['v' => $e->id],
+                ['v' => $e->terminal],
+                ['v' => $e->date?->format('d-m-Y')],
+                ['v' => $e->locality],
+                ['v' => $e->way],
+                ['v' => $e->product],
+                ['v' => $e->delivery_note],
+                ['v' => $e->delivery_program],
+                ['v' => $e->client],
+                ['v' => v($e->lata)],
+                ['v' => v($e->l15)],
+                ['v' => v($e->density)],
+                ['v' => v($m3)],
+                ['v' => v($ss_1), 'title' => "Stock de sécurité 1 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($ss_2), 'title' => "Stock de sécurité 2 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($ss)],
+                ['v' => v($mss)],
+                ['v' => v($effort_reconst)],
+                ['v' => v($mt_effort_reconst), 'title' => "Effort Reconst. St. Strat. * M3"],
+                ['v' => v($foner)],
+                ['v' => v($mt_foner), 'title' => "FONER * M3"],
+                ['v' => v($marquage_molecu)],
+                ['v' => v($mt_marquage_molecu), 'title' => "Marquage Molécule * M3"],
+                ['v' => v($intervention_eco)],
+                ['v' => v($mt_intervention_eco), 'title' => "Intervention Eco. * M3"],
+                ['v' => v($cpr_comite_suivi)],
+                ['v' => v($mt_cpr_comite_suivi), 'title' => "CRP * M3"],
+                ['v' => v($tva_vente)],
+                ['v' => v($mt_tva_vente), 'title' => "TVAV * M3"],
+                ['v' => v($droit_douane)],
+                ['v' => v($mt_droit_douane), 'title' => "DD * M3"],
+                ['v' => v($droit_consom)],
+                ['v' => v($mt_droit_consom), 'title' => "DC * M3"],
+                ['v' => v($tva_import)],
+                ['v' => v($mt_tva_import), 'title' => "TVAI * M3"],
+                ['v' => v($tva_interieur)],
+                ['v' => v($mt_tva_interieur), 'title' => "TVAIr * M3"],
+            ];
+
+            $rows[] = $pline;
+        }
+
+        $errors = array_values(array_unique($errors));
+
+        // if ($items == 'item1') {
+        //     $head = array_slice($head, 0, 17);
+        //     $t = [];
+        //     foreach ($rows as $r) {
+        //         $t[] = array_slice($r, 0, 17);
+        //     }
+        //     $rows = $t;
+        // }
+
+        // if ($items == 'item2') {
+        //     $head = array_slice($head, 0, 18);
+        //     $t = [];
+        //     foreach ($rows as $r) {
+        //         $t[] = array_slice($r, 0, 18);
+        //     }
+        //     $rows = $t;
+        // }
+
+        // if ($items == 'item3') {
+        //     $head0 = array_slice($head, 0, 16);
+        //     $head1 = array_slice($head, 18);
+        //     $head = [...$head0, ...$head1];
+
+        //     $t = [];
+        //     foreach ($rows as $r) {
+        //         $head0 = array_slice($r, 0, 16);
+        //         $head1 = array_slice($r, 18);
+        //         $t[] = [...$head0, ...$head1];
+        //     }
+        //     $rows = $t;
+        // }
 
         return compact('head', 'rows', 'errors');
     }

@@ -40,15 +40,6 @@
                                     value="{{ $d2 }}" style="min-width:120px;">
                             </div>
                             <div class="form-group mb-1">
-                                <label for="items" class="control-label d-block mb-0">Items</label>
-                                <select name="items" id="items" class="form-control select2" style="min-width:150px;">
-                                    <option value="">Tous</option>
-                                    @foreach (itemsCR() as $e)
-                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group mb-1">
                                 <label for="zone" class="control-label d-block mb-0">Zone</label>
                                 <select name="zone[]" id="zone" class="form-control" multiple
                                     style="min-width:150px;">
@@ -104,6 +95,14 @@
         .bigtitle {
             text-align: center;
         }
+
+        .bgred {
+            background: #e58f8f;
+        }
+
+        .bgblue {
+            background: rgb(122, 193, 122);
+        }
     </style>
     <script>
         flatpickr(".flatpickr", {
@@ -146,6 +145,11 @@
                     <table table class="table table-striped table-hover text-nowrap text-center"
                         style="width:100%">
                         <thead>
+                            <tr>
+                                <th colspan=13></th>
+                                <th colspan=14 class="bgred">Parafiscalité</th>
+                                <th colspan=10 class='bgblue'>Fiscalité</th>
+                            </tr>
                             <tr>${th}</tr>
                         </thead>
                         <tbody>${td}</tbody>

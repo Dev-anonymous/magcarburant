@@ -1082,10 +1082,7 @@ class DataController extends Controller
                 ->whereHas('label', fn($q) => $q->where('label', "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)"))->first()?->amount;
             $mt_tva_import = $tva_import * $m3;
 
-            $tva_interieur = (float)@$structure?->fuelprices()
-                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
-                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
-                ->whereHas('label', fn($q) => $q->where('label', "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"))->first()?->amount;
+            $tva_interieur = $tva_vente - $tva_import;
             $mt_tva_interieur = $tva_interieur * $m3;
 
             $pline = [

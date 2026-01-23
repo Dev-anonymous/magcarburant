@@ -80,7 +80,6 @@
     <x-flatpickr />
     <x-select />
 
-
     <style>
         .table td,
         .table th {

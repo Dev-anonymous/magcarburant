@@ -90,8 +90,8 @@
                                             class="nav-link dropdown-toggle dropdown-clear-caret appcol font-weight-bold"
                                             data-toggle="sidebar" data-target="#user-drawer">
                                             {{ auth()->user()->name }}
-                                            <img src="{{ userimg() }}" class="img-fluid rounded-circle ml-1"
-                                                width="35" />
+                                            <img src="{{ userimg() }}" style="border: 2px solid #ccc"
+                                                class="img-fluid rounded-circle ml-1" width="35" />
                                         </a>
                                     </li>
                                 </ul>

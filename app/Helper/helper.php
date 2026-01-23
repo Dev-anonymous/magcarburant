@@ -347,7 +347,7 @@ function userimg()
         if ($role === 'sudo') {
             return asset($i);
         }
-        if ($role === 'provider') {
+        if ($role === 'petrolier') {
             $e = $user->entities()->first()?->logo;
             if ($e) {
                 $i  = "storage/$e";

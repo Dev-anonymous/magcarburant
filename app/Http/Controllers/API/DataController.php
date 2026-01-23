@@ -580,6 +580,137 @@ class DataController extends Controller
 
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
             }
+
+            if ($type === 'balancefisc') {
+                $data = $this->greatBookFiscData();
+                $dhead = $data['head'];
+                $drows = $data['rows'];
+
+                $zones = (array) request('zone');
+                $fuels = (array) request('fuel');
+
+                $head = array_merge(
+                    [['label' => 'ITEMS', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => $z,
+                            'class' => 'title'
+                        ];
+                    }, $fuels),
+                    [['label' => 'TOTAL', 'class' => 'title']]
+                );
+
+                $rows = [];
+
+                $items1 = [
+                    'Stock de sécurité 1',
+                    'Stock de sécurité 2',
+                    'Effort de reconstruction et Stock Stratégiques',
+                    "FONER (Fonds National d'Entretien Routier)",
+                    'Marquage moléculaire',
+                    'Interventions Economiques',
+                    'CRP & Comité de suivi des Prix des produits Petroliers'
+                ];
+
+                // $tabv = [];
+                // $tabt = [];
+                // foreach ($zones as $z) {
+                //     $tabv["v_$z"] = 0;
+                //     $tabt["t_$z"] = 0;
+                // }
+
+                foreach ($items1 = [] as $ti) {
+                    foreach ($fuels as $fuel) {
+                        $line = [];
+                        $line[] = ['label' => $fuel];
+                        $tot2 = 0;
+                        foreach ($zones as $zone) {
+                            $tot = 0;
+                            $index = findIndexByLabel($dhead, $ti);
+                            if (null !== $index) {
+                                foreach ($drows as $r) {
+                                    $v = (float) @$r[$index]['vv'];
+                                    $zo = $r[4]['v'];
+                                    $pro = $r[5]['v'];
+                                    abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                                    abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                                    if ($pro === $fuel && $zone === $zo) {
+                                        $tot += round($v, 3); //
+                                    }
+                                }
+                                $line[] = ['label' => v($tot)];
+                                $tot2  += $tot;
+                                $v0 = (float) @$tabv["v_$zone"];
+                                $tabv["v_$zone"] =  $v0 + $tot;
+                            }
+                        }
+                        $line[] = ['label' => v($tot2)];
+                        $rows[] = $line;
+                    }
+
+                    $line0 = [];
+                    $line0[] = [
+                        'label' => $ti->label,
+                        'class' => 'title1',
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
+                    ];
+                    $t0 = 0;
+
+                    foreach ($tabv as $k => $v) {
+                        $z = array_values(array_filter(explode('v_', $k)))[0];
+                        $line0[] = [
+                            'label' => v($v),
+                            'class' => 'title1',
+                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
+                            'title' => "Afficher les valeurs $ti->label de la zone $z",
+                        ];
+                        $t0 += $v;
+                        $tabv[$k] = 0;
+
+                        $v0 = (float) $tabt["t_$z"];
+                        $tabt["t_$z"] = $v0 + $v;
+                    }
+
+                    $line0[] = [
+                        'label' => v($t0),
+                        'class' => 'title1',
+                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
+                    ];
+                    $rows[] = $line0;
+                }
+
+                // $line0 = [];
+                // $line0[] = [
+                //     'label' => "TOTAL GENERAL",
+                //     'class' => 'title1',
+                //     'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                //     'title' => 'Afficher les détails pour toutes les zones'
+                // ];
+                // $t0 = 0;
+                // foreach ($tabt as $k => $v) {
+                //     $z = array_values(array_filter(explode('t_', $k)))[0];
+                //     $line0[] = [
+                //         'label' => v($v),
+                //         'class' => 'title1',
+                //         'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
+                //         'title' => "Afficher le Total de la zone $z",
+                //     ];
+                //     $t0 += $v;
+                // }
+
+                // $line0[] = [
+                //     'label' => v($t0),
+                //     'class' => 'title1',
+                //     'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                //     'title' => 'Afficher les détails pour toutes les zones'
+                // ];
+                // $rows[] = $line0;
+                array_unshift($rows, $head);
+
+                return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
+            }
         }
     }
 
@@ -956,7 +1087,9 @@ class DataController extends Controller
 
         $labels = [
             ['label' => 'Stock de Sécurité 1'],
+            ['label' => 'Montant Sto. Sécurité 1'],
             ['label' => 'Stock de Sécurité 2'],
+            ['label' => 'Montant Sto. Sécurité 2'],
             ['label' => 'Stock de Sécurité'],
             ['label' => 'Montant Stock de Sécurité'],
             ['label' => 'Eff. reconst. et Sto. Stratégiques'],
@@ -1013,11 +1146,14 @@ class DataController extends Controller
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
                 ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 1'))->first()?->amount;
+            $mss1 = $ss_1 * $m3;
 
             $ss_2 = (float)@$structure?->fuelprices()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
                 ->whereHas('label', fn($q) => $q->where('label', 'Stock de Sécurité 2'))->first()?->amount;
+            $mss2 = $ss_2 * $m3;
+
             $ss = $ss_1 + $ss_2;
             $mss = $ss * $m3;
 
@@ -1100,7 +1236,9 @@ class DataController extends Controller
                 ['v' => v($e->density)],
                 ['v' => v($m3)],
                 ['v' => v($ss_1), 'title' => "Stock de sécurité 1 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($mss1), 'title' => "Stock de sécurité 1 * M3"],
                 ['v' => v($ss_2), 'title' => "Stock de sécurité 2 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($mss2), 'title' => "Stock de sécurité 2 * M3"],
                 ['v' => v($ss)],
                 ['v' => v($mss)],
                 ['v' => v($effort_reconst)],

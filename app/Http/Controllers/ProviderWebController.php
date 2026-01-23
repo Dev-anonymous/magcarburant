@@ -122,4 +122,9 @@ class ProviderWebController extends Controller
     {
         return view('provider.delivery');
     }
+
+    function taxation()
+    {
+        return view('provider.taxation');
+    }
 }

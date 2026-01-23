@@ -394,10 +394,18 @@ function itemsCR()
     ];
 }
 
+function itemsPara()
+{
+    return  [
+        (object)['label' => 'Para fiscalité', 'val' => 'item1'],
+        (object)['label' => 'Fiscalité', 'val' => 'item2'],
+    ];
+}
+
 function findIndexByLabel(array $array, string $label): ?int
 {
     foreach ($array as $index => $item) {
-        if (isset($item['label']) && $item['label'] === $label) {
+        if (isset($item['label']) && strtolower($item['label']) === strtolower($label)) {
             return $index;
         }
     }

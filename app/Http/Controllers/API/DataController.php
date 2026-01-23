@@ -602,9 +602,10 @@ class DataController extends Controller
 
                 $rows = [];
 
+                /// PARA FISC
                 $items1 = [
-                    'Stock de sécurité 1',
-                    'Stock de sécurité 2',
+                    'Stock de Sécurité 1',
+                    'Stock de Sécurité 2',
                     'Effort de reconstruction et Stock Stratégiques',
                     "FONER (Fonds National d'Entretien Routier)",
                     'Marquage moléculaire',
@@ -612,101 +613,166 @@ class DataController extends Controller
                     'CRP & Comité de suivi des Prix des produits Petroliers'
                 ];
 
-                // $tabv = [];
-                // $tabt = [];
-                // foreach ($zones as $z) {
-                //     $tabv["v_$z"] = 0;
-                //     $tabt["t_$z"] = 0;
-                // }
+                $tabt = [];
+                foreach ($fuels as $z) {
+                    $tabv["tot_para_$z"] = 0;
+                    $tabt["tot_fisc_$z"] = 0;
+                }
 
-                foreach ($items1 = [] as $ti) {
-                    foreach ($fuels as $fuel) {
-                        $line = [];
-                        $line[] = ['label' => $fuel];
-                        $tot2 = 0;
-                        foreach ($zones as $zone) {
-                            $tot = 0;
-                            $index = findIndexByLabel($dhead, $ti);
-                            if (null !== $index) {
-                                foreach ($drows as $r) {
-                                    $v = (float) @$r[$index]['vv'];
-                                    $zo = $r[4]['v'];
-                                    $pro = $r[5]['v'];
-                                    abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
-                                    abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
-                                    if ($pro === $fuel && $zone === $zo) {
-                                        $tot += round($v, 3); //
-                                    }
-                                }
-                                $line[] = ['label' => v($tot)];
-                                $tot2  += $tot;
-                                $v0 = (float) @$tabv["v_$zone"];
-                                $tabv["v_$zone"] =  $v0 + $tot;
-                            }
-                        }
-                        $line[] = ['label' => v($tot2)];
-                        $rows[] = $line;
-                    }
-
+                foreach ($items1 as $ti) {
                     $line0 = [];
                     $line0[] = [
-                        'label' => $ti->label,
-                        'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
+                        'label' => $ti,
+                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                        // 'title' => "Afficher les détails de tous les produits.",
                     ];
-                    $t0 = 0;
 
-                    foreach ($tabv as $k => $v) {
-                        $z = array_values(array_filter(explode('v_', $k)))[0];
+                    $tot = 0;
+                    foreach ($fuels as $fuel) {
+                        $t = 0;
+                        $index = findIndexByLabel($dhead, $ti);
+                        //
+                        foreach ($drows as $r) {
+                            $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = @$r[4]['v'];
+                            $pro = @$r[5]['v'];
+                            abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                            abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                            if ($pro === $fuel && in_array($zo, $zones)) {
+                                $t += round($v, 3); //
+                            }
+                        }
+
+                        incr($tabv, "tot_para_$fuel", $t);
+
+                        $tot += $t;
                         $line0[] = [
-                            'label' => v($v),
-                            'class' => 'title1',
-                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
-                            'title' => "Afficher les valeurs $ti->label de la zone $z",
+                            'label' => v($t),
+                            'title' => "Montant $ti du produit $fuel",
+                            // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                            // 'title' => "Afficher les détails pour le produit $fuel.",
                         ];
-                        $t0 += $v;
-                        $tabv[$k] = 0;
-
-                        $v0 = (float) $tabt["t_$z"];
-                        $tabt["t_$z"] = $v0 + $v;
                     }
-
                     $line0[] = [
-                        'label' => v($t0),
-                        'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
-                        'title' => "Afficher les valeurs $ti->label de toutes les zones",
+                        'label' => v($tot),
+                        'title' => "Total Montant $ti des produits.",
+                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                     ];
                     $rows[] = $line0;
                 }
 
-                // $line0 = [];
-                // $line0[] = [
-                //     'label' => "TOTAL GENERAL",
-                //     'class' => 'title1',
-                //     'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
-                //     'title' => 'Afficher les détails pour toutes les zones'
-                // ];
-                // $t0 = 0;
-                // foreach ($tabt as $k => $v) {
-                //     $z = array_values(array_filter(explode('t_', $k)))[0];
-                //     $line0[] = [
-                //         'label' => v($v),
-                //         'class' => 'title1',
-                //         'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
-                //         'title' => "Afficher le Total de la zone $z",
-                //     ];
-                //     $t0 += $v;
-                // }
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL PARA FISCALITE",
+                    'class' => "title1",
+                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails para fiscalité.",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_para_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'title' => "Afficher les détails para fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails para fiscalité.",
+                ];
+                $rows[] = $line0;
 
-                // $line0[] = [
-                //     'label' => v($t0),
-                //     'class' => 'title1',
-                //     'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
-                //     'title' => 'Afficher les détails pour toutes les zones'
-                // ];
-                // $rows[] = $line0;
+
+                /// FISC
+                $items1 = [
+                    'TVA à la vente (TVAV)',
+                    'Droits de douane (10% PMF Commercial)',
+                    'Droits de consommation (25%, 15%, 0% du PMFF)',
+                    "Droits de consommation (25%, 15%, 0% du PMFF)",
+                    "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
+                    "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"
+                ];
+
+                $tabt = [];
+                foreach ($fuels as $z) {
+                    $tabv["tot_para_$z"] = 0;
+                    $tabv["tot_fisc_$z"] = 0;
+                }
+
+                foreach ($items1 as $ti) {
+                    $line0 = [];
+                    $line0[] = [
+                        'label' => $ti,
+                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                        // 'title' => "Afficher les détails de tous les produits.",
+                    ];
+
+                    $tot = 0;
+                    foreach ($fuels as $fuel) {
+                        $t = 0;
+                        $index = findIndexByLabel($dhead, $ti);
+                        //
+                        foreach ($drows as $r) {
+                            $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = @$r[4]['v'];
+                            $pro = @$r[5]['v'];
+                            abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                            abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                            if ($pro === $fuel && in_array($zo, $zones)) {
+                                $t += round($v, 3); //
+                            }
+                        }
+
+                        incr($tabv, "tot_fisc_$fuel", $t);
+
+                        $tot += $t;
+                        $line0[] = [
+                            'label' => v($t),
+                            'title' => "Montant $ti du produit $fuel",
+                            // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                            // 'title' => "Afficher les détails pour le produit $fuel.",
+                        ];
+                    }
+                    $line0[] = [
+                        'label' => v($tot),
+                        'title' => "Total Montant $ti des produits.",
+                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    ];
+                    $rows[] = $line0;
+                }
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL FISCALITE",
+                    'class' => "title1",
+                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails fiscalité.",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_fisc_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'title' => "Afficher les détails fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails fiscalité.",
+                ];
+                $rows[] = $line0;
+
                 array_unshift($rows, $head);
 
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
@@ -1236,31 +1302,31 @@ class DataController extends Controller
                 ['v' => v($e->density)],
                 ['v' => v($m3)],
                 ['v' => v($ss_1), 'title' => "Stock de sécurité 1 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
-                ['v' => v($mss1), 'title' => "Stock de sécurité 1 * M3"],
+                ['v' => v($mss1), 'vv' => $mss1, 'title' => "Stock de sécurité 1 * M3"],
                 ['v' => v($ss_2), 'title' => "Stock de sécurité 2 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
-                ['v' => v($mss2), 'title' => "Stock de sécurité 2 * M3"],
+                ['v' => v($mss2), 'vv' => $mss2, 'title' => "Stock de sécurité 2 * M3"],
                 ['v' => v($ss)],
                 ['v' => v($mss)],
                 ['v' => v($effort_reconst)],
-                ['v' => v($mt_effort_reconst), 'title' => "Effort Reconst. St. Strat. * M3"],
+                ['v' => v($mt_effort_reconst), 'vv' => $mt_effort_reconst, 'title' => "Effort Reconst. St. Strat. * M3"],
                 ['v' => v($foner)],
-                ['v' => v($mt_foner), 'title' => "FONER * M3"],
+                ['v' => v($mt_foner), 'vv' => $mt_foner, 'title' => "FONER * M3"],
                 ['v' => v($marquage_molecu)],
-                ['v' => v($mt_marquage_molecu), 'title' => "Marquage Molécule * M3"],
+                ['v' => v($mt_marquage_molecu), 'vv' => $mt_marquage_molecu, 'title' => "Marquage Molécule * M3"],
                 ['v' => v($intervention_eco)],
-                ['v' => v($mt_intervention_eco), 'title' => "Intervention Eco. * M3"],
+                ['v' => v($mt_intervention_eco), 'vv' => $mt_intervention_eco, 'title' => "Intervention Eco. * M3"],
                 ['v' => v($cpr_comite_suivi)],
-                ['v' => v($mt_cpr_comite_suivi), 'title' => "CRP * M3"],
+                ['v' => v($mt_cpr_comite_suivi), 'vv' => $mt_cpr_comite_suivi, 'title' => "CRP * M3"],
                 ['v' => v($tva_vente)],
-                ['v' => v($mt_tva_vente), 'title' => "TVAV * M3"],
+                ['v' => v($mt_tva_vente), 'vv' => $mt_tva_vente, 'title' => "TVAV * M3"],
                 ['v' => v($droit_douane)],
-                ['v' => v($mt_droit_douane), 'title' => "DD * M3"],
+                ['v' => v($mt_droit_douane), 'vv' => $mt_droit_douane, 'title' => "DD * M3"],
                 ['v' => v($droit_consom)],
-                ['v' => v($mt_droit_consom), 'title' => "DC * M3"],
+                ['v' => v($mt_droit_consom), 'vv' => $mt_droit_consom, 'title' => "DC * M3"],
                 ['v' => v($tva_import)],
-                ['v' => v($mt_tva_import), 'title' => "TVAI * M3"],
+                ['v' => v($mt_tva_import), 'vv' => $mt_tva_import, 'title' => "TVAI * M3"],
                 ['v' => v($tva_interieur)],
-                ['v' => v($mt_tva_interieur), 'title' => "TVAIr * M3"],
+                ['v' => v($mt_tva_interieur), 'vv' => $mt_tva_interieur, 'title' => "TVAIr * M3"],
             ];
 
             $rows[] = $pline;
@@ -1268,37 +1334,28 @@ class DataController extends Controller
 
         $errors = array_values(array_unique($errors));
 
-        // if ($items == 'item1') {
-        //     $head = array_slice($head, 0, 17);
-        //     $t = [];
-        //     foreach ($rows as $r) {
-        //         $t[] = array_slice($r, 0, 17);
-        //     }
-        //     $rows = $t;
-        // }
+        if ($items == 'item1') {
+            $head = array_slice($head, 0, 29);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 29);
+            }
+            $rows = $t;
+        }
 
-        // if ($items == 'item2') {
-        //     $head = array_slice($head, 0, 18);
-        //     $t = [];
-        //     foreach ($rows as $r) {
-        //         $t[] = array_slice($r, 0, 18);
-        //     }
-        //     $rows = $t;
-        // }
+        if ($items == 'item2') {
+            $head0 = array_slice($head, 0, 13);
+            $head1 = array_slice($head, 29);
+            $head  = [...$head0, ...$head1];
 
-        // if ($items == 'item3') {
-        //     $head0 = array_slice($head, 0, 16);
-        //     $head1 = array_slice($head, 18);
-        //     $head = [...$head0, ...$head1];
-
-        //     $t = [];
-        //     foreach ($rows as $r) {
-        //         $head0 = array_slice($r, 0, 16);
-        //         $head1 = array_slice($r, 18);
-        //         $t[] = [...$head0, ...$head1];
-        //     }
-        //     $rows = $t;
-        // }
+            $t = [];
+            foreach ($rows as $r) {
+                $head0 = array_slice($r, 0, 13);
+                $head1 = array_slice($r, 29);
+                $t[]   = [...$head0, ...$head1];
+            }
+            $rows = $t;
+        }
 
         return compact('head', 'rows', 'errors');
     }

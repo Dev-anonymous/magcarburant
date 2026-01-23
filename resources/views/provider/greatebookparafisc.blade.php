@@ -40,6 +40,15 @@
                                     value="{{ $d2 }}" style="min-width:120px;">
                             </div>
                             <div class="form-group mb-1">
+                                <label for="items" class="control-label d-block mb-0">Items</label>
+                                <select name="items" id="items" class="form-control select2" style="min-width:150px;">
+                                    <option value="">Tous</option>
+                                    @foreach (itemsPara() as $e)
+                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group mb-1">
                                 <label for="zone" class="control-label d-block mb-0">Zone</label>
                                 <select name="zone[]" id="zone" class="form-control" multiple
                                     style="min-width:150px;">
@@ -132,15 +141,17 @@
                         td += '</tr>';
                     });
 
+                    // <tr>
+                    //             <th colspan=13></th>
+                    //             <th colspan=14>Parafiscalité</th>
+                    //             <th colspan=10>Fiscalité</th>
+                    //         </tr>
+
                     var h = `
                     <table table class="table table-striped table-hover text-nowrap text-center"
                         style="width:100%">
                         <thead>
-                            <tr>
-                                <th colspan=13></th>
-                                <th colspan=14>Parafiscalité</th>
-                                <th colspan=10>Fiscalité</th>
-                            </tr>
+
                             <tr>${th}</tr>
                         </thead>
                         <tbody>${td}</tbody>
@@ -257,23 +268,23 @@
             }, 100);
         });
 
-        // var date1 = '{{ request('date1') }}';
-        // var date2 = '{{ request('date2') }}';
-        // var item = '{{ request('el') }}';
-        // var fuel = '{{ request('fuel') }}';
-        // if (date1.length) {
-        //     $('[name="date1"]').val(date1).change();
-        // }
-        // if (date2.length) {
-        //     $('[name="date2"]').val(date2).change();
-        // }
-        // if (item.length) {
-        //     $('[name="items"]').val(item).change();
-        // }
-        // if (fuel.length) {
-        //     $('[name="fuel[]"]').val([fuel]).change();
-        //     $('[name="fuel[]"]').multiselect('refresh');
-        // }
+        var date1 = '{{ request('date1') }}';
+        var date2 = '{{ request('date2') }}';
+        var item = '{{ request('el') }}';
+        var fuel = '{{ request('fuel') }}';
+        if (date1.length) {
+            $('[name="date1"]').val(date1).change();
+        }
+        if (date2.length) {
+            $('[name="date2"]').val(date2).change();
+        }
+        if (item.length) {
+            $('[name="items"]').val(item).change();
+        }
+        if (fuel.length) {
+            $('[name="fuel[]"]').val([fuel]).change();
+            $('[name="fuel[]"]').multiselect('refresh');
+        }
 
         getData();
     </script>

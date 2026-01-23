@@ -95,14 +95,6 @@
         .bigtitle {
             text-align: center;
         }
-
-        .bgred {
-            background: #e58f8f;
-        }
-
-        .bgblue {
-            background: rgb(122, 193, 122);
-        }
     </style>
     <script>
         flatpickr(".flatpickr", {
@@ -147,8 +139,8 @@
                         <thead>
                             <tr>
                                 <th colspan=13></th>
-                                <th colspan=14 class="bgred">Parafiscalité</th>
-                                <th colspan=10 class='bgblue'>Fiscalité</th>
+                                <th colspan=14>Parafiscalité</th>
+                                <th colspan=10>Fiscalité</th>
                             </tr>
                             <tr>${th}</tr>
                         </thead>

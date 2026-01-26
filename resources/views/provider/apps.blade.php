@@ -23,25 +23,6 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.accounting') }}')">
-                    <div class="w-100">
-                        <div class="d-flex align-items-center">
-                            <span class="material-icons md-48 ml-2">account_balance</span>
-                            <div class="p-2">
-                                <h4 class="font-weight-bold">Comptabilité</h4>
-                                <p class="m-0">Gestion de la comptabilité</p>
-                            </div>
-                        </div>
-                        {{-- <div class="text-center">
-                            <a href="{{ route('provider.rates') }}">Taux réels</a>
-                            <span>|</span>
-                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
-                        </div> --}}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.sale') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
@@ -64,6 +45,25 @@
                     </svg>
                     <div class="p-2">
                         <h4 class="font-weight-bold">Livraisons excédentaires</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('provider.accounting') }}')">
+                    <div class="w-100">
+                        <div class="d-flex align-items-center">
+                            <span class="material-icons md-48 ml-2">account_balance</span>
+                            <div class="p-2">
+                                <h4 class="font-weight-bold">Comptabilité</h4>
+                                <p class="m-0">Gestion de la comptabilité</p>
+                            </div>
+                        </div>
+                        {{-- <div class="text-center">
+                            <a href="{{ route('provider.rates') }}">Taux réels</a>
+                            <span>|</span>
+                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
+                        </div> --}}
                     </div>
                 </div>
             </div>

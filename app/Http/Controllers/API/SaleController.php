@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Entity;
 use App\Models\Sale;
 use App\Models\Salefile;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +23,9 @@ class SaleController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
 
-        if ($user->user_role == 'petrolier') {
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
         } else {
             abort(403);
@@ -37,8 +39,15 @@ class SaleController extends Controller
         $date = array_filter($date);
         $from = @$date[0] ?? nnow()->toDateString();
         $to = @$date[1] ?? $from;
+        $type = request('type');
 
         $sales->whereBetween('date', [$from, $to]);
+        if ($type === "1") {
+            $sales->where('from_mutuality', 1);
+        }
+        if ($type === "0") {
+            $sales->where('from_mutuality', 0);
+        }
 
         return DataTables::of($sales)
             ->addIndexColumn()
@@ -52,7 +61,7 @@ class SaleController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) use ($user) {
+            ->addColumn('action', function ($row) use ($entity) {
                 $eb = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
@@ -87,9 +96,13 @@ class SaleController extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'petrolier') {
-                    return $t;
+                if ($row->from_mutuality) {
+                    $t = '';
                 }
+
+                // if ($user->user_role == 'petrolier') {
+                return $t;
+                // }
             })
             ->rawColumns(['action', 'salefile'])
             ->make(true);
@@ -157,7 +170,7 @@ class SaleController extends Controller
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if ($user->user_role == 'petrolier') {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -168,6 +181,8 @@ class SaleController extends Controller
             $sheet = array_slice($sheet, 1);
             $insert = [];
             $errors = [];
+
+            DB::beginTransaction();
             foreach ($sheet as $index => $row) {
                 $rowNumber = $index + 2;
                 $colA = trim($row[0] ?? null);
@@ -269,7 +284,7 @@ class SaleController extends Controller
                     continue;
                 }
 
-                $insert[] = [
+                $insert[] = $ins = [
                     'entity_id'        => $entity->id,
                     'date'             => $colA,
                     'terminal'         => $colB,
@@ -283,7 +298,29 @@ class SaleController extends Controller
                     'l15'              => $colJ,
                     'density'          => $colK,
                 ];
+
+                $sale = Sale::updateOrCreate(['delivery_note' => $colF], $ins);
+
+                if (strtoupper($colD) == 'OUEST') {
+                    if ($entity->user->user_role == 'logisticien') {
+                        $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                        if (in_array($colD, $wz)) {
+                            $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
+                            foreach ($entities as $ent) {
+                                $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                                if (in_array('OUEST', $ewz)) {
+                                    $ins['parent_id'] = $sale->id;
+                                    $ins['from_mutuality'] = 1;
+                                    $ins['entity_id'] = $ent->id;
+                                    Sale::insertOrIgnore($ins);
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            DB::commit();
 
             if (count($errors)) {
                 return response()->json([
@@ -299,14 +336,14 @@ class SaleController extends Controller
                 ], 422);
             }
 
-            Sale::insertOrIgnore($insert);
+            // Sale::insertOrIgnore($insert);
 
             return response()->json([
                 'success' => true,
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            if ($user->user_role == 'petrolier') {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
             } else {
                 abort(403);
@@ -335,6 +372,31 @@ class SaleController extends Controller
             $validated['entity_id'] = $entity->id;
 
             $sale = Sale::create($validated);
+
+            if ($entity->user->user_role == 'logisticien') {
+                $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                $w = strtoupper(request('way'));
+                if (in_array($w, $wz) && $w == 'OUEST') {
+                    $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
+                    foreach ($entities as $ent) {
+                        $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                        if (in_array('OUEST', $ewz)) {
+                            $validated['parent_id'] = $sale->id;
+                            $validated['from_mutuality'] = 1;
+                            $validated['entity_id'] = $ent->id;
+                            $sale2 = Sale::create($validated);
+
+                            $f = [];
+                            if ($request->hasFile('salefile')) {
+                                foreach ($request->file('salefile') as $file) {
+                                    $f[] = ['sale_id' => $sale2->id, 'file' =>  $file->store('bills', 'public')];
+                                }
+                            }
+                            Salefile::insert($f);
+                        }
+                    }
+                }
+            }
 
             $f = [];
             if ($request->hasFile('salefile')) {

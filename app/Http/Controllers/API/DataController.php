@@ -21,7 +21,7 @@ class DataController extends Controller
 
         $type = request('type');
 
-        if ($user->user_role == 'petrolier') {
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             if ($type === 'purchase') {
                 $date = request('date');
                 $date = explode(' to ', $date);
@@ -63,6 +63,14 @@ class DataController extends Controller
 
                 $entity = $user->entities()->first();
                 $base = $entity->sales()->whereBetween('date', [$from, $to]);
+                $from_mutuality = request('from_mutuality');
+
+                if ($from_mutuality === "1") {
+                    $base->where('from_mutuality', 1);
+                }
+                if ($from_mutuality === "0") {
+                    $base->where('from_mutuality', 0);
+                }
 
                 $totalLata = v((clone $base)->sum('lata'));
                 $totalL15 = v((clone $base)->sum('l15'));
@@ -71,7 +79,14 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] =  round($entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata')  / 1000, 3);
+                    $query = $entity->sales();
+                    if ($from_mutuality === "1") {
+                        $query->where('from_mutuality', 1);
+                    }
+                    if ($from_mutuality === "0") {
+                        $query->where('from_mutuality', 0);
+                    }
+                    $data[] =  round($query->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata')  / 1000, 3);
                     $labels[] = $el;
                 }
                 $chart1 = compact('labels', 'data');
@@ -79,7 +94,14 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $data[] = round($entity->sales()->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $query = $entity->sales();
+                    if ($from_mutuality === "1") {
+                        $query->where('from_mutuality', 1);
+                    }
+                    if ($from_mutuality === "0") {
+                        $query->where('from_mutuality', 0);
+                    }
+                    $data[] = round($query->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
                     $labels[] = $el;
                 }
                 $chart2 = compact('labels', 'data');

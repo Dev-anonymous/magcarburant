@@ -71,21 +71,30 @@
                             <div class="row">
                                 <div class="col-xs-12 col-sm-6">
                                     <h4 class="card-title font-weight-bold">Historique des toutes les ventes</h4>
-                                </div>@php
+                                </div>
+                                @php
                                     $d = now()->startOfMonth()->toDateString();
                                     $d2 = now()->toDateString();
                                 @endphp
-                                <div class="col-xs-12 col-sm-6">
+                                {{-- <div class="col-xs-12 col-sm-6">
                                     <form class="form-inline filters-form pull-right" role="form">
                                         <div class="form-group mb-1">
-                                            <label class="mr-2" for="dv222">Du</label>
+                                            <label class="mr-2 control-label d-block mb-0" for="dv222">Du</label>
                                             <input class="form-control flatpickr2" id="dv222"
                                                 value="{{ $d }}" name="date1" style="width:100px" />
                                         </div>
                                         <div class="form-group mb-1">
-                                            <label class="mr-2" for="dv22">Au</label>
+                                            <label class="mr-2 control-label d-block mb-0" for="dv22">Au</label>
                                             <input class="form-control flatpickr2" id="dv22"
                                                 value="{{ $d2 }}" name="date2" style="width:100px" />
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <label for="items" class="control-label d-block mb-0">Type de vente</label>
+                                            <select name="type" class="form-control select2" style="min-width:150px;">
+                                                <option value="">Tous</option>
+                                                <option value="0">Non mutualisé</option>
+                                                <option value="1">Mutualisé</option>
+                                            </select>
                                         </div>
                                         <div class="form-group mb-1">
                                             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
@@ -94,8 +103,35 @@
                                             </button>
                                         </div>
                                     </form>
-                                </div>
+                                </div> --}}
                             </div>
+                            <form id="ffilter" class="filters-form pull-right" role="form">
+                                <div class="form-group mb-1">
+                                    <label for="dv222" class="control-label d-block mb-0">Du</label>
+                                    <input type="text" class="form-control flatpickr2" id="dv222" name="date1"
+                                        value="{{ $d }}" style="min-width:120px;">
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label for="dv22" class="control-label d-block mb-0">Au</label>
+                                    <input type="text" class="form-control flatpickr2" id="dv22" name="date2"
+                                        value="{{ $d2 }}" style="min-width:120px;">
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label for="zone" class="control-label d-block mb-0">Type de vente</label>
+                                    <select name="type" id="zone" class="form-control select2"
+                                        style="min-width:150px;">
+                                        <option value="">Tous</option>
+                                        <option value="0">Non mutualisé</option>
+                                        <option value="1">Mutualisé</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-1">
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                        data-target="#mdlChose">
+                                        <i class="material-icons md-18">add_circle_outline</i> Nouvelle vente
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                         <div class="py-4">
                             <div class="table-responsive">
@@ -493,7 +529,7 @@
     <x-datatable />
     <x-flatpickr />
     <x-chart />
-
+    <x-select />
 
     <script>
         flatpickr(".flatpickr", {
@@ -523,6 +559,7 @@
                 data: function(d) {
                     d.entity_id = '{{ @$entity->id }}';
                     d.date = $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val();
+                    d.type = $('[name="type"]').val();
                 }
             },
             order: [
@@ -651,9 +688,16 @@
             });
         });
 
-        $('.flatpickr2').change(function() {
-            dtObj.ajax.reload(null, false);
-            dashboard();
+        var ff = $('#ffilter');
+
+        let timer;
+        ff.change(function(e) {
+            clearTimeout(timer);
+            var e = $(e.target);
+            timer = setTimeout(() => {
+                dtObj.ajax.reload(null, false);
+                dashboard();
+            }, 100);
         });
 
         $('#mdledit').on('shown.bs.modal', function() {
@@ -760,6 +804,7 @@
                 url: '{{ route('dashboard') }}',
                 data: {
                     type: 'sale',
+                    from_mutuality: $('[name="type"]').val(),
                     date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },
                 success: function(data) {

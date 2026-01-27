@@ -6,28 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('deliveryfile', function (Blueprint $table) {
+        Schema::create('workingzones', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->unsignedBigInteger('entity_id');
-            $table->unsignedBigInteger('zone_id');
+            $table->unsignedInteger('entity_id');
+            $table->unsignedInteger('zone_id');
+
             $table->unique(['entity_id', 'zone_id']);
-            $table->foreign('entity_id', 'fk_workingzones_entity')
+
+            $table->foreign('entity_id')
                 ->references('id')
-                ->on('entities')
+                ->on('entity')
                 ->onDelete('cascade');
 
-            $table->foreign('zone_id', 'fk_workingzones_zone')
+            $table->foreign('zone_id')
                 ->references('id')
-                ->on('zones')
+                ->on('zone')
                 ->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('deliveryfile');
+        Schema::dropIfExists('workingzones');
     }
 };

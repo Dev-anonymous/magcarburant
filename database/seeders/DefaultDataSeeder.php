@@ -24,10 +24,10 @@ class DefaultDataSeeder extends Seeder
             ['ENGEN', 'ENGEN RDC SA', 'petrolier'],
             ['COBIL', 'COBIL SA', 'petrolier'],
             ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo', 'petrolier'],
-            ['LEREXCOM', 'LEREXCOM', 'logisticien'],
-            ['SEP CONGO', 'SEP CONGO', 'logisticien'],
-            ['SPSA', 'SPSA COBIL', 'logisticien'],
-            ['SOCIR', 'SOCIR', 'logisticien'],
+            ['LEREXCOM', 'LEREXCOM', 'logisticien', ['OUEST']],
+            ['SEP CONGO', 'SEP CONGO', 'logisticien', ['NORD', 'SUD', 'EST', 'OUEST']],
+            ['SPSA', 'SPSA COBIL', 'logisticien',  ['OUEST']],
+            ['SOCIR', 'SOCIR', 'logisticien', ['OUEST']],
             ['GPDPP', 'GPDPP', 'etatique'],
             ['FEC', 'Fédération des Entreprises du Congo', 'etatique'],
             ['MINECO', 'Ministère de l\'Économie', 'etatique'],
@@ -56,6 +56,14 @@ class DefaultDataSeeder extends Seeder
                 $e->longname =  $el[1];
                 $e->users_id = $u->id;
                 $e->save();
+            }
+
+            $wz = (array) @$el[3];
+            foreach ($wz as $w) {
+                $zone = Zone::where('zone', $w)->firstOrFail();
+                $ewz = $e->workingzones()->where('zone_id', $zone->id)->firstOrNew();
+                $ewz->zone_id = $zone->id;
+                $ewz->save();
             }
         }
 

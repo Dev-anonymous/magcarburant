@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Collection|Rate[] $rates
  * @property Collection|Sale[] $sales
  * @property Collection|Structureprice[] $structureprices
+ * @property Collection|Workingzone[] $workingzones
  *
  * @package App\Models
  */
@@ -71,5 +72,10 @@ class Entity extends Model
 	public function structureprices()
 	{
 		return $this->hasMany(Structureprice::class);
+	}
+
+	public function workingzones()
+	{
+		return $this->hasMany(Workingzone::class);
 	}
 }

@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\LogisticsWebController;
 use App\Http\Controllers\ProviderWebController;
 use App\Http\Controllers\SudoWebController;
+use App\Http\Middleware\APP\LogisticsMiddleware;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
 use App\Models\Delivery;
@@ -111,6 +113,9 @@ Route::get('', function () {
         if ($role === 'petrolier') {
             return redirect(route('provider.home'));
         }
+        if ($role === 'logisticien') {
+            return redirect(route('logistics.home'));
+        }
     }
     return view('login');
 })->name('login');
@@ -135,6 +140,22 @@ Route::middleware('auth')->group(function () {
                 Route::get('claim', 'claim')->name('provider.claim');
                 Route::get('delivery', 'delivery')->name('provider.delivery');
                 Route::get('taxation', 'taxation')->name('provider.taxation');
+            });
+        });
+    });
+
+    Route::prefix('logistics')->middleware(LogisticsMiddleware::class)->group(function () {
+        Route::controller(LogisticsWebController::class)->group(function () {
+            Route::get('', 'home')->name('logistics.home');
+            Route::get('sale', 'sale')->name('logistics.sale');
+            // Route::get('apps', 'apps')->name('logistics.apps');
+            // Route::get('purchase', 'purchase')->name('logistics.purchase');
+            Route::prefix('accounting')->group(function () {
+                Route::get('', 'accounting')->name('logistics.accounting');
+            //     Route::get('analyse', 'analyse')->name('logistics.analyse');
+            //     Route::get('claim', 'claim')->name('logistics.claim');
+            //     Route::get('delivery', 'delivery')->name('logistics.delivery');
+            //     Route::get('taxation', 'taxation')->name('logistics.taxation');
             });
         });
     });

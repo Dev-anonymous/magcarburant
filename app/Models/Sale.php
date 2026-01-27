@@ -23,11 +23,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $delivery_note
  * @property string|null $delivery_program
  * @property string|null $client
- * @property string|null $lata
- * @property string|null $l15
- * @property string|null $density
+ * @property float|null $lata
+ * @property float|null $l15
+ * @property float|null $density
+ * @property bool $from_mutuality
+ * @property int|null $parent_id
  * 
  * @property Entity $entity
+ * @property Sale|null $sale
+ * @property Collection|Sale[] $sales
  * @property Collection|Salefile[] $salefiles
  *
  * @package App\Models
@@ -39,7 +43,12 @@ class Sale extends Model
 
 	protected $casts = [
 		'entity_id' => 'int',
-		'date' => 'datetime'
+		'date' => 'datetime',
+		'lata' => 'float',
+		'l15' => 'float',
+		'density' => 'float',
+		'from_mutuality' => 'bool',
+		'parent_id' => 'int'
 	];
 
 	protected $fillable = [
@@ -54,12 +63,24 @@ class Sale extends Model
 		'client',
 		'lata',
 		'l15',
-		'density'
+		'density',
+		'from_mutuality',
+		'parent_id'
 	];
 
 	public function entity()
 	{
 		return $this->belongsTo(Entity::class);
+	}
+
+	public function sale()
+	{
+		return $this->belongsTo(Sale::class, 'parent_id');
+	}
+
+	public function sales()
+	{
+		return $this->hasMany(Sale::class, 'parent_id');
 	}
 
 	public function salefiles()

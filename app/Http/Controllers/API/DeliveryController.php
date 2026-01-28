@@ -44,8 +44,8 @@ class DeliveryController extends Controller
         return DataTables::of($deliveries)
             ->addIndexColumn()
             ->addColumn('total', function ($row) {
-                $v = v(($row->lata / 1000) * $row->unitprice);
-                return "<span title='(LATA/1000)*Prix unitaire' tooltip>$v</span>";
+                $v = v(($row->lata) * $row->unitprice);
+                return "<span title='LATA * Prix unitaire' tooltip>$v</span>";
             })->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('deliveryfile', function ($row) {
@@ -308,7 +308,7 @@ class DeliveryController extends Controller
                     'delivery_program' => $colG,
                     'client'           => $colH,
                     'lata'             => $colI,
-                    'unitprice'              => $colJ,
+                    'unitprice'        => $colJ,
                 ];
             }
 

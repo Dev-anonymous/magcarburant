@@ -31,9 +31,16 @@
                             <div class="page-title m-0"></div>
                             <div class="collapse navbar-collapse" id="mainNavbar">
                                 <ul class="navbar-nav ml-auto align-items-center">
-                                    @if (Route::is('provider.accounting') || Route::is('provider.analyse'))
+                                    @if (Route::is('provider.accounting') ||
+                                            Route::is('provider.analyse') ||
+                                            Route::is('logistics.accounting') ||
+                                            Route::is('logistics.analyse'))
+                                        @php
+                                            $islog = auth()->user()->user_role == 'logisticien';
+                                            $lab = $islog ? 'logistics' : 'provider';
+                                        @endphp
                                         <li class="nav-item dropdown nav-language d-flex align-items-center">
-                                            <a href="{{ route('provider.analyse') }}" class="nav-link"
+                                            <a href="{{ route("$lab.analyse") }}" class="nav-link"
                                                 aria-expanded="false">
                                                 <i class="material-icons md-18 align-middle">trending_up</i>
                                                 MAG
@@ -47,7 +54,7 @@
                                                 <ul class="list-unstyled">
                                                     <small class="font-italic text-muted ml-2">Gestions des prix</small>
                                                     <li>
-                                                        <a href="{{ route('provider.accounting', ['item' => 'pricestr']) }}"
+                                                        <a href="{{ route("$lab.accounting", ['item' => 'pricestr']) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">
@@ -59,7 +66,7 @@
                                                     </li>
                                                     <small class="font-italic text-muted ml-2">Gestions des taux</small>
                                                     <li>
-                                                        <a href="{{ route('provider.accounting', ['item' => 'rtx']) }}"
+                                                        <a href="{{ route("$lab.accounting", ['item' => 'rtx']) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">
@@ -70,7 +77,7 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ route('provider.accounting', ['item' => 'stx']) }}"
+                                                        <a href="{{ route("$lab.accounting", ['item' => 'stx']) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">
@@ -92,6 +99,7 @@
                                             {{ auth()->user()->name }}
                                             <img src="{{ userimg() }}" style="border: 2px solid #ccc"
                                                 class="img-fluid rounded-circle ml-1" width="35" />
+                                            <br> <small>{{ ucfirst(auth()->user()->user_role) }}</small>
                                         </a>
                                     </li>
                                 </ul>

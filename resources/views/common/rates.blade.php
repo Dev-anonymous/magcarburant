@@ -26,14 +26,14 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
-                        @if (auth()->user()->user_role === 'petrolier')
+                        {{-- @if (auth()->user()->user_role === 'petrolier') --}}
                             <div class="">
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                     <i class="material-icons md-24">add_circle_outline</i>
                                     Nouveau taux
                                 </button>
                             </div>
-                        @endif
+                        {{-- @endif --}}
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">

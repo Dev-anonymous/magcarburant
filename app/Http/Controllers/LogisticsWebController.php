@@ -25,9 +25,6 @@ class LogisticsWebController extends Controller
         return view('logistics.sale');
     }
 
-
-    ///////////////////
-
     function accounting()
     {
         $item = request('item');
@@ -50,16 +47,16 @@ class LogisticsWebController extends Controller
         }
 
         if ($item == 'gb') {
-            return view('provider.greatebook');
+            return view('logistics.greatebook');
         }
 
-        if ($item == 'cc') {
-            return view('provider.greatebookCR');
-        }
+        // if ($item == 'cc') {
+        //     return view('provider.greatebookCR');
+        // }
 
-        if ($item == 'pf') {
-            return view('provider.greatebookparafisc');
-        }
+        // if ($item == 'pf') {
+        //     return view('provider.greatebookparafisc');
+        // }
 
         $stx = request('stx');
         if ($stx) {
@@ -97,8 +94,12 @@ class LogisticsWebController extends Controller
                 return view('common.strprices', compact('grouped', 'structure'));
             }
         }
-        return view('provider.apps-accounting');
+        return view('logistics.apps-accounting');
     }
+
+
+    ///////////////////
+
 
     function purchase()
     {

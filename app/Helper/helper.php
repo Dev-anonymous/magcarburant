@@ -347,7 +347,7 @@ function userimg()
         if ($role === 'sudo') {
             return asset($i);
         }
-        if ($role === 'petrolier') {
+        if (in_array($role, ['petrolier', 'logisticien'])) {
             $e = $user->entities()->first()?->logo;
             if ($e) {
                 $i  = "storage/$e";
@@ -399,6 +399,16 @@ function itemsPara()
     return  [
         (object)['label' => 'Para fiscalité', 'val' => 'item1'],
         (object)['label' => 'Fiscalité', 'val' => 'item2'],
+    ];
+}
+
+function itemslog()
+{
+    return  [
+        (object)['label' => 'PMAG CHANGE SOCIR', 'val' => 'item1'],
+        (object)['label' => 'PMAG CHANGE SEP CONGO', 'val' => 'item2'],
+        (object)['label' => 'PMAG CHANGE SPSA-COBIL', 'val' => 'item3'],
+        (object)['label' => 'PMAG CHANGE LEREXCOM ', 'val' => 'item4'],
     ];
 }
 

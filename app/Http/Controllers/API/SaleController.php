@@ -54,8 +54,13 @@ class SaleController extends Controller
             ->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('salefile', function ($row) {
+                if ($row->sale) {
+                    $sf = $row->sale->salefiles; // parent
+                } else {
+                    $sf = $row->salefiles;
+                }
                 $f = '';
-                foreach ($row->salefiles as $i => $e) {
+                foreach ($sf as $i => $e) {
                     $u = asset('storage/' . $e->file);
                     $f .= "<a href='$u' class='text-nowrap mr-2' target='_blank'><i class='material-icons md-18 align-middle mb-1 text-primary'>attach_file</i> Fichier " . ($i + 1) . "</a>";
                 }
@@ -116,6 +121,8 @@ class SaleController extends Controller
         $user = auth()->user();
 
         if (request('action') == 'update') {
+            abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
+
             $id = request('id');
             $sale = Sale::findOrFail($id);
 
@@ -140,6 +147,9 @@ class SaleController extends Controller
             DB::beginTransaction();
 
             $sale->update($validated);
+            foreach ($sale->sales as $ch) { // children
+                $ch->update($validated);
+            }
 
             if ($request->hasFile('salefile')) {
                 $insertFiles = [];
@@ -384,15 +394,7 @@ class SaleController extends Controller
                             $validated['parent_id'] = $sale->id;
                             $validated['from_mutuality'] = 1;
                             $validated['entity_id'] = $ent->id;
-                            $sale2 = Sale::create($validated);
-
-                            $f = [];
-                            if ($request->hasFile('salefile')) {
-                                foreach ($request->file('salefile') as $file) {
-                                    $f[] = ['sale_id' => $sale2->id, 'file' =>  $file->store('bills', 'public')];
-                                }
-                            }
-                            Salefile::insert($f);
+                            Sale::create($validated);
                         }
                     }
                 }
@@ -437,15 +439,23 @@ class SaleController extends Controller
     public function destroy(Sale $sale)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
         $entity = $user->entities()->first();
         abort_if($entity->id != $sale->entity_id, 403, "Not permit");
+
+        DB::beginTransaction();
+        foreach ($sale->sales as $s) {
+            foreach ($s->salefiles as $f) {
+                File::delete("storage/" . $f->file);
+            }
+            $s->delete();
+        }
 
         foreach ($sale->salefiles as $f) {
             File::delete("storage/" . $f->file);
         }
-
         $sale->delete();
+        DB::commit();
 
         return response()->json([
             'success' => true,

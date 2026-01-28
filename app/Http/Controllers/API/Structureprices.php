@@ -18,9 +18,9 @@ class Structureprices extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['sudo', 'petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['sudo', 'petrolier', 'logisticien']), 403, "No permission");
 
-        if ($user->user_role == 'petrolier') {
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
         } else {
             $entity = Entity::find(request('entity_id'));
@@ -42,6 +42,8 @@ class Structureprices extends Controller
             ->addColumn('view', function ($row) use ($user) {
                 if ($user->user_role == 'petrolier') {
                     $href = route('provider.accounting', ['stx' => $row->id]);
+                } elseif ($user->user_role == 'logisticien') {
+                    $href = route('logistics.accounting', ['stx' => $row->id]);
                 } else {
                     $href = route('sudo.provider', ['stx' => $row->id]);
                 }
@@ -101,7 +103,7 @@ class Structureprices extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        abort_if($user->user_role !== 'petrolier', 403, "No permission");
+        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
 
         if (request('action') == 'update') {
             $validated = $request->validate([

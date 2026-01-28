@@ -20,7 +20,7 @@ class RateController extends Controller
         $user = auth()->user();
         $type = request('type');
         $isTx = true;
-        if ($user->user_role === 'petrolier') {
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
             if ($type == 'structure') {
@@ -118,7 +118,7 @@ class RateController extends Controller
             $entity = $rate->entity;
             abort_if($user->user_role == 'petrolier' && $entity->users_id != $user->id, 403, "No permission !!!");
 
-            if ($user->user_role == 'petrolier') {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 //
             } else {
                 abort(403);
@@ -182,7 +182,7 @@ class RateController extends Controller
             ]);
 
             $user = auth()->user();
-            if ($user->user_role == 'petrolier') {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
                 abort_if(!$entity, 422, "No entity");
                 $rate = $entity->rates();

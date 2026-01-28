@@ -15,7 +15,7 @@ class TxStructure extends Controller
     {
         $user = auth()->user();
         $isTx = true;
-        if ($user->user_role === 'petrolier') {
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
             abort_if(!$entity, 422, "No entity");
             $data = $entity->structureprices();

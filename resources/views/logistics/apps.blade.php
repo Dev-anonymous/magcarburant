@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    eonclick="location.assign('{{ route('logistics.accounting') }}')">
+                    onclick="location.assign('{{ route('logistics.accounting') }}')">
                     <div class="w-100">
                         <div class="d-flex align-items-center">
                             <span class="material-icons md-48 ml-2">account_balance</span>
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         {{-- <div class="text-center">
-                            <a href="{{ route('provider.rates') }}">Taux réels</a>
+                            <a href="{{ route('logistics.home.rates') }}">Taux réels</a>
                             <span>|</span>
                             <a href="{{ route('provider.prices') }}">Structures des prix</a>
                         </div> --}}
@@ -42,7 +42,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
-                    eonclick="location.assign('{{ route('provider.home') }}')">
+                    eonclick="location.assign('{{ route('logistics.home') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path

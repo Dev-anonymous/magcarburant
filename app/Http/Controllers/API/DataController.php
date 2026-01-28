@@ -151,6 +151,10 @@ class DataController extends Controller
                 return $this->greatBookFiscData();
             }
 
+            if ($type === 'greatbooklog') {
+                return $this->greatBookLogData();
+            }
+
             if ($type === 'balance') {
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
@@ -955,7 +959,7 @@ class DataController extends Controller
                 ['v' => v($pmag_marge_socom), 'vv' => $pmag_marge_socom, 'class' => 'bigtitle', 'title' => '10% de PMAG PMFC SOCOM'],
                 ['v' => v($tx_reel)],
                 ['v' => v($tx_str)],
-                ['v' => v($variation_change), 'class' => 'bigtitle', 'title' => '(Taux Réel - Taux Structure)/Taux Réel '],
+                ['v' => v($variation_change), 'class' => 'bigtitle', 'title' => '(Taux Réel - Taux Structure)/Taux Réel'],
                 ['v' => v($charge_socom_str)],
                 ['v' => v($marge_socom_str)],
                 ['v' => v($ecart_change), 'class' => 'bigtitle', 'title' => '(PMFC Structure + Charge SOCOM Structure + Marge SOCOM Structure ) * Variation Change'],
@@ -1375,6 +1379,205 @@ class DataController extends Controller
                 $head0 = array_slice($r, 0, 13);
                 $head1 = array_slice($r, 29);
                 $t[]   = [...$head0, ...$head1];
+            }
+            $rows = $t;
+        }
+
+        return compact('head', 'rows', 'errors');
+    }
+
+    private function greatBookLogData()
+    {
+        $reqzone = (array) request('zone');
+        $reqfuel = (array) request('fuel');
+        $items = request('items');
+
+        $user = auth()->user();
+        $entity = $user->entities()->first();
+
+        $from = request('date1') ?? nnow()->toDateString();
+        $to = request('date2') ?? nnow()->toDateString();
+
+        $head = [
+            ['label' => 'ID'],
+            ['label' => 'Terminal'],
+            ['label' => 'Date'],
+            ['label' => 'Localité'],
+            ['label' => 'Voie'],
+            ['label' => 'Produit'],
+            ['label' => 'Bon de livraison'],
+            ['label' => 'Programme de livraison'],
+            ['label' => 'Client'],
+            ['label' => 'LATA'],
+            ['label' => 'L15'],
+            ['label' => 'Densité'],
+            ['label' => 'M3'],
+        ];
+
+        $rows = [];
+        $errors = [];
+
+        $labels = [
+            ['label' => 'TAUX REEL'],
+            ['label' => 'TAUX STRUCTURE'],
+            ['label' => 'Variation Change(%)'],
+            ['label' => 'CHARGES SOCIR'],
+            ['label' => 'CHARGES SEP CONGO'],
+            ['label' => 'CHARGES SPSA-COBIL'],
+            ['label' => 'CHARGES LEREXCOM', 'class' => "bigtitle"],
+            ['label' => 'PMAG CHANGE SOCIR', 'class' => "bigtitle"],
+            ['label' => 'PMAG CHANGE SEP CONGO'],
+            ['label' => 'PMAG CHANGE SPSA-COBIL'],
+            ['label' => 'PMAG CHANGE LEREXCOM '],
+        ];
+
+        $head = [...$head, ...$labels];
+
+        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+            $q->whereIn('product', $reqfuel);
+            $q->whereIn('way', $reqzone);
+        })->whereBetween('date', [$from, $to])->orderBy('date')->get();
+
+        foreach ($sales as $e) {
+            $saledate = $e->date;
+            $structure = $entity->structureprices()->where(function ($q) use ($saledate) {
+                $q->where(function ($q) use ($saledate) {
+                    $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                })->orWhere(function ($q) use ($saledate) {
+                    $q->whereNull('to')->where('from', '<=', $saledate);
+                });
+            })->orderByDesc('from')->first();
+
+            $m3 = ((float) $e->lata) / 1000;
+
+            $zone = $e->way;
+            $fuel = $e->product;
+
+            if (!$structure) {
+                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $fuelObj = Fuel::where(compact('fuel'))->first();
+
+            $tx_reel = (float) $entity->rates()->where(function ($q) use ($saledate) {
+                $q->where(function ($q) use ($saledate) {
+                    $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                })->orWhere(function ($q) use ($saledate) {
+                    $q->whereNull('to')->where('from', '<=', $saledate);
+                });
+            })->orderByDesc('from')->first()?->usd_cdf;
+            if (!$tx_reel) {
+                $errors[] = "Aucun taux réel n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+            $tx_str = (float) $structure?->usd_cdf;
+            if (!$tx_str) {
+                $errors[] = "Aucun taux structure n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $variation_change = $tx_reel ? ($tx_reel - $tx_str) / $tx_reel : 0;
+
+            $charge_socir = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Charges SOCIR'))->first()?->amount;
+
+            if (!$charge_socir) {
+                $errors[] = "Aucune valeur Charge SOCIR n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $charge_sep_congo = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Charges Sep Congo'))->first()?->amount;
+
+            if (!$charge_sep_congo) {
+                $errors[] = "Aucune valeur Charge Sep Congo n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $charge_spa_cobil = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Charges SPSA-COBIL'))->first()?->amount;
+
+            if (!$charge_spa_cobil) {
+                $errors[] = "Aucune valeur Charge SPSA-COBIL n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $charge_lerexcom = (float)@$structure?->fuelprices()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('label', fn($q) => $q->where('label', 'Charges LEREXCOM PETROLEUM ET Appui Terrestre'))->first()?->amount;
+
+            if (!$charge_lerexcom) {
+                $errors[] = "Aucune valeur Lerexcom n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $pmag_change_socir = $charge_socir * $variation_change * $m3;
+            $pmag_change_sep_congo = $charge_sep_congo * $variation_change * $m3;
+            $pmag_change_cobil = $charge_spa_cobil * $variation_change * $m3;
+            $pmag_change_lerexcom = $charge_lerexcom * $variation_change * $m3;
+
+            $pline = [
+                ['v' => $e->id],
+                ['v' => $e->terminal],
+                ['v' => $e->date?->format('d-m-Y')],
+                ['v' => $e->locality],
+                ['v' => $e->way],
+                ['v' => $e->product],
+                ['v' => $e->delivery_note],
+                ['v' => $e->delivery_program],
+                ['v' => $e->client],
+                ['v' => v($e->lata)],
+                ['v' => v($e->l15)],
+                ['v' => v($e->density)],
+                ['v' => v($m3)],
+                ['v' => v($tx_reel)],
+                ['v' => v($tx_str)],
+                ['v' => v($variation_change), 'class' => 'bigtitle', 'title' => '(Taux Réel - Taux Structure)/Taux Réel'],
+                ['v' => v($charge_socir)],
+                ['v' => v($charge_sep_congo)],
+                ['v' => v($charge_spa_cobil)],
+                ['v' => v($charge_lerexcom)],
+                ['v' => v($pmag_change_socir), 'vv' => $pmag_change_socir, 'class' => 'bigtitle', 'title' => 'Charges SOCIR * Variation change * M3'],
+                ['v' => v($pmag_change_sep_congo), 'vv' => $pmag_change_sep_congo, 'class' => 'bigtitle', 'title' => 'Charges Sep Congo * Variation change * M3'],
+                ['v' => v($pmag_change_cobil), 'vv' => $pmag_change_cobil, 'class' => 'bigtitle', 'title' => 'Charges SPSA-COBIL * Variation change * M3'],
+                ['v' => v($pmag_change_lerexcom), 'vv' => $pmag_change_lerexcom,  'class' => 'bigtitle', 'title' => 'Charges LEREXCOM * Variation change * M3'],
+            ];
+
+            $rows[] = $pline;
+        }
+
+        $errors = array_values(array_unique($errors));
+
+        $indexes = null;
+        if ($items == 'item1') {
+            // Colonnes 0 à 20
+            $indexes = range(0, 20);
+        }
+
+        if ($items == 'item2') {
+            // Colonnes 0 à 19 + 21
+            $indexes = array_merge(range(0, 19), [21]);
+        }
+
+        if ($items == 'item3') {
+            // Colonnes 0 à 19 + 22
+            $indexes = array_merge(range(0, 19), [22]);
+        }
+
+        if ($items == 'item4') {
+            // Colonnes 0 à 19 + 23
+            $indexes = array_merge(range(0, 19), [23]);
+        }
+
+        if ($indexes !== null) {
+            // On filtre le head
+            $head = array_values(array_intersect_key($head, array_flip($indexes)));
+
+            // On filtre chaque row
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_values(array_intersect_key($r, array_flip($indexes)));
             }
             $rows = $t;
         }

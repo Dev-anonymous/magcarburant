@@ -129,7 +129,7 @@
                                             <th>Programme de livraison</th>
                                             <th class="text-nowrap">Client</th>
                                             <th class="text-nowrap">LATA</th>
-                                            <th class="text-nowrap">Prix unitaire /M3</th>
+                                            <th class="text-nowrap">Prix unitaire LATA</th>
                                             <th class="text-nowrap">Total</th>
                                             <th class="text-nowrap no-export">Factures</th>
                                             <th class="no-export"></th>
@@ -237,7 +237,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Prix unitaire /M3</label>
+                                    <label class="mb-0">Prix unitaire LATA</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>
@@ -356,7 +356,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="mb-0">Prix unitaire /M3</label>
+                                    <label class="mb-0">Prix unitaire LATA</label>
                                     <input type="number" min="0" step="0.001" class="form-control" required
                                         name="unitprice">
                                 </div>

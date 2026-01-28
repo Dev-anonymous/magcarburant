@@ -152,7 +152,7 @@ Route::middleware('auth')->group(function () {
             // Route::get('purchase', 'purchase')->name('logistics.purchase');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('logistics.accounting');
-                //     Route::get('analyse', 'analyse')->name('logistics.analyse');
+                    Route::get('analyse', 'analyse')->name('logistics.analyse');
                 //     Route::get('claim', 'claim')->name('logistics.claim');
                 //     Route::get('delivery', 'delivery')->name('logistics.delivery');
                 //     Route::get('taxation', 'taxation')->name('logistics.taxation');

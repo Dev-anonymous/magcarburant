@@ -132,7 +132,7 @@
                         }, 800);
                         setInterval(() => {
                             location.reload();
-                        }, 3000);
+                        }, 1000);
                     },
                     error: function(xhr, a, b) {
                         var resp = xhr.responseJSON;

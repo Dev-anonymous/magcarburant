@@ -97,40 +97,11 @@ class LogisticsWebController extends Controller
         return view('logistics.apps-accounting');
     }
 
-
-    ///////////////////
-
-
-    function purchase()
-    {
-        return view('provider.purchase');
-    }
-
-
-
     function analyse()
     {
         $user = auth()->user();
         $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
-        return view('provider.analyse', compact('ps'));
-    }
-
-    function claim()
-    {
-        $user = auth()->user();
-        $entity = $user->entities()->first();
-        $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
-        return view('provider.claim', compact('ps'));
-    }
-
-    function delivery()
-    {
-        return view('provider.delivery');
-    }
-
-    function taxation()
-    {
-        return view('provider.taxation');
+        return view('logistics.analyse', compact('ps'));
     }
 }

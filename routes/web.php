@@ -3,20 +3,14 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\LogisticsWebController;
 use App\Http\Controllers\ProviderWebController;
+use App\Http\Controllers\StateWebController;
 use App\Http\Controllers\SudoWebController;
 use App\Http\Middleware\APP\LogisticsMiddleware;
 use App\Http\Middleware\APP\ProviderMiddleware;
+use App\Http\Middleware\APP\StateMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
-use App\Models\Delivery;
-use App\Models\Entity;
-use App\Models\Purchase;
-use App\Models\Rate;
-use App\Models\Sale;
-use App\Models\Structureprice;
-use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
@@ -32,76 +26,8 @@ Route::get('def', function () {
     if ('migrate' == $action) {
         Artisan::call('migrate', ['--seed' => true]);
     }
-
-    // foreach (Sale::all() as $e) {
-    //     $e->update([
-    //         'lata' => round($e->lata, 3),
-    //         'l15' => round($e->l15, 3),
-    //         'density' => round($e->density, 3),
-    //     ]);
-    // }
-    // foreach (Purchase::all() as $e) {
-    //     $e->update([
-    //         'qtytm' => round($e->qtytm, 3),
-    //         'qtym3' => round($e->qtym3, 3),
-    //         'density' => round($e->density, 3),
-    //     ]);
-    // }
-
-    // $entities = [
-    //     ['TOTAL', 'TOTAL ENERGIES SA', 'petrolier'],
-    //     ['ENGEN', 'ENGEN RDC SA', 'petrolier'],
-    //     ['COBIL', 'COBIL SA', 'petrolier'],
-    //     ['SONAHYDROC', 'Société Nationale des Hydrocarbures du Congo', 'petrolier'],
-    //     ['LEREXCOM', 'LEREXCOM', 'logisticien'],
-    //     ['SEP CONGO', 'SEP CONGO', 'logisticien'],
-    //     ['SPSA', 'SPSA COBIL', 'logisticien'],
-    //     ['SOCIR', 'SOCIR', 'logisticien'],
-    //     ['GPDPP', 'GPDPP', 'etatique'],
-    //     ['FEC', 'Fédération des Entreprises du Congo', 'etatique'],
-    //     ['MINECO', 'Ministère de l\'Économie', 'etatique'],
-    //     ['PRIMATURE', 'Primature (Cabinet du Premier Ministre)', 'etatique'],
-    //     ['PRESIDENCE', 'Présidence de la République', 'etatique'],
-    //     ['MINHYD', 'Ministère des Hydrocarbures', 'etatique'],
-    //     ['DGDA', 'Direction Générale des Douanes et Accises', 'etatique'],
-    //     ['DGI', 'Direction Générale des Impôts', 'etatique'],
-    //     ['AUTHENTIX', 'AUTHENTIX', 'etatique'],
-    // ];
-
-    // DB::statement("
-    //             ALTER TABLE users
-    //             MODIFY user_role ENUM('sudo', 'provider', 'petrolier', 'logisticien', 'etatique') NOT NULL
-    //         ");
-    // DB::transaction(function () use ($entities) {
-    //     User::where(['user_role' => 'provider'])->update(['user_role' => 'sudo']);
-    //     foreach ($entities as $el) {
-    //         User::where(['name' => $el[0]])->update(['user_role' => $el[2]]);
-    //     }
-    // });
-    // DB::statement("
-    //             ALTER TABLE users
-    //             MODIFY user_role ENUM('sudo', 'petrolier', 'logisticien', 'etatique') NOT NULL
-    //         ");
     $out = Artisan::output();
-
-    // DB::beginTransaction();
-    // $total = Entity::where('shortname', 'TOTAL')->first();
-    // $auth = Entity::where('shortname', 'AUTHENTIX')->first();
-
-    // $total->sales()->delete();
-    // $total->purchases()->delete();
-    // $total->structureprices()->delete();
-    // $total->rates()->delete();
-    // $total->deliveries()->delete();
-
-    // Sale::query()->update(['entity_id' => $total->id]);
-    // Purchase::query()->update(['entity_id' => $total->id]);
-    // Structureprice::query()->update(['entity_id' => $total->id]);
-    // Rate::query()->update(['entity_id' => $total->id]);
-    // Delivery::query()->update(['entity_id' => $total->id]);
-    // DB::commit();
-
-    echo (@$out);
+    echo ($out);
 });
 
 Route::get('', function () {
@@ -115,6 +41,9 @@ Route::get('', function () {
         }
         if ($role === 'logisticien') {
             return redirect(route('logistics.home'));
+        }
+        if ($role === 'etatique') {
+            return redirect(route('state.home'));
         }
     }
     return view('login');
@@ -152,11 +81,29 @@ Route::middleware('auth')->group(function () {
             // Route::get('purchase', 'purchase')->name('logistics.purchase');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('logistics.accounting');
-                    Route::get('analyse', 'analyse')->name('logistics.analyse');
+                Route::get('analyse', 'analyse')->name('logistics.analyse');
                 //     Route::get('claim', 'claim')->name('logistics.claim');
                 //     Route::get('delivery', 'delivery')->name('logistics.delivery');
                 //     Route::get('taxation', 'taxation')->name('logistics.taxation');
             });
+        });
+    });
+
+    Route::prefix('state')->middleware(StateMiddleware::class)->group(function () {
+        Route::controller(StateWebController::class)->group(function () {
+            Route::get('', 'home')->name('state.home');
+            Route::prefix('view/{entity}')->group(function () {
+                Route::get('sale', 'sale')->name('state.view.sale');
+                Route::get('purchase', 'purchase')->name('state.view.purchase');
+                Route::prefix('accounting')->group(function () {
+                    Route::get('', 'accounting')->name('state.view.accounting');
+                    Route::get('analyse', 'analyse')->name('state.view.analyse');
+                    Route::get('delivery', 'delivery')->name('state.view.delivery');
+                    //     Route::get('claim', 'claim')->name('state.view.claim');
+                    //     Route::get('taxation', 'taxation')->name('state.taxation');
+                });
+            });
+            // Route::get('apps', 'apps')->name('state.apps');
         });
     });
 });

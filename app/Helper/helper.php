@@ -338,16 +338,16 @@ function initfuelprice(Structureprice $structure)
     }
 }
 
-function userimg()
+function userimg(?User $user = null)
 {
     if (Auth::check()) {
-        $user = auth()->user();
+        $user = $user ?? auth()->user();
         $role = $user->user_role;
         $i = 'assets/images/avatar.png';
         if ($role === 'sudo') {
             return asset($i);
         }
-        if (in_array($role, ['petrolier', 'logisticien'])) {
+        if (in_array($role, ['petrolier', 'logisticien', 'etatique'])) {
             $e = $user->entities()->first()?->logo;
             if ($e) {
                 $i  = "storage/$e";

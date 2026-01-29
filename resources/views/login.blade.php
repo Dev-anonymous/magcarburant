@@ -127,10 +127,10 @@
                                 'p-1 text-center alert alert-success')
                             .show();
                         localStorage.setItem('_token', resp.token);
-                        setInterval(() => {
+                        setTimeout(() => {
                             $(':input', form).attr('disabled', true);
                         }, 800);
-                        setInterval(() => {
+                        setTimeout(() => {
                             location.reload();
                         }, 1000);
                     },

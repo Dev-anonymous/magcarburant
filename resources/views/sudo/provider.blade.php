@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <h2>Utilisateurs (<span nb></span>)</h2>
         <div class="d-flex justify-content-between">
-            <p class="lead">Gesion d'tilisateurs</p>
+            <p class="lead">Gesion d'utilisateurs</p>
             <div class="m-2">
                 <div class="d-flex">
                     <div class="mr-2">

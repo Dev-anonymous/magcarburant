@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Croisement des créances</h2>
-                <p class="lead small m-0">Analyse et Bilan Croisement des créances de tous les prodtuis et toutes les zones
+                <p class="lead small m-0">Analyse et Bilan Croisement des créances de tous les produits et toutes les zones
                 </p>
             </div>
             <div class="m-2">

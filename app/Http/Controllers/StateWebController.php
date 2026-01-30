@@ -15,98 +15,114 @@ class StateWebController extends Controller
         return view('state.choose', compact('entity', 'entities'));
     }
 
+    function apps(Entity $entity)
+    {
+        return view('state.views.apps', compact('entity'));
+    }
 
-    //////////
+    function purchase(Entity $entity)
+    {
+        return view('state.views.purchase', compact('entity'));
+    }
 
-    function accounting()
+    function sale(Entity $entity)
+    {
+        return view('state.views.sale', compact('entity'));
+    }
+
+    function delivery(Entity $entity)
+    {
+        return view('state.views.delivery', compact('entity'));
+    }
+
+
+    function accounting(Entity $entity)
     {
         $item = request('item');
-        if ($item == 'rtx') {
-            $user = auth()->user();
-            $entity = $user->entities()->first();
-            return view('common.rates', compact('entity'));
-        }
+        // if ($item == 'rtx') {
+        //     $user = auth()->user();
+        //     $entity = $user->entities()->first();
+        //     return view('common.rates', compact('entity'));
+        // }
 
-        if ($item == 'stx') {
-            $user = auth()->user();
-            $entity = $user->entities()->first();
-            return view('provider.structrates', compact('entity'));
-        }
+        // if ($item == 'stx') {
+        //     $user = auth()->user();
+        //     $entity = $user->entities()->first();
+        //     return view('provider.structrates', compact('entity'));
+        // }
 
-        if ($item == 'pricestr') {
-            $user = auth()->user();
-            $entity = $user->entities()->first();
-            return view('common.structprices', compact('entity'));
-        }
+        // if ($item == 'pricestr') {
+        //     $user = auth()->user();
+        //     $entity = $user->entities()->first();
+        //     return view('common.structprices', compact('entity'));
+        // }
 
         if ($item == 'gb') {
-            return view('provider.greatebook');
+            return view('state.views.greatebook', compact('entity'));
         }
 
-        if ($item == 'cc') {
-            return view('provider.greatebookCR');
-        }
+        // if ($item == 'cc') {
+        //     return view('provider.greatebookCR');
+        // }
 
-        if ($item == 'pf') {
-            return view('provider.greatebookparafisc');
-        }
+        // if ($item == 'pf') {
+        //     return view('provider.greatebookparafisc');
+        // }
 
-        $stx = request('stx');
-        if ($stx) {
-            $entity = auth()->user()->entities()->first();
-            $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
-            if ($structure) {
-                initfuelprice($structure);
-                $structure->refresh();
+        // $stx = request('stx');
+        // if ($stx) {
+        //     $entity = auth()->user()->entities()->first();
+        //     $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
+        //     if ($structure) {
+        //         initfuelprice($structure);
+        //         $structure->refresh();
 
-                $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
-                $aviation  = ['JET'];
-                $grouped = [
-                    'terrestre' => [],
-                    'aviation'  => [],
-                ];
-                foreach ($structure->fuelprices as $price) {
-                    $fuelName  = strtoupper($price->fuel->fuel);
-                    $zoneName  = $price->zone->zone;
-                    $labelName = $price->label->label;
-                    $labelTag  = $price->label->tag;
+        //         $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
+        //         $aviation  = ['JET'];
+        //         $grouped = [
+        //             'terrestre' => [],
+        //             'aviation'  => [],
+        //         ];
+        //         foreach ($structure->fuelprices as $price) {
+        //             $fuelName  = strtoupper($price->fuel->fuel);
+        //             $zoneName  = $price->zone->zone;
+        //             $labelName = $price->label->label;
+        //             $labelTag  = $price->label->tag;
 
-                    $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
+        //             $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
 
-                    if (!isset($grouped[$type][$zoneName][$fuelName])) {
-                        $grouped[$type][$zoneName][$fuelName] = [];
-                    }
+        //             if (!isset($grouped[$type][$zoneName][$fuelName])) {
+        //                 $grouped[$type][$zoneName][$fuelName] = [];
+        //             }
 
-                    $grouped[$type][$zoneName][$fuelName][$labelName] = [
-                        'id' => $price->id,
-                        'amount' => $price->amount,
-                        'tag'    => $labelTag,
-                    ];
-                }
+        //             $grouped[$type][$zoneName][$fuelName][$labelName] = [
+        //                 'id' => $price->id,
+        //                 'amount' => $price->amount,
+        //                 'tag'    => $labelTag,
+        //             ];
+        //         }
 
-                return view('common.strprices', compact('grouped', 'structure'));
-            }
-        }
-        return view('provider.apps-accounting');
+        //         return view('common.strprices', compact('grouped', 'structure'));
+        //     }
+        // }
+        return view('state.views.apps-accounting', compact('entity'));
     }
 
-    function purchase()
-    {
-        return view('provider.purchase');
-    }
-
-    function sale()
-    {
-        return view('provider.sale');
-    }
-
-    function analyse()
+    function analyse(Entity $entity)
     {
         $user = auth()->user();
-        $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
-        return view('provider.analyse', compact('ps'));
+        return view('state.views.analyse', compact('entity'));
     }
+
+
+    ////////// ///////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
     function claim()
     {
@@ -116,10 +132,7 @@ class StateWebController extends Controller
         return view('provider.claim', compact('ps'));
     }
 
-    function delivery()
-    {
-        return view('provider.delivery');
-    }
+
 
     function taxation()
     {

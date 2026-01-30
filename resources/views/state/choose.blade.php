@@ -48,13 +48,14 @@
     <div class="modal fade" id="mdlChose" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-body text-center p-5">
-                    <h4 class="mb-3">Sélectionner une société </h4>
+                <div class="modal-body text-center">
+                    <h4 class="my-3">Sélectionnez une société </h4>
                     <div class="my-3">
                         <div class="row">
                             @foreach ($entities as $el)
                                 <div class="col-md-6">
-                                    <div class="carte text-left" estyle="cursor: pointer;min-height: 145px">
+                                    <div class="carte text-left" entity="{{ $el->id }}"
+                                        style="cursor: pointer;min-height: 145px">
                                         <img src="{{ userimg($el->user) }}"
                                             style="border: 2px solid #ccc; width: 50px!important"
                                             class="img-fluid rounded-circle ml-1" />
@@ -93,6 +94,17 @@
             } else {
 
             }
-        })
+        });
+        $('[entity]').click(function() {
+            var entity = $(this).attr('entity');
+            if (entity) {
+                var href = '{{ route('state.view', ['entity' => 'DATA_ID']) }}/';
+                href = href.split('DATA_ID').join(entity);
+                setTimeout(() => {
+                    $('#mdlChose').modal('hide');
+                }, 300);
+                location.href = href;
+            }
+        });
     </script>
 @endsection

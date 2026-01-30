@@ -93,14 +93,15 @@ Route::middleware('auth')->group(function () {
         Route::controller(StateWebController::class)->group(function () {
             Route::get('', 'home')->name('state.home');
             Route::prefix('view/{entity}')->group(function () {
+                Route::get('', 'apps')->name('state.view');
                 Route::get('sale', 'sale')->name('state.view.sale');
                 Route::get('purchase', 'purchase')->name('state.view.purchase');
                 Route::prefix('accounting')->group(function () {
                     Route::get('', 'accounting')->name('state.view.accounting');
                     Route::get('analyse', 'analyse')->name('state.view.analyse');
                     Route::get('delivery', 'delivery')->name('state.view.delivery');
-                    //     Route::get('claim', 'claim')->name('state.view.claim');
-                    //     Route::get('taxation', 'taxation')->name('state.taxation');
+                    Route::get('claim', 'claim')->name('state.view.claim');
+                    Route::get('taxation', 'taxation')->name('state.view.taxation');
                 });
             });
             // Route::get('apps', 'apps')->name('state.apps');

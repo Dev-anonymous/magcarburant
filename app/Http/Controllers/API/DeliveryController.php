@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Delivery;
 use App\Models\Deliveryfile;
+use App\Models\Entity;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +22,12 @@ class DeliveryController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier','etatique']), 403, "No permission");
 
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
         }

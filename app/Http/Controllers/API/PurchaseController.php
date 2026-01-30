@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Entity;
 use App\Models\Purchase;
 use App\Models\Purchasefile;
 use Carbon\Carbon;
@@ -21,16 +22,16 @@ class PurchaseController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
-            // $entity = Entity::find(request('entity_id'));
         }
         abort_if(!$entity, 422, "No entity");
-        $purchases = $entity->purchases();
 
         $date = request('date');
         $date = explode(' to ', $date);
@@ -38,7 +39,7 @@ class PurchaseController extends Controller
         $from = @$date[0] ?? nnow()->toDateString();
         $to = @$date[1] ?? $from;
 
-        $purchases->whereBetween('date', [$from, $to]);
+        $purchases = $entity->purchases()->whereBetween('date', [$from, $to]);
 
         return DataTables::of($purchases)
             ->addIndexColumn()
@@ -183,9 +184,7 @@ class PurchaseController extends Controller
                 $colH = trim($row[7] ?? null); // qtym3
                 $colI = trim($row[8] ?? null); // density
 
-                $row = array_splice($row, 0, 9);
-
-                if (empty(array_filter($row))) {
+                if (empty(array_filter([$colA, $colB, $colC, $colD, $colE, $colF, $colG, $colH, $colI]))) {
                     continue;
                 }
 
@@ -214,7 +213,7 @@ class PurchaseController extends Controller
                 if (empty($colB)) {
                     $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner la zone";
                 } else {
-                    if (!in_array($colB, mainWays())) {
+                    if (!in_array(strtoupper($colB), mainWays())) {
                         $lineErrors[] = "Cellule B$rowNumber : La zone \"$colB\" n'est pas valide";
                     }
                 }
@@ -223,7 +222,7 @@ class PurchaseController extends Controller
                 if (empty($colC)) {
                     $lineErrors[] = "Cellule C$rowNumber : veuillez renseigner le nom du produit";
                 } else {
-                    if (!in_array($colC, mainfuels(), true)) {
+                    if (!in_array(strtoupper($colC), mainfuels(), true)) {
                         $lineErrors[] = "Cellule C$rowNumber : le produit \"$colC\" n'est pas reconnu";
                     }
                 }
@@ -258,8 +257,8 @@ class PurchaseController extends Controller
                 $insert[] = [
                     'entity_id' => $entity->id,
                     'date' => $colA,
-                    'way' => $colB,
-                    'product' => $colC,
+                    'way' => strtoupper($colB),
+                    'product' => strtoupper($colC),
                     'provider' => $colD,
                     'billnumber' => $colE,
                     'unitprice' => $colF,
@@ -283,7 +282,7 @@ class PurchaseController extends Controller
                 ], 422);
             }
 
-            Purchase::insertOrIgnore($insert);
+            Purchase::insert($insert);
 
             return response()->json([
                 'success' => true,

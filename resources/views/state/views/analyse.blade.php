@@ -5,8 +5,17 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Manque à Gagner des Sociétés Logistiques</h2>
-                <p class="lead small m-0">Analyse et Bilan MAG de tous les produits et toutes les zones </p>
+                @if ($entity->user->user_role == 'petrolier')
+                    <h2 class="font-weight-bold">Manque à Gagner des Sociétés Commerciales ({{ $entity->shortname }})</h2>
+                @elseif ($entity->user->user_role == 'logisticien')
+                    <h2 class="font-weight-bold">Manque à Gagner des Sociétés Logistiques ({{ $entity->shortname }})</h2>
+                @else
+                    @php
+                        dd('user role not found');
+                    @endphp
+                @endif
+                <p class="lead small m-0">Analyse et Bilan MAG de tous les produits et toutes les zones pour
+                    {{ $entity->shortname }} </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -29,7 +38,9 @@
                             $d2 = now()->toDateString();
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
-                            <input type="hidden" name="type" value="balancelog">
+                            <input type="hidden" name="type"
+                                value="{{ $entity->user->user_role === 'petrolier' ? 'balance' : 'balancelog' }}">
+                            <input type="hidden" name="entity_id" value="{{ $entity->id }}">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
                                 <input type="text" class="form-control flatpickr" id="dv222" name="date1"
@@ -147,7 +158,7 @@
                 data: data,
                 success: function(data) {
                     var h = `
-                    <h6 class='text-center font-weight-bold'>MANQUE A GAGNER SOCIETES LOGISTIQUES USD</h6>
+                    <h6 class='text-center font-weight-bold'>MANQUE A GAGNER SOCIETES COMMERCIALES USD</h6>
                     <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                     `;
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Label;
 use App\Models\Purchase;
@@ -21,7 +22,7 @@ class DataController extends Controller
 
         $type = request('type');
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
             if ($type === 'purchase') {
                 $date = request('date');
                 $date = explode(' to ', $date);
@@ -29,7 +30,11 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                $entity = $user->entities()->first();
+                if ($user->user_role == 'etatique') {
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    $entity = $user->entities()->first();
+                }
                 $base = $entity->purchases()->whereBetween('date', [$from, $to]);
 
                 $totalTm = v((clone $base)->sum('qtytm'));
@@ -61,7 +66,11 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                $entity = $user->entities()->first();
+                if ($user->user_role == 'etatique') {
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    $entity = $user->entities()->first();
+                }
                 $base = $entity->sales()->whereBetween('date', [$from, $to]);
                 $from_mutuality = request('from_mutuality');
 
@@ -118,7 +127,12 @@ class DataController extends Controller
                 $zones = (array) request('zones');
                 $fuels = (array) request('fuels');
 
-                $entity = $user->entities()->first();
+                if ($user->user_role == 'etatique') {
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    $entity = $user->entities()->first();
+                }
+
                 $base = $entity->deliveries()->whereBetween('date', [$from, $to]);
 
                 $labels = [];
@@ -936,7 +950,13 @@ class DataController extends Controller
         $items = request('items');
 
         $user = auth()->user();
-        $entity = $user->entities()->first();
+        if ($user->user_role == 'petrolier') {
+            $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
+        } else {
+            abort(403);
+        }
 
         $from = request('date1') ?? nnow()->toDateString();
         $to = request('date2') ?? nnow()->toDateString();
@@ -1516,7 +1536,13 @@ class DataController extends Controller
         $items = request('items');
 
         $user = auth()->user();
-        $entity = $user->entities()->first();
+        if ($user->user_role == 'logisticien') {
+            $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
+        } else {
+            abort(403);
+        }
 
         $from = request('date1') ?? nnow()->toDateString();
         $to = request('date2') ?? nnow()->toDateString();

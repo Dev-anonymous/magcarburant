@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Fiscalité & Parafiscalité</h2>
-                <p class="lead small m-0">Bilan fiscalité & parafiscalité de tous les prodtuis et toutes les zones </p>
+                <p class="lead small m-0">Bilan fiscalité & parafiscalité de tous les produits et toutes les zones </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">

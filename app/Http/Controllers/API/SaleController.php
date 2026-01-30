@@ -23,29 +23,29 @@ class SaleController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
-            // $entity = Entity::find(request('entity_id'));
         }
         abort_if(!$entity, 422, "No entity");
-        $sales = $entity->sales();
 
         $date = request('date');
         $date = explode(' to ', $date);
         $date = array_filter($date);
         $from = @$date[0] ?? nnow()->toDateString();
         $to = @$date[1] ?? $from;
-        $type = request('type');
+        $from_mutuality = request('from_mutuality');
 
-        $sales->whereBetween('date', [$from, $to]);
-        if ($type === "1") {
+        $sales = $entity->sales()->whereBetween('date', [$from, $to]);
+        if ($from_mutuality === "1") {
             $sales->where('from_mutuality', 1);
         }
-        if ($type === "0") {
+        if ($from_mutuality === "0") {
             $sales->where('from_mutuality', 0);
         }
 
@@ -206,9 +206,8 @@ class SaleController extends Controller
                 $colI = trim($row[8] ?? null);
                 $colJ = trim($row[9] ?? null);
                 $colK = trim($row[10] ?? null);
-                $row = array_splice($row, 0, 11);
 
-                if (empty(array_filter($row))) {
+                if (empty(array_filter([$colA, $colB, $colC, $colD, $colE, $colF, $colG, $colH, $colI, $colJ, $colK]))) {
                     continue;
                 }
 
@@ -294,7 +293,18 @@ class SaleController extends Controller
                     continue;
                 }
 
-                $insert[] = $ins = [
+                if (Sale::where([
+                    'way' => $colD,
+                    'product' => $colE,
+                    'delivery_note' => $colF,
+                    'delivery_program' => $colG,
+                    'entity_id' => $entity->id,
+                ])->exists()) {
+                    $errors[] = "La ligne $rowNumber existe déjà dans l'application.";
+                    continue;
+                }
+
+                $ins = [
                     'entity_id'        => $entity->id,
                     'date'             => $colA,
                     'terminal'         => $colB,
@@ -308,8 +318,8 @@ class SaleController extends Controller
                     'l15'              => $colJ,
                     'density'          => $colK,
                 ];
-
-                $sale = Sale::updateOrCreate(['delivery_note' => $colF], $ins);
+                $sale = Sale::create($ins);
+                $insert[] = $ins;
 
                 if (strtoupper($colD) == 'OUEST') {
                     if ($entity->user->user_role == 'logisticien') {
@@ -322,7 +332,7 @@ class SaleController extends Controller
                                     $ins['parent_id'] = $sale->id;
                                     $ins['from_mutuality'] = 1;
                                     $ins['entity_id'] = $ent->id;
-                                    Sale::insertOrIgnore($ins);
+                                    Sale::create($ins);
                                 }
                             }
                         }
@@ -330,9 +340,8 @@ class SaleController extends Controller
                 }
             }
 
-            DB::commit();
-
             if (count($errors)) {
+                DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => implode('<br/>', $errors),
@@ -340,6 +349,7 @@ class SaleController extends Controller
             }
 
             if (!count($insert)) {
+                DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => "Aucune ligne n'a été importée. Veuillez remplir le fichier excel en commençant par la cellule A2.",
@@ -347,6 +357,7 @@ class SaleController extends Controller
             }
 
             // Sale::insertOrIgnore($insert);
+            DB::commit();
 
             return response()->json([
                 'success' => true,

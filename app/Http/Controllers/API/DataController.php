@@ -232,7 +232,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => $ti->label,
                         'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $t0 = 0;
@@ -242,7 +242,7 @@ class DataController extends Controller
                         $line0[] = [
                             'label' => v($v),
                             'class' => 'title1',
-                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
+                            'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
                             'title' => "Afficher les valeurs $ti->label de la zone $z",
                         ];
                         $t0 += $v;
@@ -255,7 +255,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($t0),
                         'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $rows[] = $line0;
@@ -265,7 +265,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => "TOTAL GENERAL",
                     'class' => 'title1',
-                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $t0 = 0;
@@ -274,7 +274,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($v),
                         'class' => 'title1',
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
                         'title' => "Afficher le Total de la zone $z",
                     ];
                     $t0 += $v;
@@ -283,7 +283,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($t0),
                     'class' => 'title1',
-                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $rows[] = $line0;
@@ -293,7 +293,13 @@ class DataController extends Controller
             }
 
             if ($type === 'balancecr') {
-                $entity = $user->entities()->first();
+                if ($user->user_role == 'petrolier') {
+                    $entity = $user->entities()->first();
+                } else if ($user->user_role == 'etatique') {
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    abort(403);
+                }
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -881,7 +887,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => $ti->label,
                         'class' => 'title1',
-                        'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $t0 = 0;
@@ -891,7 +897,7 @@ class DataController extends Controller
                         $line0[] = [
                             'label' => v($v),
                             'class' => 'title1',
-                            'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
+                            'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
                             'title' => "Afficher les valeurs $ti->label de la zone $z",
                         ];
                         $t0 += $v;
@@ -904,7 +910,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($t0),
                         'class' => 'title1',
-                        'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $rows[] = $line0;
@@ -914,7 +920,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => "TOTAL GENERAL",
                     'class' => 'title1',
-                    'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $t0 = 0;
@@ -923,7 +929,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($v),
                         'class' => 'title1',
-                        'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
                         'title' => "Afficher le Total de la zone $z",
                     ];
                     $t0 += $v;
@@ -932,7 +938,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($t0),
                     'class' => 'title1',
-                    'href' => route('logistics.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $rows[] = $line0;
@@ -1156,7 +1162,13 @@ class DataController extends Controller
         $items = request('items');
 
         $user = auth()->user();
-        $entity = $user->entities()->first();
+        if ($user->user_role == 'petrolier') {
+            $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
+        } else {
+            abort(403);
+        }
 
         $from = request('date1') ?? nnow()->toDateString();
         $to = request('date2') ?? nnow()->toDateString();;

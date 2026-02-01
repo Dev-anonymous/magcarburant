@@ -173,6 +173,7 @@
                 data: function(d) {
                     d.entity_id = '{{ @$entity->id }}';
                     d.date = $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val();
+                    d.from_mutuality = $('#from_mutuality').val();
                 }
             },
             order: [
@@ -320,6 +321,7 @@
                 url: '{{ route('dashboard') }}',
                 data: {
                     type: 'sale',
+                    from_mutuality: $('#from_mutuality').val(),
                     entity_id: '{{ @$entity->id }}',
                     date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },

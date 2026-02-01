@@ -111,8 +111,12 @@ class StateWebController extends Controller
     function analyse(Entity $entity)
     {
         $user = auth()->user();
-        $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('state.views.analyse', compact('entity'));
+    }
+
+    function claim(Entity $entity)
+    {
+        return view('state.views.claim', compact('entity'));
     }
 
 
@@ -124,13 +128,7 @@ class StateWebController extends Controller
 
 
 
-    function claim()
-    {
-        $user = auth()->user();
-        $entity = $user->entities()->first();
-        $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
-        return view('provider.claim', compact('ps'));
-    }
+
 
 
 

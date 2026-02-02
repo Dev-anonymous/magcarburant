@@ -40,15 +40,6 @@
                                     value="{{ $d2 }}" style="min-width:120px;">
                             </div>
                             <div class="form-group mb-1">
-                                <label for="items" class="control-label d-block mb-0">Items</label>
-                                <select name="items" id="items" class="form-control select2" style="min-width:150px;">
-                                    <option value="">Tous</option>
-                                    @foreach (itemslog() as $e)
-                                        <option value="{{ $e->val }}">{{ $e->label }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group mb-1">
                                 <label for="zone" class="control-label d-block mb-0">Zone</label>
                                 <select name="zone[]" id="zone" class="form-control" multiple
                                     style="min-width:150px;">

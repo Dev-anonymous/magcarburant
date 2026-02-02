@@ -1711,24 +1711,41 @@ class DataController extends Controller
         $errors = array_values(array_unique($errors));
 
         $indexes = null;
-        if ($items == 'item1') {
-            // Colonnes 0 à 20
-            $indexes = range(0, 20);
-        }
 
-        if ($items == 'item2') {
-            // Colonnes 0 à 19 + 21
-            $indexes = array_merge(range(0, 19), [21]);
-        }
+        if ($user->user_role === 'logisticien') {
+            $name = $user->entities()->first()?->shortname;
+            if ($name == 'SEP CONGO') {
+                $indexes = array_merge(range(0, 15), [17, 21]);
+            }
+            if ($name == 'LEREXCOM') {
+                $indexes = array_merge(range(0, 15), [19, 23]);
+            }
+            if ($name == 'SPSA') {
+                $indexes = array_merge(range(0, 15), [18, 22]);
+            }
+            if ($name == 'SOCIR') {
+                $indexes = array_merge(range(0, 15), [16, 20]);
+            }
+        } else if ($user->user_role == 'etatique') {
+            if ($items == 'item1') {
+                // Colonnes 0 à 20
+                $indexes = range(0, 20);
+            }
 
-        if ($items == 'item3') {
-            // Colonnes 0 à 19 + 22
-            $indexes = array_merge(range(0, 19), [22]);
-        }
+            if ($items == 'item2') {
+                // Colonnes 0 à 19 + 21
+                $indexes = array_merge(range(0, 19), [21]);
+            }
 
-        if ($items == 'item4') {
-            // Colonnes 0 à 19 + 23
-            $indexes = array_merge(range(0, 19), [23]);
+            if ($items == 'item3') {
+                // Colonnes 0 à 19 + 22
+                $indexes = array_merge(range(0, 19), [22]);
+            }
+
+            if ($items == 'item4') {
+                // Colonnes 0 à 19 + 23
+                $indexes = array_merge(range(0, 19), [23]);
+            }
         }
 
         if ($indexes !== null) {

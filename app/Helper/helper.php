@@ -404,6 +404,32 @@ function itemsPara()
 
 function itemslog()
 {
+    $user = auth()->user();
+    if ($user->user_role === 'logisticien') {
+        $name = $user->entities()->first()?->shortname;
+        if ($name == 'SEP CONGO') {
+            return  [
+                (object)['label' => 'PMAG CHANGE SEP CONGO', 'val' => 'item2'],
+            ];
+        }
+        if ($name == 'LEREXCOM') {
+            return  [
+                (object)['label' => 'PMAG CHANGE LEREXCOM ', 'val' => 'item4'],
+            ];
+        }
+        if ($name == 'SPSA') {
+            return  [
+                (object)['label' => 'PMAG CHANGE SPSA-COBIL', 'val' => 'item3'],
+            ];
+        }
+        if ($name == 'SOCIR') {
+            return  [
+                (object)['label' => 'PMAG CHANGE SOCIR', 'val' => 'item1'],
+            ];
+        }
+        return [];
+    }
+
     return  [
         (object)['label' => 'PMAG CHANGE SOCIR', 'val' => 'item1'],
         (object)['label' => 'PMAG CHANGE SEP CONGO', 'val' => 'item2'],

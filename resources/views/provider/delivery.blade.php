@@ -540,10 +540,10 @@
         var date2 = '{{ request('date2') }}';
         var fuel = '{{ request('fuel') }}';
         if (date1.length) {
-            $('[name="date1"]').val(date1).change();
+            $('[name="date1"]')[0]._flatpickr.setDate(date1, true);
         }
         if (date2.length) {
-            $('[name="date2"]').val(date2).change();
+            $('[name="date2"]')[0]._flatpickr.setDate(date2, true);
         }
         if (fuel.length) {
             $('[name="fuel[]"]').val([fuel]).change();

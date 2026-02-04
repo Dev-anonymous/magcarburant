@@ -18,12 +18,14 @@ class Structureprices extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['sudo', 'petrolier', 'logisticien']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['sudo', 'petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity = $user->entities()->first();
+        } elseif (in_array($user->user_role, ['etatique'])) {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
-            $entity = Entity::find(request('entity_id'));
+            abort(403);
         }
         abort_if(!$entity, 422, "No entity");
         $structureprices = $entity->structureprices;
@@ -39,13 +41,16 @@ class Structureprices extends Controller
             ->addColumn('tx', function ($row) {
                 return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
-            ->addColumn('view', function ($row) use ($user) {
+            ->addColumn('view', function ($row) use ($user, $entity) {
+                $param = ['stx' => $row->id];
                 if ($user->user_role == 'petrolier') {
-                    $href = route('provider.accounting', ['stx' => $row->id]);
+                    $href = route('provider.accounting', $param);
                 } elseif ($user->user_role == 'logisticien') {
-                    $href = route('logistics.accounting', ['stx' => $row->id]);
+                    $href = route('logistics.accounting', $param);
+                } elseif ($user->user_role == 'etatique') {
+                    $href = route('state.view.accounting', array_merge(['entity' => $entity->id], $param));
                 } else {
-                    $href = route('sudo.provider', ['stx' => $row->id]);
+                    $href = route('sudo.provider', $param);
                 }
                 $t = "<a class='btn btn-sm btn-primary' href='$href'>
                         <i class='material-icons md-14 align-middle'>settings</i>

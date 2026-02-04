@@ -102,14 +102,14 @@
                                             </div>
                                             <div class="">
                                                 {{-- @if (empty($structure->to)) --}}
-                                                {{-- @if (auth()->user()->user_role == 'petrolier') --}}
+                                                @if (in_array(auth()->user()->user_role, ['logisticien', 'petrolier']))
                                                     <div class="text-right">
                                                         <button class="btn btn-sm btn-edit-table">
                                                             <i class="material-icons md-18">edit</i>
                                                             Modifier les prix
                                                         </button>
                                                     </div>
-                                                {{-- @endif --}}
+                                                @endif
                                                 {{-- @endif --}}
                                             </div>
                                         </div>

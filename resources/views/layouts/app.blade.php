@@ -34,13 +34,24 @@
                                     @if (Route::is('provider.accounting') ||
                                             Route::is('provider.analyse') ||
                                             Route::is('logistics.accounting') ||
-                                            Route::is('logistics.analyse'))
+                                            Route::is('logistics.analyse') ||
+                                            Route::is('state.view.accounting') ||
+                                            Route::is('state.view.analyse'))
                                         @php
-                                            $islog = auth()->user()->user_role == 'logisticien';
-                                            $lab = $islog ? 'logistics' : 'provider';
+                                            $role = auth()->user()->user_role;
+                                            $param = [];
+                                            if ($role == 'logisticien') {
+                                                $lab = 'logistics';
+                                            } elseif ($role == 'petrolier') {
+                                                $lab = 'provider';
+                                            } elseif ($role == 'etatique') {
+                                                $lab = 'state.view';
+                                                $entity = request()->route('entity');
+                                                $param = ['entity' => $entity->id];
+                                            }
                                         @endphp
                                         <li class="nav-item dropdown nav-language d-flex align-items-center">
-                                            <a href="{{ route("$lab.analyse") }}" class="nav-link"
+                                            <a href="{{ route("$lab.analyse", $param) }}" class="nav-link"
                                                 aria-expanded="false">
                                                 <i class="material-icons md-18 align-middle">trending_up</i>
                                                 MAG
@@ -51,10 +62,10 @@
                                                 Configuration
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                <ul class="list-unstyled">
-                                                    <small class="font-italic text-muted ml-2">Gestions des prix</small>
+                                                <ul class="list-unstyle">
+                                                    <small class="font-italic text-muted ml-2">Gestion des prix</small>
                                                     <li>
-                                                        <a href="{{ route("$lab.accounting", ['item' => 'pricestr']) }}"
+                                                        <a href="{{ route("$lab.accounting", array_merge(['item' => 'pricestr'], $param)) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">
@@ -64,9 +75,9 @@
                                                             Structure des prix
                                                         </a>
                                                     </li>
-                                                    <small class="font-italic text-muted ml-2">Gestions des taux</small>
+                                                    <small class="font-italic text-muted ml-2">Gestion des taux</small>
                                                     <li>
-                                                        <a href="{{ route("$lab.accounting", ['item' => 'rtx']) }}"
+                                                        <a href="{{ route("$lab.accounting", array_merge(['item' => 'rtx'], $param)) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">
@@ -77,7 +88,7 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ route("$lab.accounting", ['item' => 'stx']) }}"
+                                                        <a href="{{ route("$lab.accounting", array_merge(['item' => 'stx'], $param)) }}"
                                                             class="dropdown-item d-flex">
                                                             <svg xmlns="http://www.w3.org/2000/svg" height="18px"
                                                                 viewBox="0 -960 960 960" width="18px" fill="#000000">

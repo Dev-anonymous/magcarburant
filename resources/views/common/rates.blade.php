@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Taux Réels | {{ $entity->shortname }} </h2>
-                <p class="lead small m-0">Gestion des taux réels</p>
+                <p class="lead small m-0">Historique des taux réels pour {{ $entity->shortname }}</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -26,14 +26,14 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
-                        {{-- @if (auth()->user()->user_role === 'petrolier') --}}
+                        @if (auth()->user()->user_role === 'petrolier')
                             <div class="">
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                     <i class="material-icons md-24">add_circle_outline</i>
                                     Nouveau taux
                                 </button>
                             </div>
-                        {{-- @endif --}}
+                        @endif
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
@@ -222,7 +222,7 @@
                 url: '{{ route('rate.index') }}',
                 data: function(d) {
                     d.entity_id = '{{ $entity->id }}';
-                    d.type = 'RÉEL';
+                    // d.type = 'RÉEL';
                 }
             },
             order: [

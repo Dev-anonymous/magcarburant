@@ -39,72 +39,65 @@ class StateWebController extends Controller
     function accounting(Entity $entity)
     {
         $item = request('item');
-        // if ($item == 'rtx') {
-        //     $user = auth()->user();
-        //     $entity = $user->entities()->first();
-        //     return view('common.rates', compact('entity'));
-        // }
+        if ($item == 'rtx') {
+            return view('state.views.rrates', compact('entity'));
+        }
 
-        // if ($item == 'stx') {
-        //     $user = auth()->user();
-        //     $entity = $user->entities()->first();
-        //     return view('provider.structrates', compact('entity'));
-        // }
+        if ($item == 'stx') {
+            return view('state.views.strates', compact('entity'));
+        }
 
-        // if ($item == 'pricestr') {
-        //     $user = auth()->user();
-        //     $entity = $user->entities()->first();
-        //     return view('common.structprices', compact('entity'));
-        // }
+        if ($item == 'pricestr') {
+            return view('state.views.structprices', compact('entity'));
+        }
 
         if ($item == 'gb') {
             return view('state.views.greatebook', compact('entity'));
         }
 
-        // if ($item == 'cc') {
-        //     return view('provider.greatebookCR');
-        // }
+        if ($item == 'cc') {
+            return view('state.views.greatebookCR', compact('entity'));
+        }
 
-        // if ($item == 'pf') {
-        //     return view('provider.greatebookparafisc');
-        // }
+        if ($item == 'pf') {
+            return view('state.views.greatebookparafisc', compact('entity'));
+        }
 
-        // $stx = request('stx');
-        // if ($stx) {
-        //     $entity = auth()->user()->entities()->first();
-        //     $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
-        //     if ($structure) {
-        //         initfuelprice($structure);
-        //         $structure->refresh();
+        $stx = request('stx');
+        if ($stx) {
+            $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
+            if ($structure) {
+                initfuelprice($structure);
+                $structure->refresh();
 
-        //         $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
-        //         $aviation  = ['JET'];
-        //         $grouped = [
-        //             'terrestre' => [],
-        //             'aviation'  => [],
-        //         ];
-        //         foreach ($structure->fuelprices as $price) {
-        //             $fuelName  = strtoupper($price->fuel->fuel);
-        //             $zoneName  = $price->zone->zone;
-        //             $labelName = $price->label->label;
-        //             $labelTag  = $price->label->tag;
+                $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
+                $aviation  = ['JET'];
+                $grouped = [
+                    'terrestre' => [],
+                    'aviation'  => [],
+                ];
+                foreach ($structure->fuelprices as $price) {
+                    $fuelName  = strtoupper($price->fuel->fuel);
+                    $zoneName  = $price->zone->zone;
+                    $labelName = $price->label->label;
+                    $labelTag  = $price->label->tag;
 
-        //             $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
+                    $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
 
-        //             if (!isset($grouped[$type][$zoneName][$fuelName])) {
-        //                 $grouped[$type][$zoneName][$fuelName] = [];
-        //             }
+                    if (!isset($grouped[$type][$zoneName][$fuelName])) {
+                        $grouped[$type][$zoneName][$fuelName] = [];
+                    }
 
-        //             $grouped[$type][$zoneName][$fuelName][$labelName] = [
-        //                 'id' => $price->id,
-        //                 'amount' => $price->amount,
-        //                 'tag'    => $labelTag,
-        //             ];
-        //         }
+                    $grouped[$type][$zoneName][$fuelName][$labelName] = [
+                        'id' => $price->id,
+                        'amount' => $price->amount,
+                        'tag'    => $labelTag,
+                    ];
+                }
 
-        //         return view('common.strprices', compact('grouped', 'structure'));
-        //     }
-        // }
+                return view('common.strprices', compact('grouped', 'structure'));
+            }
+        }
         return view('state.views.apps-accounting', compact('entity'));
     }
 
@@ -119,21 +112,8 @@ class StateWebController extends Controller
         return view('state.views.claim', compact('entity'));
     }
 
-
-    ////////// ///////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-    function taxation()
+    function taxation(Entity $entity)
     {
-        return view('provider.taxation');
+        return view('state.views.taxation', compact('entity'));
     }
 }

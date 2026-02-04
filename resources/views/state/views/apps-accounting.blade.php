@@ -3,7 +3,7 @@
 @section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
-        <h2 class="font-weight-bold">Comptabilité ({{ $entity->shortname }})</h2>
+        <h2 class="font-weight-bold">Comptabilité | {{ $entity->shortname }}</h2>
         <p class="lead small m-0">Toute la partie fiscalité & comptabilité pour {{ $entity->shortname }} </p>
         <hr />
 

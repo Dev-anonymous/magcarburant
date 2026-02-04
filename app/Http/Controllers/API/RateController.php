@@ -19,16 +19,17 @@ class RateController extends Controller
     {
         $user = auth()->user();
         $type = request('type');
-        $isTx = true;
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity = $user->entities()->first();
-            abort_if(!$entity, 422, "No entity");
-            if ($type == 'structure') {
-                $data = $entity->structureprices();
-                $isTx = false;
+        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                $entity = $user->entities()->first();
+            } elseif (in_array($user->user_role, ['etatique'])) {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
-                $data = $entity->rates();
+                abort(403);
             }
+            abort_if(!$entity, 422, "No entity");
+            $data = $entity->rates();
+            // }
         } else if ($user->user_role === 'sudo') {
             // $entity = Entity::find(request('entity_id'));
             // if ($type == 'structure') {
@@ -53,7 +54,7 @@ class RateController extends Controller
             ->addColumn('rate', function ($row) {
                 return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
-            ->addColumn('action', function ($row) use ($user, $type, $isTx) {
+            ->addColumn('action', function ($row) use ($user, $type) {
                 $data = e(json_encode([
                     'id' => $row->id,
                     'from' => $row->from->format('Y-m-d'),

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Entity;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -14,9 +15,14 @@ class TxStructure extends Controller
     public function index()
     {
         $user = auth()->user();
-        $isTx = true;
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity = $user->entities()->first();
+        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                $entity = $user->entities()->first();
+            } elseif (in_array($user->user_role, ['etatique'])) {
+                $entity  = Entity::findOrFail(request('entity_id'));
+            } else {
+                abort(403);
+            }
             abort_if(!$entity, 422, "No entity");
             $data = $entity->structureprices();
         } else {

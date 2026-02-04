@@ -5,8 +5,8 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Ventes ({{ $entity->shortname }}) </h2>
-                <p class="lead small m-0">Historiques des ventes (sorties) pour ({{ $entity->shortname }}) </p>
+                <h2 class="font-weight-bold">Ventes | {{ $entity->shortname }} </h2>
+                <p class="lead small m-0">Historiques des ventes (sorties) pour | {{ $entity->shortname }} </p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">

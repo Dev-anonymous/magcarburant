@@ -461,18 +461,17 @@ function incr(&$tab, $key,  $val)
     $tab[$key] = $v;
 }
 
-function gb_href($params)
+function gb_href($params, $route = null)
 {
     $user = auth()->user();
-
     if ($user->user_role === 'petrolier') {
-        $href = route('provider.accounting', $params);
+        $href = route($route ? "provider.$route" : 'provider.accounting', $params);
     } elseif ($user->user_role === 'logisticien') {
         $href = route('logistics.accounting', $params);
     } elseif ($user->user_role === 'etatique') {
         $entity  = Entity::findOrFail(request('entity_id'));
         $params = array_merge(['entity' => $entity->id], $params);
-        $href = route('state.view.accounting', $params);
+        $href = route($route ? "state.view.$route" : 'state.view.accounting', $params);
     } else {
         abort(422, "Invalid role !");
     }

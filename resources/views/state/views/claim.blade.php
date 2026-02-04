@@ -5,7 +5,7 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Croisement des créances ({{ $entity->shortname }})</h2>
+                <h2 class="font-weight-bold">Croisement des créances | {{ $entity->shortname }}</h2>
                 <p class="lead small m-0">Analyse et Bilan Croisement des créances de tous les produits et toutes les zones pour {{ $entity->shortname }}
                 </p>
             </div>

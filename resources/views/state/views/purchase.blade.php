@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Achats ({{ $entity->shortname }}) </h2>
+                <h2 class="font-weight-bold">Achats | {{ $entity->shortname }} </h2>
                 <p class="lead small m-0">Historique des achats (entrées) pour {{ $entity->shortname }} </p>
             </div>
             <div class="m-2">

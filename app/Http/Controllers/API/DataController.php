@@ -390,7 +390,7 @@ class DataController extends Controller
                     $tot += $t;
                     $line0[] = [
                         'label' => v($t),
-                        'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
                         'title' => "Somme de $lb du produit $fuel pour les zones : " . implode(', ', $zones),
                     ];
                 }
@@ -398,7 +398,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($tot),
                     'class' => 'title1',
-                    'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails PMAG de toutes les zones",
                 ];
 
@@ -413,7 +413,7 @@ class DataController extends Controller
                         $line00[] = [
                             'label' => "TOTAL PMAG",
                             'class' => 'title1',
-                            'href' => route('provider.accounting', ['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                            'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
                             'title' => "Afficher les détails PMAG de toutes les zones",
                         ];
                         continue;
@@ -429,7 +429,7 @@ class DataController extends Controller
                 $line0 = [];
                 $line0[] = [
                     'label' => 'LIVRAISONS EXCÉDENTAIRES',
-                    'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['date1' => request('date1'), 'date2' => request('date2')], 'delivery'),
                     'title' => "Afficher les détails",
                 ];
 
@@ -441,7 +441,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($delivery),
                         'title' => "Somme LATA des livraisons excédentaires du produit $fuel pour les zones : " . implode(', ', $zones),
-                        'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                        'href' => gb_href(['date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel], 'delivery'),
                         'title' => "Afficher les détails des livraisons excédentaires du prduit $fuel",
                     ];
                     incr($tabVar, "livr_excedent_$fuel", $delivery);
@@ -449,7 +449,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($tot),
                     'title' => "Total LATA des livraisons excédentaires des produits.",
-                    'href' => route('provider.delivery', ['date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['date1' => request('date1'), 'date2' => request('date2')], 'delivery'),
                     'title' => "Afficher les détails",
 
                 ];
@@ -711,7 +711,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => "TOTAL PARA FISCALITE",
                     'class' => "title1",
-                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails para fiscalité.",
                 ];
                 $tot = 0;
@@ -721,14 +721,14 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($v),
                         'class' => "title1",
-                        'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'href' => gb_href(['item' => 'pf', 'el' => 'item1', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
                         'title' => "Afficher les détails para fiscalité du produit $fuel.",
                     ];
                 }
                 $line0[] = [
                     'label' => v($tot),
                     'class' => "title1",
-                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails para fiscalité.",
                 ];
                 $rows[] = $line0;
@@ -755,7 +755,7 @@ class DataController extends Controller
                     $line0 = [];
                     $line0[] = [
                         'label' => $ti,
-                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                        // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                         // 'title' => "Afficher les détails de tous les produits.",
                     ];
 
@@ -781,14 +781,14 @@ class DataController extends Controller
                         $line0[] = [
                             'label' => v($t),
                             'title' => "Montant $ti du produit $fuel",
-                            // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                            // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
                             // 'title' => "Afficher les détails pour le produit $fuel.",
                         ];
                     }
                     $line0[] = [
                         'label' => v($tot),
                         'title' => "Total Montant $ti des produits.",
-                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                        // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                     ];
                     $rows[] = $line0;
                 }
@@ -797,7 +797,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => "TOTAL FISCALITE",
                     'class' => "title1",
-                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails fiscalité.",
                 ];
                 $tot = 0;
@@ -807,14 +807,14 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($v),
                         'class' => "title1",
-                        'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'href' => gb_href(['item' => 'pf', 'el' => 'item2', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
                         'title' => "Afficher les détails fiscalité du produit $fuel.",
                     ];
                 }
                 $line0[] = [
                     'label' => v($tot),
                     'class' => "title1",
-                    'href' => route('provider.accounting', ['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails fiscalité.",
                 ];
                 $rows[] = $line0;
@@ -1308,7 +1308,14 @@ class DataController extends Controller
         $items = request('items');
 
         $user = auth()->user();
-        $entity = $user->entities()->first();
+        if ($user->user_role == 'petrolier') {
+            $entity = $user->entities()->first();
+        } else if ($user->user_role == 'etatique') {
+            $entity  = Entity::findOrFail(request('entity_id'));
+            $isetatik = true;
+        } else {
+            abort(403);
+        }
 
         $from = request('date1') ?? nnow()->toDateString();
         $to = request('date2') ?? nnow()->toDateString();

@@ -469,11 +469,27 @@ function gb_href($params, $route = null)
     } elseif ($user->user_role === 'logisticien') {
         $href = route('logistics.accounting', $params);
     } elseif ($user->user_role === 'etatique') {
+        $mode = request()->header('x-page-mode', 'view');
         $entity  = Entity::findOrFail(request('entity_id'));
-        $params = array_merge(['entity' => $entity->id], $params);
-        $href = route($route ? "state.view.$route" : 'state.view.accounting', $params);
+        $params = array_merge(['entity' => $entity->id, 'mode' => $mode], $params);
+        $href = route($route ? "state.$route" : 'state.accounting', $params);
     } else {
         abort(422, "Invalid role !");
     }
     return $href;
+}
+
+
+function state_route(string $name, $entity)
+{
+    $mode = request()->route('mode') ?? 'view';
+    $params = [
+        'mode'   => $mode,
+        'entity' => $entity,
+    ];
+    if (is_array($entity)) {
+        unset($params['entity']);
+        $params = [...$params, ...$entity];
+    }
+    return route("state.$name", $params);
 }

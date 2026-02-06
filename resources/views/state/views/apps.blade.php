@@ -23,7 +23,7 @@
             @if ($entity->user->user_role == 'petrolier')
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.purchase', $entity->id) }}')">
+                        onclick="location.assign('{{ state_route('purchase', $entity) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path
@@ -38,7 +38,7 @@
             @endif
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('state.view.sale', $entity->id) }}')">
+                    onclick="location.assign('{{ state_route('sale', $entity) }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -53,7 +53,7 @@
             @if ($entity->user->user_role == 'petrolier')
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.delivery', $entity->id) }}')">
+                        onclick="location.assign('{{ state_route('delivery', $entity) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path
@@ -68,7 +68,7 @@
             @endif
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('state.view.accounting', $entity->id) }}')">
+                    onclick="location.assign('{{ state_route('accounting', $entity) }}')">
                     <div class="w-100">
                         <div class="d-flex align-items-center">
                             <span class="material-icons md-48 ml-2">account_balance</span>
@@ -78,9 +78,9 @@
                             </div>
                         </div>
                         {{-- <div class="text-center">
-                            <a href="{{ route('state.view.rates') }}">Taux réels</a>
+                            <a href="{{ state_route('rates') }}">Taux réels</a>
                             <span>|</span>
-                            <a href="{{ route('state.view.prices') }}">Structures des prix</a>
+                            <a href="{{ state_route('prices') }}">Structures des prix</a>
                         </div> --}}
                     </div>
                 </div>

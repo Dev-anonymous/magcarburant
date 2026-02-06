@@ -41,12 +41,11 @@
                 drawer?.mdkDrawer?.close();
             }, 0);
         });
-
         $.ajaxSetup({
             headers: {
-                // 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Authorization': 'Bearer ' + localStorage.getItem('_token'),
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'x-page-mode': '{{ $mode }}'
             }
         });
 

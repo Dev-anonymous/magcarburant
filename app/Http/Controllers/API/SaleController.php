@@ -66,7 +66,7 @@ class SaleController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) use ($entity) {
+            ->addColumn('action', function ($row) use ($user) {
                 $eb = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
@@ -105,9 +105,9 @@ class SaleController extends Controller
                     $t = '';
                 }
 
-                // if ($user->user_role == 'petrolier') {
-                return $t;
-                // }
+                if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                    return $t;
+                }
             })
             ->rawColumns(['action', 'salefile'])
             ->make(true);

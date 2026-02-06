@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('state.view.analyse', $entity->id) }}')">
+                    onclick="location.assign('{{ state_route('analyse', $entity) }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -24,7 +24,7 @@
             </div>
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('state.view.accounting', ['item' => 'gb', 'entity' => $entity->id]) }}')">
+                    onclick="location.assign('{{ state_route('accounting', ['item' => 'gb', 'entity' => $entity->id]) }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -38,7 +38,7 @@
             @if ($entity->user->user_role == 'petrolier')
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.claim', $entity->id) }}')">
+                        onclick="location.assign('{{ state_route('claim', $entity) }}')">
                         <div class="w-100">
                             <div class="d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
@@ -56,7 +56,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.accounting', ['item' => 'cc', 'entity' => $entity->id]) }}')">
+                        onclick="location.assign('{{ state_route('accounting', ['item' => 'cc', 'entity' => $entity->id]) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path
@@ -69,7 +69,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.taxation', $entity->id) }}')">
+                        onclick="location.assign('{{ state_route('taxation', $entity) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path
@@ -83,7 +83,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ route('state.view.accounting', ['item' => 'pf', 'entity' => $entity->id]) }}')">
+                        onclick="location.assign('{{ state_route('accounting', ['item' => 'pf', 'entity' => $entity->id]) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path

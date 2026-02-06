@@ -50,6 +50,7 @@
             <div class="modal-content">
                 <div class="modal-body text-center">
                     <h4 class="my-3">Sélectionnez une société </h4>
+                    <input type="hidden" id="navmode">
                     <div class="my-3">
                         <div class="row">
                             @foreach ($entities as $el)
@@ -89,16 +90,22 @@
     <script>
         $('[mode]').click(function() {
             var mode = $(this).attr('mode');
-            if ('view' == mode) {
-                $('#mdlChose').modal('show');
-            } else {
-
-            }
+            $('#navmode').val(mode);
+            $('#mdlChose').modal('show');
         });
         $('[entity]').click(function() {
             var entity = $(this).attr('entity');
             if (entity) {
-                var href = '{{ route('state.view', ['entity' => 'DATA_ID']) }}/';
+
+                var mode = $('#navmode').val();
+                if ('view' == mode) {
+                    var href = '{{ route('state.apps', ['mode' => 'view', 'entity' => 'DATA_ID']) }}/';
+                } else if ('edit' == mode) {
+                    var href = '{{ route('state.apps', ['mode' => 'edit', 'entity' => 'DATA_ID']) }}/';
+                } else {
+                    return alert('Invalid mode');
+                }
+
                 href = href.split('DATA_ID').join(entity);
                 setTimeout(() => {
                     $('#mdlChose').modal('hide');

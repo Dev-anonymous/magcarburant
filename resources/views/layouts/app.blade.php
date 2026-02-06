@@ -35,8 +35,7 @@
                                             Route::is('provider.analyse') ||
                                             Route::is('logistics.accounting') ||
                                             Route::is('logistics.analyse') ||
-                                            Route::is('state.view.accounting') ||
-                                            Route::is('state.view.analyse'))
+                                            Route::is('state.accounting', 'state.analyse'))
                                         @php
                                             $role = auth()->user()->user_role;
                                             $param = [];
@@ -45,9 +44,10 @@
                                             } elseif ($role == 'petrolier') {
                                                 $lab = 'provider';
                                             } elseif ($role == 'etatique') {
-                                                $lab = 'state.view';
+                                                $lab = 'state';
                                                 $entity = request()->route('entity');
-                                                $param = ['entity' => $entity->id];
+                                                $mode = request()->route('mode');
+                                                $param = ['entity' => $entity->id, 'mode' => $mode];
                                             }
                                         @endphp
                                         <li class="nav-item dropdown nav-language d-flex align-items-center">
@@ -242,7 +242,7 @@
         }
     </style>
     @yield('modals')
-    <x-js />
+    <x-js mode="{{$mode}}" />
     @yield('script')
 
 </body>

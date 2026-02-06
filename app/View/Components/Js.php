@@ -8,12 +8,13 @@ use Illuminate\View\Component;
 
 class Js extends Component
 {
+    public string $mode;
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct(string $mode = 'view')
     {
-        //
+        $this->mode = $mode;
     }
 
     /**

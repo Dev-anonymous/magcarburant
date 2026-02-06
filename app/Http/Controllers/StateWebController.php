@@ -15,28 +15,27 @@ class StateWebController extends Controller
         return view('state.choose', compact('entity', 'entities'));
     }
 
-    function apps(Entity $entity)
+    function apps($mode, Entity $entity)
     {
         return view('state.views.apps', compact('entity'));
     }
 
-    function purchase(Entity $entity)
+    function purchase($mode, Entity $entity)
     {
         return view('state.views.purchase', compact('entity'));
     }
 
-    function sale(Entity $entity)
+    function sale($mode, Entity $entity)
     {
         return view('state.views.sale', compact('entity'));
     }
 
-    function delivery(Entity $entity)
+    function delivery($mode, Entity $entity)
     {
         return view('state.views.delivery', compact('entity'));
     }
 
-
-    function accounting(Entity $entity)
+    function accounting($mode, Entity $entity)
     {
         $item = request('item');
         if ($item == 'rtx') {
@@ -101,18 +100,17 @@ class StateWebController extends Controller
         return view('state.views.apps-accounting', compact('entity'));
     }
 
-    function analyse(Entity $entity)
+    function analyse($mode, Entity $entity)
     {
-        $user = auth()->user();
         return view('state.views.analyse', compact('entity'));
     }
 
-    function claim(Entity $entity)
+    function claim($mode, Entity $entity)
     {
         return view('state.views.claim', compact('entity'));
     }
 
-    function taxation(Entity $entity)
+    function taxation($mode, Entity $entity)
     {
         return view('state.views.taxation', compact('entity'));
     }

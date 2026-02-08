@@ -20,9 +20,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::get('def', function () {
     $action = request('action');
-    if ('reset' == $action) {
-        Artisan::call('migrate:refresh', ['--seed' => true]);
-    }
+    // if ('reset' == $action) {
+    //     Artisan::call('migrate:refresh', ['--seed' => true]);
+    // }
     if ('migrate' == $action) {
         Artisan::call('migrate', ['--seed' => true]);
     }

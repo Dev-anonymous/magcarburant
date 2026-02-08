@@ -48,7 +48,7 @@ class Structureprices extends Controller
                 } elseif ($user->user_role == 'logisticien') {
                     $href = route('logistics.accounting', $param);
                 } elseif ($user->user_role == 'etatique') {
-                    $href = route('state.view.accounting', array_merge(['entity' => $entity->id], $param));
+                    $href = state_route('accounting', array_merge(['entity' => $entity->id], $param));
                 } else {
                     $href = route('sudo.provider', $param);
                 }

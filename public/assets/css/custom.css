@@ -286,7 +286,11 @@ input.form-control:focus {
     color: #1a3b5d !important;
 }
 
-
 .cursor {
     cursor: pointer;
+}
+
+[dir="ltr"] .table tr th {
+    font-size: 13px;
+    text-transform: none;
 }

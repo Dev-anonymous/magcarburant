@@ -126,7 +126,7 @@
                                             <th>Bon de livraison</th>
                                             <th>Programme de livraison</th>
                                             <th class="text-nowrap">Client</th>
-                                            <th class="text-nowrap">LATA</th>
+                                            <th class="text-nowrap">Lata</th>
                                             <th class="text-nowrap">L15</th>
                                             <th class="text-nowrap">Densité</th>
                                             <th class="text-nowrap no-export">Factures</th>

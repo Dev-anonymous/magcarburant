@@ -336,22 +336,22 @@ class DataController extends Controller
                         foreach ($zones as $zone) {
                             $tot = 0;
                             $index = findIndexByLabel($dhead, $ti->label);
-                            if (null !== $index) {
-                                foreach ($drows as $r) {
-                                    $v = (float) @$r[$index]['vv'];
-                                    $zo = $r[4]['v'];
-                                    $pro = $r[5]['v'];
-                                    abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
-                                    abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
-                                    if ($pro === $fuel && $zone === $zo) {
-                                        $tot += round($v, 3); //
-                                    }
+                            abort_if(is_null($index), 422, "Can't process: label \"$ti->label\" not found in greatebook");
+
+                            foreach ($drows as $r) {
+                                $v = (float) @$r[$index]['vv'];
+                                $zo = $r[4]['v'];
+                                $pro = $r[5]['v'];
+                                abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                                abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                                if ($pro === $fuel && $zone === $zo) {
+                                    $tot += round($v, 3); //
                                 }
-                                $line[] = ['label' => v($tot)];
-                                $tot2  += $tot;
-                                $v0 = (float) @$tabv["v_$zone"];
-                                $tabv["v_$zone"] =  $v0 + $tot;
                             }
+                            $line[] = ['label' => v($tot)];
+                            $tot2  += $tot;
+                            $v0 = (float) @$tabv["v_$zone"];
+                            $tabv["v_$zone"] =  $v0 + $tot;
                         }
                         $line[] = ['label' => v($tot2)];
                         $rows[] = $line;
@@ -499,16 +499,16 @@ class DataController extends Controller
                     $t = 0;
                     foreach ($title as $ti) {
                         $index = findIndexByLabel($dhead, $ti->label);
-                        if (null !== $index) {
-                            foreach ($drows as $r) {
-                                $v = (float) @$r[$index]['vv'];
-                                $zo = @$r[4]['v'];
-                                $pro = @$r[5]['v'];
-                                abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
-                                abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
-                                if ($pro === $fuel && in_array($zo, $zones)) {
-                                    $t += round($v, 3); //
-                                }
+                        abort_if(is_null($index), 422, "Can't process: label \"$ti->label\" not found in greatebook");
+
+                        foreach ($drows as $r) {
+                            $v = (float) @$r[$index]['vv'];
+                            $zo = @$r[4]['v'];
+                            $pro = @$r[5]['v'];
+                            abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                            abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                            if ($pro === $fuel && in_array($zo, $zones)) {
+                                $t += round($v, 3); //
                             }
                         }
                     }
@@ -650,7 +650,8 @@ class DataController extends Controller
                 $tot = 0;
                 foreach ($fuels as $k => $fuel) {
                     $index = findIndexByLabel($dhead2, 'Montant Stock de Sécurité');
-                    abort_if(!$index, 422, "Can't process:  \"Montant Stock de Sécurité\" not found for fuel -> $fuel");
+                    abort_if(is_null($index), 422, "Can't process: label \"Montant Stock de Sécurité\" not found in greatebook for fuel -> $fuel");
+
                     $t = 0;
                     foreach ($drows2 as $r) {
                         $v = (float) @$r[$index]['vv'];
@@ -806,6 +807,8 @@ class DataController extends Controller
                     foreach ($fuels as $fuel) {
                         $t = 0;
                         $index = findIndexByLabel($dhead, $ti);
+                        abort_if(is_null($index), 422, "Can't process: label \"$ti\" not found in greatebook");
+
                         //
                         foreach ($drows as $r) {
                             $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
@@ -892,6 +895,8 @@ class DataController extends Controller
                     foreach ($fuels as $fuel) {
                         $t = 0;
                         $index = findIndexByLabel($dhead, $ti);
+                        abort_if(is_null($index), 422, "Can't process: label \"$ti\" not found in greatebook");
+
                         //
                         foreach ($drows as $r) {
                             $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
@@ -991,22 +996,22 @@ class DataController extends Controller
                         foreach ($zones as $zone) {
                             $tot = 0;
                             $index = findIndexByLabel($dhead, $ti->label);
-                            if (null !== $index) {
-                                foreach ($drows as $r) {
-                                    $v = (float) @$r[$index]['vv'];
-                                    $zo = $r[4]['v'];
-                                    $pro = $r[5]['v'];
-                                    abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
-                                    abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
-                                    if ($pro === $fuel && $zone === $zo) {
-                                        $tot += round($v, 3); //
-                                    }
+                            abort_if(is_null($index), 422, "Can't process: label \"$ti->label\" not found in greatebook");
+
+                            foreach ($drows as $r) {
+                                $v = (float) @$r[$index]['vv'];
+                                $zo = $r[4]['v'];
+                                $pro = $r[5]['v'];
+                                abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                                abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                                if ($pro === $fuel && $zone === $zo) {
+                                    $tot += round($v, 3); //
                                 }
-                                $line[] = ['label' => v($tot)];
-                                $tot2  += $tot;
-                                $v0 = (float) @$tabv["v_$zone"];
-                                $tabv["v_$zone"] =  $v0 + $tot;
                             }
+                            $line[] = ['label' => v($tot)];
+                            $tot2  += $tot;
+                            $v0 = (float) @$tabv["v_$zone"];
+                            $tabv["v_$zone"] =  $v0 + $tot;
                         }
                         $line[] = ['label' => v($tot2)];
                         $rows[] = $line;
@@ -1104,7 +1109,7 @@ class DataController extends Controller
             ['label' => 'Voie'],
             ['label' => 'Produit'],
             ['label' => 'Bon de livraison'],
-            ['label' => 'Programme de livraison'],
+            ['label' => 'Progr. de livraison'],
             ['label' => 'Client'],
             ['label' => 'LATA'],
             ['label' => 'L15'],
@@ -1310,9 +1315,9 @@ class DataController extends Controller
             ['label' => 'Voie'],
             ['label' => 'Produit'],
             ['label' => 'Bon de livraison'],
-            ['label' => 'Programme de livraison'],
+            ['label' => 'Progr. de livraison'],
             ['label' => 'Client'],
-            ['label' => 'LATA'],
+            ['label' => 'Lata'],
             ['label' => 'L15'],
             ['label' => 'Densité'],
             ['label' => 'M3'],
@@ -1457,9 +1462,9 @@ class DataController extends Controller
             ['label' => 'Voie'],
             ['label' => 'Produit'],
             ['label' => 'Bon de livraison'],
-            ['label' => 'Programme de livraison'],
+            ['label' => 'Progr. de livraison'],
             ['label' => 'Client'],
-            ['label' => 'LATA'],
+            ['label' => 'Lata'],
             ['label' => 'L15'],
             ['label' => 'Densité'],
             ['label' => 'M3'],
@@ -1475,9 +1480,9 @@ class DataController extends Controller
             ['label' => 'Montant Sto. Sécurité 2'],
             ['label' => 'Stock de Sécurité'],
             ['label' => 'Montant Stock de Sécurité'],
-            ['label' => 'Eff. reconst. et Sto. Stratégiques'],
+            ['label' => 'Effort de reconstruction et Stock Stratégiques'],
             ['label' => 'Montant Eff. reconst. et Sto. Strat.'],
-            ['label' => 'FONER'],
+            ['label' => "FONER (Fonds National d'Entretien Routier)"],
             ['label' => 'Montant FONER'],
             ['label' => 'Marquage moléculaire'],
             ['label' => 'Montant Marq. molécul.'],

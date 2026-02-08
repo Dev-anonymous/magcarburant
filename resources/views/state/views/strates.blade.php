@@ -112,8 +112,11 @@
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
-                            let num = parseFloat(data.toString().replace(/ /g,
-                                '').replace(',', '.'));
+                            if (!data) return data;
+                            let cleaned = data.toString().replace(/\s+/g,
+                                '');
+                            cleaned = cleaned.replace(',', '.');
+                            let num = parseFloat(cleaned);
                             return isNaN(num) ? data : num;
                         }
                     }

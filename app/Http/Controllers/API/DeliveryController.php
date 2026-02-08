@@ -22,7 +22,7 @@ class DeliveryController extends Controller
     public function index()
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier','etatique']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
@@ -33,6 +33,11 @@ class DeliveryController extends Controller
         }
         abort_if(!$entity, 422, "No entity");
         $deliveries = $entity->deliveries();
+        if (from_state()) {
+            $deliveries->where('from_state', 1);
+        } else {
+            $deliveries->where('from_state', 0);
+        }
 
         $date = request('date');
         $date = explode(' to ', $date);
@@ -94,7 +99,7 @@ class DeliveryController extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'petrolier') {
+                if (in_array($user->user_role, ['petrolier', 'etatique'])) {
                     return $t;
                 }
             })
@@ -163,8 +168,10 @@ class DeliveryController extends Controller
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if ($user->user_role == 'petrolier') {
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
+            } else if ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -312,6 +319,7 @@ class DeliveryController extends Controller
                     'client'           => $colH,
                     'lata'             => $colI,
                     'unitprice'        => $colJ,
+                    'from_state' => from_state(),
                 ];
             }
 
@@ -338,6 +346,8 @@ class DeliveryController extends Controller
         } else {
             if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
+            } else if ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -362,6 +372,7 @@ class DeliveryController extends Controller
 
             DB::beginTransaction();
             $validated['entity_id'] = $entity->id;
+            $validated['from_state'] = from_state();
 
             $delivery = Delivery::create($validated);
 
@@ -404,9 +415,14 @@ class DeliveryController extends Controller
     public function destroy(Delivery $delivery)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
-        $entity = $user->entities()->first();
-        abort_if($entity->id != $delivery->entity_id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
+
+        if ($user->user_role == 'etatique') {
+            //
+        } else {
+            $entity = $user->entities()->first();
+            abort_if($entity->id != $delivery->entity_id, 403, "Not permit");
+        }
 
         foreach ($delivery->deliveryfiles as $f) {
             File::delete("storage/" . $f->file);

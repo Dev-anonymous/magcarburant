@@ -29,12 +29,12 @@
                             Historique des structures des prix
                         </h4>
                         {{-- @if (auth()->user()->user_role === 'petrolier') --}}
-                            <div class="">
-                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                                    <i class="material-icons md-24">add_circle_outline</i>
-                                    Nouvelle structure
-                                </button>
-                            </div>
+                        <div class="">
+                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                <i class="material-icons md-24">add_circle_outline</i>
+                                Nouvelle structure
+                            </button>
+                        </div>
                         {{-- @endif --}}
                     </div>
                     <div class="py-4">
@@ -288,8 +288,11 @@
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
-                            let num = parseFloat(data.toString().replace(/ /g,
-                                '').replace(',', '.'));
+                            if (!data) return data;
+                            let cleaned = data.toString().replace(/\s+/g,
+                                '');
+                            cleaned = cleaned.replace(',', '.');
+                            let num = parseFloat(cleaned);
                             return isNaN(num) ? data : num;
                         }
                     }

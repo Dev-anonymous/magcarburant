@@ -42,6 +42,11 @@ class SaleController extends Controller
         $from_mutuality = request('from_mutuality');
 
         $sales = $entity->sales()->whereBetween('date', [$from, $to]);
+        if (from_state()) {
+            $sales->where('from_state', 1);
+        } else {
+            $sales->where('from_state', 0);
+        }
         if ($from_mutuality === "1") {
             $sales->where('from_mutuality', 1);
         }
@@ -105,7 +110,7 @@ class SaleController extends Controller
                     $t = '';
                 }
 
-                if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
                     return $t;
                 }
             })
@@ -121,7 +126,7 @@ class SaleController extends Controller
         $user = auth()->user();
 
         if (request('action') == 'update') {
-            abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
+            abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
             $id = request('id');
             $sale = Sale::findOrFail($id);
@@ -182,6 +187,8 @@ class SaleController extends Controller
 
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
+            } else if ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -293,16 +300,18 @@ class SaleController extends Controller
                     continue;
                 }
 
-                if (Sale::where([
-                    'way' => $colD,
-                    'product' => $colE,
-                    'delivery_note' => $colF,
-                    'delivery_program' => $colG,
-                    'entity_id' => $entity->id,
-                ])->exists()) {
-                    $errors[] = "La ligne $rowNumber existe déjà dans l'application.";
-                    continue;
-                }
+                if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                    if (Sale::where([
+                        'way' => $colD,
+                        'product' => $colE,
+                        'delivery_note' => $colF,
+                        'delivery_program' => $colG,
+                        'entity_id' => $entity->id,
+                    ])->exists()) {
+                        $errors[] = "La ligne $rowNumber(bon de livraison, programme de livraison) existe déjà dans l'application.";
+                        continue;
+                    }
+                } /// uhm
 
                 $ins = [
                     'entity_id'        => $entity->id,
@@ -317,22 +326,25 @@ class SaleController extends Controller
                     'lata'             => $colI,
                     'l15'              => $colJ,
                     'density'          => $colK,
+                    'from_state' => from_state(),
                 ];
                 $sale = Sale::create($ins);
                 $insert[] = $ins;
 
-                if (strtoupper($colD) == 'OUEST') {
-                    if ($entity->user->user_role == 'logisticien') {
-                        $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
-                        if (in_array($colD, $wz)) {
-                            $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
-                            foreach ($entities as $ent) {
-                                $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
-                                if (in_array('OUEST', $ewz)) {
-                                    $ins['parent_id'] = $sale->id;
-                                    $ins['from_mutuality'] = 1;
-                                    $ins['entity_id'] = $ent->id;
-                                    Sale::create($ins);
+                if ($user->user_role !== 'etatique') {
+                    if (strtoupper($colD) == 'OUEST') {
+                        if ($entity->user->user_role == 'logisticien') {
+                            $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                            if (in_array($colD, $wz)) {
+                                $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
+                                foreach ($entities as $ent) {
+                                    $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                                    if (in_array('OUEST', $ewz)) {
+                                        $ins['parent_id'] = $sale->id;
+                                        $ins['from_mutuality'] = 1;
+                                        $ins['entity_id'] = $ent->id;
+                                        Sale::create($ins);
+                                    }
                                 }
                             }
                         }
@@ -366,6 +378,8 @@ class SaleController extends Controller
         } else {
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
+            } elseif ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -391,21 +405,24 @@ class SaleController extends Controller
 
             DB::beginTransaction();
             $validated['entity_id'] = $entity->id;
+            $validated['from_state'] = from_state();
 
             $sale = Sale::create($validated);
 
             if ($entity->user->user_role == 'logisticien') {
-                $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
-                $w = strtoupper(request('way'));
-                if (in_array($w, $wz) && $w == 'OUEST') {
-                    $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
-                    foreach ($entities as $ent) {
-                        $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
-                        if (in_array('OUEST', $ewz)) {
-                            $validated['parent_id'] = $sale->id;
-                            $validated['from_mutuality'] = 1;
-                            $validated['entity_id'] = $ent->id;
-                            Sale::create($validated);
+                if ($user->user_role !== 'etatique') {
+                    $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                    $w = strtoupper(request('way'));
+                    if (in_array($w, $wz) && $w == 'OUEST') {
+                        $entities = Entity::whereIn('users_id', User::where('user_role', 'logisticien')->where('id', '!=', $entity->user->id)->pluck('id')->all())->get();
+                        foreach ($entities as $ent) {
+                            $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
+                            if (in_array('OUEST', $ewz)) {
+                                $validated['parent_id'] = $sale->id;
+                                $validated['from_mutuality'] = 1;
+                                $validated['entity_id'] = $ent->id;
+                                Sale::create($validated);
+                            }
                         }
                     }
                 }
@@ -450,9 +467,13 @@ class SaleController extends Controller
     public function destroy(Sale $sale)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
-        $entity = $user->entities()->first();
-        abort_if($entity->id != $sale->entity_id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        if ($user->user_role == 'etatique') {
+            //
+        } else {
+            $entity = $user->entities()->first();
+            abort_if($entity->id != $sale->entity_id, 403, "Not permit");
+        }
 
         DB::beginTransaction();
         foreach ($sale->sales as $s) {

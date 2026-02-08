@@ -412,7 +412,7 @@
                     <input type="hidden" name="action" value="import">
                     <div class="modal-body">
                         <div class="text-center p-3">
-                            <h5>Vous pouvez importer la liste de tous vos achats disponibles depuis un fichier Excel en
+                            <h5>Vous pouvez importer la liste de tous les achats disponibles depuis un fichier Excel en
                                 respectant les colonnes et le format des données.</h5>
                         </div>
                         <p class="mt-2">Sélectionnez le fichier excel à importer</p>
@@ -525,7 +525,7 @@
                     data: 'date',
                     name: 'date'
                 },
-                 {
+                {
                     data: 'way',
                     name: 'way'
                 },
@@ -578,8 +578,11 @@
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
-                            let num = parseFloat(data.toString().replace(/ /g,
-                                '').replace(',', '.'));
+                            if (!data) return data;
+                            let cleaned = data.toString().replace(/\s+/g,
+                                '');
+                            cleaned = cleaned.replace(',', '.');
+                            let num = parseFloat(cleaned);
                             return isNaN(num) ? data : num;
                         }
                     }
@@ -705,6 +708,7 @@
                             'p-1 m-0 text-center alert alert-success')
                         .show();
                     dtObj.ajax.reload(null, false);
+                    dashboard();
                     setTimeout(() => {
                         rep.hide();
                         $('#mdldel').modal('hide');

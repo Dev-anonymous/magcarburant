@@ -40,6 +40,11 @@ class PurchaseController extends Controller
         $to = @$date[1] ?? $from;
 
         $purchases = $entity->purchases()->whereBetween('date', [$from, $to]);
+        if (from_state()) {
+            $purchases->where('from_state', 1);
+        } else {
+            $purchases->where('from_state', 0);
+        }
 
         return DataTables::of($purchases)
             ->addIndexColumn()
@@ -96,7 +101,7 @@ class PurchaseController extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'petrolier') {
+                if (in_array($user->user_role, ['petrolier', 'etatique'])) {
                     return $t;
                 }
             })
@@ -110,7 +115,7 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
             $id = request('id');
@@ -163,6 +168,8 @@ class PurchaseController extends Controller
 
             if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
+            } else if ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -236,8 +243,12 @@ class PurchaseController extends Controller
                 if (empty($colE)) {
                     $lineErrors[] = "Cellule E$rowNumber : veuillez renseigner le numéro facture";
                 } else {
-                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE])->exists();
-                    if ($exi) {
+                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE, 'from_state' => 0])->exists();
+                    if ($exi && $user->user_role === 'petrolier') {
+                        $lineErrors[] = "Cellule E$rowNumber : l'achat avec le numéro facture $colE est déjà enregistré";
+                    }
+                    $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE, 'from_state' => 1])->exists();
+                    if ($exi && $user->user_role === 'etatique') {
                         $lineErrors[] = "Cellule E$rowNumber : l'achat avec le numéro facture $colE est déjà enregistré";
                     }
                 }
@@ -265,6 +276,7 @@ class PurchaseController extends Controller
                     'qtytm' => $colG,
                     'qtym3' => $colH,
                     'density' => $colI,
+                    'from_state' => from_state(),
                 ];
             }
 
@@ -291,6 +303,8 @@ class PurchaseController extends Controller
         } else {
             if ($user->user_role == 'petrolier') {
                 $entity = $user->entities()->first();
+            } elseif ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
@@ -312,6 +326,7 @@ class PurchaseController extends Controller
 
             DB::beginTransaction();
             $validated['entity_id'] = $entity->id;
+            $validated['from_state'] = from_state();
             $sale = Purchase::create($validated);
 
             $f = [];
@@ -353,9 +368,13 @@ class PurchaseController extends Controller
     public function destroy(Purchase $purchase)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier']), 403, "No permission");
-        $entity = $user->entities()->first();
-        abort_if($entity->id != $purchase->entity_id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
+        if ($user->user_role == 'etatique') {
+            //
+        } else {
+            $entity = $user->entities()->first();
+            abort_if($entity->id != $purchase->entity_id, 403, "Not permit");
+        }
 
         foreach ($purchase->purchasefiles as $f) {
             File::delete("storage/" . $f->file);

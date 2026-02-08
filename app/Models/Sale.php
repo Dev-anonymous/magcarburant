@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float|null $density
  * @property bool $from_mutuality
  * @property int|null $parent_id
+ * @property bool $from_state
  * 
  * @property Entity $entity
  * @property Sale|null $sale
@@ -48,7 +49,8 @@ class Sale extends Model
 		'l15' => 'float',
 		'density' => 'float',
 		'from_mutuality' => 'bool',
-		'parent_id' => 'int'
+		'parent_id' => 'int',
+		'from_state' => 'bool'
 	];
 
 	protected $fillable = [
@@ -65,7 +67,8 @@ class Sale extends Model
 		'l15',
 		'density',
 		'from_mutuality',
-		'parent_id'
+		'parent_id',
+		'from_state'
 	];
 
 	public function entity()

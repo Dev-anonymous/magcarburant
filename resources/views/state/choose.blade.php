@@ -34,7 +34,7 @@
                     </div>
                     <div class="p-2">
                         <h4 class="font-weight-bold">Mode Ecriture</h4>
-                        <p class="m-0">Pour l’ajout, la modification et la suppression de vos données : taux réels,
+                        <p class="m-0">Pour l’ajout, la modification et la suppression de les données : taux réels,
                             achats, ventes, structures des prix et autres</p>
                     </div>
                 </div>

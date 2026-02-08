@@ -6,7 +6,8 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité | {{ $entity->shortname }}</h2>
-                <p class="lead small m-0">Grand Livre Fiscalité & Parafiscalité sur les ventes des produits pour {{ $entity->shortname }}</p>
+                <p class="lead small m-0">Grand Livre Fiscalité & Parafiscalité sur les ventes des produits pour
+                    {{ $entity->shortname }}</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -197,8 +198,11 @@
                                     columns: ':not(.no-export)',
                                     format: {
                                         body: function(data, row, column, node) {
-                                            let num = parseFloat(data.toString().replace(/ /g,
-                                                '').replace(',', '.'));
+                                            if (!data) return data;
+                                            let cleaned = data.toString().replace(/\s+/g,
+                                                '');
+                                            cleaned = cleaned.replace(',', '.');
+                                            let num = parseFloat(cleaned);
                                             return isNaN(num) ? data : num;
                                         }
                                     }

@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float|null $qtytm
  * @property float|null $qtym3
  * @property float|null $density
+ * @property bool $from_state
  * 
  * @property Entity $entity
  * @property Collection|Purchasefile[] $purchasefiles
@@ -41,7 +42,8 @@ class Purchase extends Model
 		'unitprice' => 'float',
 		'qtytm' => 'float',
 		'qtym3' => 'float',
-		'density' => 'float'
+		'density' => 'float',
+		'from_state' => 'bool'
 	];
 
 	protected $fillable = [
@@ -54,7 +56,8 @@ class Purchase extends Model
 		'unitprice',
 		'qtytm',
 		'qtym3',
-		'density'
+		'density',
+		'from_state'
 	];
 
 	public function entity()

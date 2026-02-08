@@ -242,7 +242,7 @@
         }
     </style>
     @yield('modals')
-    <x-js mode="{{$mode}}" />
+    <x-js mode="{{ @$mode }}" />
     @yield('script')
 
 </body>

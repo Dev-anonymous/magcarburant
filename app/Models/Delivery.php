@@ -23,8 +23,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $delivery_note
  * @property string|null $delivery_program
  * @property string|null $client
- * @property float|null $qtym3
+ * @property float|null $lata
  * @property float|null $unitprice
+ * @property bool $from_state
  * 
  * @property Entity $entity
  * @property Collection|Deliveryfile[] $deliveryfiles
@@ -39,8 +40,9 @@ class Delivery extends Model
 	protected $casts = [
 		'entity_id' => 'int',
 		'date' => 'datetime',
-		'qtym3' => 'float',
-		'unitprice' => 'float'
+		'lata' => 'float',
+		'unitprice' => 'float',
+		'from_state' => 'bool'
 	];
 
 	protected $fillable = [
@@ -53,8 +55,9 @@ class Delivery extends Model
 		'delivery_note',
 		'delivery_program',
 		'client',
-		'qtym3',
-		'unitprice'
+		'lata',
+		'unitprice',
+		'from_state'
 	];
 
 	public function entity()

@@ -104,7 +104,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mb-1">
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                    <button type="button" class="btn btn-sm btn-primary mt-3" data-toggle="modal"
                                         data-target="#mdlChose">
                                         <i class="material-icons md-18">add_circle_outline</i> Nouvelle
                                         livraison excédentaire
@@ -434,7 +434,7 @@
                     <input type="hidden" name="action" value="import">
                     <div class="modal-body">
                         <div class="text-center p-3">
-                            <h5>Vous pouvez importer la liste de toutes vos livraisons excédentaires disponibles depuis un
+                            <h5>Vous pouvez importer la liste de toutes les livraisons excédentaires disponibles depuis un
                                 fichier Excel en
                                 respectant les colonnes et le format des données.</h5>
                         </div>
@@ -644,8 +644,11 @@
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
-                            let num = parseFloat(data.toString().replace(/ /g,
-                                '').replace(',', '.'));
+                            if (!data) return data;
+                            let cleaned = data.toString().replace(/\s+/g,
+                                '');
+                            cleaned = cleaned.replace(',', '.');
+                            let num = parseFloat(cleaned);
                             return isNaN(num) ? data : num;
                         }
                     }
@@ -746,7 +749,7 @@
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdladd,#mdledit').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {
@@ -783,6 +786,7 @@
                             'p-1 m-0 text-center alert alert-success')
                         .show();
                     dtObj.ajax.reload(null, false);
+                    dashboard();
                     setTimeout(() => {
                         rep.hide();
                         $('#mdldel').modal('hide');

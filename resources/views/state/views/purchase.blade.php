@@ -96,6 +96,14 @@
                                             <input class="form-control flatpickr2" id="dv22"
                                                 value="{{ $d2 }}" name="date2" style="width:100px" />
                                         </div>
+                                        @if ('edit' == $mode)
+                                            <div class="form-group mb-1">
+                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                                    data-target="#mdlChose">
+                                                    <i class="material-icons md-18">add_circle_outline</i> Nouvel achat
+                                                </button>
+                                            </div>
+                                        @endif
                                     </form>
                                 </div>
                             </div>
@@ -117,6 +125,39 @@
                                             <th class="text-nowrap">Qte M3</th>
                                             <th class="text-nowrap">Densité</th>
                                             <th class="text-nowrap no-export">Factures</th>
+                                            <th class="no-export"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card transparent">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <h4 class="card-title font-weight-bold">
+                                        Réconciliation des achats entre {{ auth()->user()->name }} et
+                                        {{ $entity->shortname }}
+                                    </h4>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="table2" class="table table-striped table-hover text-nowrap"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Carburant</th>
+                                            <th>Unité</th>
+                                            <th>{{ auth()->user()->name }}</th>
+                                            <th>{{ $entity->shortname }}</th>
+                                            <th>Écart</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -128,10 +169,348 @@
             </div>
         </div>
     </div>
-
+@endsection
+@section('modals')
+    <div class="modal fade" id="mdladd" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Nouvel achat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fadd>
+                    <div class="modal-body">
+                        <h2 class="mb-3 text-center">
+                            Veuillez enregistrer l'achat de <b>{{ $entity->shortname }}</b>
+                        </h2>
+                        <input type="hidden" name="entity_id" value="{{ $entity->id }}">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        <option value="">Sélectionnez une voie</option>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Produit</label>
+                                    <select name="product" id="" class="form-control" required>
+                                        <option value="">Sélectionnez un produit</option>
+                                        @foreach (mainfuels() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0" for="dv1">Date de l'achat</label>
+                                    <input class="form-control flatpickr" id="dv1" required name="date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Fournisseur</label>
+                                    <input class="form-control" required name="provider">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">N° Facture</label>
+                                    <input class="form-control" required name="billnumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Prix Unitaire (en USD)</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="unitprice">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Qantité TM</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="qtytm">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Qantité M3</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="qtym3">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Densité</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="density">
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-2">Pièces jointes : factures ou documents (.pdf)</p>
+                        <div class="mb-2">
+                            <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
+                            <input type="file" multiple class="form-control" name="purchasefile[]">
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdledit" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Modification de l'achat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fedit>
+                    <h2 class="mb-3 text-center">
+                        Veuillez modifier l'achat de <b>{{ $entity->shortname }}</b>
+                    </h2>
+                    <input type="hidden" name="entity_id" value="{{ $entity->id }}">
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="action" value="update">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-2">
+                                    <label class="mb-0">Voie</label>
+                                    <select name="way" id="" class="form-control" required>
+                                        <option value="">Sélectionnez une voie</option>
+                                        @foreach (mainWays() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Produit</label>
+                                    <select name="product" id="" class="form-control" required>
+                                        <option value="">Sélectionnez un produit</option>
+                                        @foreach (mainfuels() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0" for="dv1">Date de l'achat</label>
+                                    <input class="form-control flatpickr" id="dv1" required name="date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Fournisseur</label>
+                                    <input class="form-control" required name="provider">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">N° Facture</label>
+                                    <input class="form-control" required name="billnumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Prix Unitaire (en USD)</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="unitprice">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Qantité TM</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="qtytm">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Qantité M3</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="qtym3">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <label class="mb-0">Densité</label>
+                                    <input type="number" min="0.001" step="0.001" class="form-control" required
+                                        name="density">
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-2">Pièces jointes : factures ou documents (.pdf)</p>
+                        <div class="mb-2">
+                            <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
+                            <input type="file" multiple class="form-control" name="purchasefile[]">
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdldel" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fdel>
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="mb-2 text-center">
+                            <h3 class="text-danger">
+                                Voulez-vous supprimer cet achat ?
+                            </h3>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdladd2" role="dialog" style="overflow-y: auto;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Importation des données d'achat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fadd>
+                    <input type="hidden" name="action" value="import">
+                    <div class="modal-body">
+                        <h2 class="mb-3 text-center">
+                            Veuillez importer le fichier Excel des achats de <b>{{ $entity->shortname }}</b>
+                        </h2>
+                        <input type="hidden" name="entity_id" value="{{ $entity->id }}">
+                        <div class="text-center p-3">
+                            <h5>Vous pouvez importer la liste de tous les achats disponibles depuis un fichier Excel en
+                                respectant les colonnes et le format des données.</h5>
+                        </div>
+                        <p class="mt-2">Sélectionnez le fichier excel à importer</p>
+                        <div class="mb-2">
+                            <input type="file" required multiple class="form-control" name="file">
+                        </div>
+                        <x-alert />
+                        <div class="mt-3">
+                            <a href="{{ asset('ModeleImportationAchat.xlsx') }}" class="btn text-danger">
+                                <i class="material-icons md-18">insert_drive_file</i>
+                                Télécharger le modèle
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdlChose" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <h4 class="mb-3">Quelle action voulez-vous ? </h4>
+                    <button class="btn btn-sm btn-primary m-2" btnmdl data-target="#mdladd">
+                        <i class="material-icons md-18">edit</i>
+                        Saisir un achat
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary m-2 mr-2" btnmdl data-target="#mdladd2">
+                        <i class="material-icons md-18">insert_drive_file</i>
+                        Importer les achats
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">
+                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
-
 @section('script')
     <x-datatable />
     <x-flatpickr />
@@ -155,7 +534,15 @@
             $('.modal.show').modal('hide');
             var t = $(this).data('target');
             $(`${t}`).modal('show');
-        })
+        });
+
+        function formatFr(val) {
+            if (val === '' || val === null || isNaN(val)) return '';
+            return parseFloat(val).toLocaleString('fr-FR', {
+                minimumFractionDigits: 3,
+                maximumFractionDigits: 3
+            });
+        }
 
         var dtObj = $('#table').DataTable({
             processing: true,
@@ -226,6 +613,12 @@
                     orderable: false,
                     searchable: false,
                 },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                },
             ],
             dom: 'Blfrtip',
             buttons: [{
@@ -235,8 +628,11 @@
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
-                            let num = parseFloat(data.toString().replace(/ /g,
-                                '').replace(',', '.'));
+                            if (!data) return data;
+                            let cleaned = data.toString().replace(/\s+/g,
+                                '');
+                            cleaned = cleaned.replace(',', '.');
+                            let num = parseFloat(cleaned);
                             return isNaN(num) ? data : num;
                         }
                     }
@@ -284,6 +680,103 @@
             dashboard();
         });
 
+        $('#mdledit').on('shown.bs.modal', function() {
+            $('[name="from"], [name="to"]', this).each(function() {
+                if (this._flatpickr) {
+                    this._flatpickr.destroy();
+                }
+                flatpickr(this, {
+                    maxDate: "today",
+                    locale: {
+                        firstDayOfWeek: 1
+                    }
+                });
+            });
+        });
+
+        $('[fadd],[fedit]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var data = new FormData(this);
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('purchase.store') }}',
+                method: 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    dashboard();
+                    form[0].reset();
+                    setTimeout(() => {
+                        rep.hide();
+                        $('#mdladd,#mdledit').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            });
+        });
+
+        $('[fdel]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var id = $('[name="id"]', form).val();
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('purchase.index') }}/' + id,
+                method: 'delete',
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    dashboard();
+                    setTimeout(() => {
+                        rep.hide();
+                        $('#mdldel').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            })
+        });
 
         function dashboard() {
             var ldr = $('[dataloader]');
@@ -312,6 +805,87 @@
                         chart1.update({}, true);
                         chart2.update({}, true);
                     }, 400);
+
+                    var rec = data.rec;
+                    var table = $('#table2');
+                    table.DataTable().destroy();
+                    const tbody = table.find("tbody");
+                    tbody.empty();
+                    rec.forEach(row => {
+                        // 3 lignes par carburant
+                        const units = [{
+                                label: "M³",
+                                state: row.m31,
+                                client: row.m32,
+                            },
+                            {
+                                label: "TM",
+                                state: row.tm1,
+                                client: row.tm2,
+                            },
+                            {
+                                label: "USD",
+                                state: row.usd1,
+                                client: row.usd2,
+                            }
+                        ];
+
+                        units.forEach((u, i) => {
+                            const tr = document.createElement("tr");
+                            // Carburant (pas de rowspan)
+                            const tdFuel = document.createElement("td");
+                            tdFuel.innerHTML = i == 0 ? row.fuel : '';
+                            tdFuel.className = 'bold font-weight-bold';
+                            tr.appendChild(tdFuel);
+
+                            // Unité
+                            const tdUnit = document.createElement("td");
+                            tdUnit.textContent = u.label;
+                            tr.appendChild(tdUnit);
+
+                            // État
+                            const tdState = document.createElement("td");
+                            tdState.textContent = formatFr(u.state);
+                            tr.appendChild(tdState);
+
+                            // Client
+                            const tdClient = document.createElement("td");
+                            tdClient.textContent = formatFr(u.client);
+                            tr.appendChild(tdClient);
+
+                            // Écart
+                            const tdDiff = document.createElement("td");
+                            var v = u.state - u.client;
+                            tdDiff.textContent = formatFr(v);
+                            tdDiff.className = v != 0 ? 'text-danger' : '';
+                            tdDiff.style.fontWeight = "bold";
+                            tr.appendChild(tdDiff);
+                            tbody[0].appendChild(tr);
+                        });
+                    });
+
+                    table.DataTable({
+                        dom: 'Bfrt',
+                        searching: false,
+                        ordering: false,
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            title: 'Export Excel',
+                            exportOptions: {
+                                columns: ':not(.no-export)',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        if (!data) return data;
+                                        let cleaned = data.toString().replace(/\s+/g,
+                                            '');
+                                        cleaned = cleaned.replace(',', '.');
+                                        let num = parseFloat(cleaned);
+                                        return isNaN(num) ? data : num;
+                                    }
+                                }
+                            }
+                        }, ],
+                    });
 
                     ldr.hide();
                 },

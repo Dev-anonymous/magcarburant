@@ -27,7 +27,7 @@ Route::get('def', function () {
         Artisan::call('migrate', ['--seed' => true]);
     }
     $out = Artisan::output();
-    echo ($out);
+    dd($out);
 });
 
 Route::get('', function () {

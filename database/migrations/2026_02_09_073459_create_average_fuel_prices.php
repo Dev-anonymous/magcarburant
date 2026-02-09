@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('average_fuel_prices', function (Blueprint $table) {
             $table->id();
-            $table->string('product', 32);
             $table->date('month');
-            $table->decimal('avg_price', 12, 3)->default(0);
-            $table->unique(['product', 'month']);
+            $table->string('product');
+            $table->integer('zone_id')->unsigned();
+            $table->decimal('avg_price', 12, 3);
+            $table->unique(['month', 'product', 'zone_id']);
+            $table->foreign('zone_id')->references('id')->on('zone')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

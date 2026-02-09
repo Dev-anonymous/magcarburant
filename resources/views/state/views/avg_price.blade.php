@@ -64,16 +64,34 @@
                     </button>
                 </div>
                 <form class="was-validated" fedit>
-                    <input type="hidden" name="id">
                     <div class="modal-body">
                         <div class="py-3">
                             <h4 product></h4>
                             <h4 month></h4>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" label></label>
+                            <label class="mb-0">Prix Moyen d'achat au NORD</label>
+                            <input type="hidden" name="nord_id">
                             <input type="number" min="0" step="0.001" class="form-control" required
-                                name="avg_price">
+                                name="nord">
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0">Prix Moyen d'achat au SUD</label>
+                            <input type="hidden" name="sud_id">
+                            <input type="number" min="0" step="0.001" class="form-control" required
+                                name="sud">
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0">Prix Moyen d'achat à l'EST</label>
+                            <input type="hidden" name="est_id">
+                            <input type="number" min="0" step="0.001" class="form-control" required
+                                name="est">
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0">Prix Moyen d'achat à l'OUEST</label>
+                            <input type="hidden" name="ouest_id">
+                            <input type="number" min="0" step="0.001" class="form-control" required
+                                name="ouest">
                         </div>
                         <x-alert />
                     </div>
@@ -115,17 +133,22 @@
 
         $(document).on('click', '.editdata', function() {
             var tr = $(this);
-            var id = tr.data('id');
-            var product = tr.data('product');
+            var data = tr.data('data');
+            var id = data.id;
+            var product = data.NORD.prod;
             var month = tr.closest('[col]').find('[mlabel]').text().trim();
-            var v = tr.data('v');
 
             var mdl = $('#mdledit');
-            $('[name="id"]', mdl).val(id);
             $('[product]', mdl).html('Carburant : ' + product);
             $('[month]', mdl).html('Mois : ' + month);
-            $('[label]', mdl).html(`Prix moyen d'achat ${product} (${month}) en USD`);
-            $('[name="avg_price"]', mdl).val(v);
+            $('[name="nord_id"]', mdl).val(data.NORD.id);
+            $('[name="nord"]', mdl).val(data.NORD.v);
+            $('[name="sud_id"]', mdl).val(data.SUD.id);
+            $('[name="sud"]', mdl).val(data.SUD.v);
+            $('[name="est_id"]', mdl).val(data.EST.id);
+            $('[name="est"]', mdl).val(data.EST.v);
+            $('[name="ouest_id"]', mdl).val(data.OUEST.id);
+            $('[name="ouest"]', mdl).val(data.OUEST.v);
             mdl.modal('show');
         });
 
@@ -140,11 +163,9 @@
             $('[loader]', btn).show();
             $('[text]', btn).hide();
 
-            var id = $('[name="id"]', form).val();
-
             $.ajax({
-                url: '{{ route('avgprice.index') }}/' + id,
-                method: 'PUT',
+                url: '{{ route('avgprice.index') }}',
+                method: 'post',
                 data: data,
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
@@ -207,39 +228,50 @@
                         var id = 'tbl' + Math.random().toString().split('.').join('');
                         tab.push(id);
 
-                        const rows = months[m] || [];
-                        let html = `
-                        <div class="col-md-3" col>
-                        <h4 class="mt-4 px-3" mlabel>${monthNames[m]} ${year}</h4>
-                        <table id="${id}" class="table table-striped table-hover text-nowrap table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Produit</th>
-                                    <th class='text-right'>Prix moyen (USD)</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+                        const products = data.months[m] || {};
 
-                        if (rows.length === 0) {
-                            html += `
-                                <tr>
-                                    <td colspan="2" class="text-center text-muted">
-                                        Aucune donnée
-                                    </td>
-                                </tr>
+                        let html = `
+                                <div class="col-md-3" col>
+                                <h4 class="mt-4" mlabel>${monthNames[m]} ${data.year}</h4>
+                                <table id="${id}" class="table table-striped table-hover text-nowrap table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Produit</th>
+                                            <th>Nord</th>
+                                            <th>Sud</th>
+                                            <th>Est</th>
+                                            <th>Ouest</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                             `;
-                        } else {
-                            rows.forEach(row => {
-                                html += `
-                                    <tr class='cursor editdata' data-id='${row.id}' data-product='${row.product}' data-v='${row.avg_price}'>
-                                        <td>${row.product}</td>
-                                        <td class='text-right'>${row.v}</td>
+
+                        if (Object.keys(products).length === 0) {
+                            html += `
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            Aucune donnée
+                                        </td>
                                     </tr>
                                 `;
-                            });
+                        } else {
+                            for (const product in products) {
+                                const z = products[product];
+                                html += `
+                                        <tr class='cursor editdata' data-data='${JSON.stringify(z)}'>
+                                            <td>${product}</td>
+                                            <td>${z.NORD.price }</td>
+                                            <td>${z.SUD.price }</td>
+                                            <td>${z.EST.price }</td>
+                                            <td>${z.OUEST.price }</td>
+                                        </tr>
+                                    `;
+                            }
                         }
+
                         html += `</tbody></table></div>`;
                         container.insertAdjacentHTML('beforeend', html);
+
                     }
 
                     tab.forEach(e => {
@@ -257,9 +289,10 @@
                                     format: {
                                         body: function(data, row, column, node) {
                                             if (!data) return data;
-                                            let cleaned = data.toString().replace(
-                                                /\s+/g,
-                                                '');
+                                            let cleaned = data.toString()
+                                                .replace(
+                                                    /\s+/g,
+                                                    '');
                                             cleaned = cleaned.replace(',', '.');
                                             let num = parseFloat(cleaned);
                                             return isNaN(num) ? data : num;

@@ -13,9 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * Class AverageFuelPrice
  * 
  * @property int $id
- * @property string $product
  * @property Carbon $month
+ * @property string $product
+ * @property int $zone_id
  * @property float $avg_price
+ * 
+ * @property Zone $zone
  *
  * @package App\Models
  */
@@ -26,12 +29,19 @@ class AverageFuelPrice extends Model
 
 	protected $casts = [
 		'month' => 'datetime',
+		'zone_id' => 'int',
 		'avg_price' => 'float'
 	];
 
 	protected $fillable = [
-		'product',
 		'month',
+		'product',
+		'zone_id',
 		'avg_price'
 	];
+
+	public function zone()
+	{
+		return $this->belongsTo(Zone::class);
+	}
 }

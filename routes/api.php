@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AVGPriceController;
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\DeliveryController;
 use App\Http\Controllers\API\EntityController;
@@ -9,7 +10,6 @@ use App\Http\Controllers\API\RateController;
 use App\Http\Controllers\API\SaleController;
 use App\Http\Controllers\API\Structureprices;
 use App\Http\Controllers\API\TxStructure;
-use App\Http\Controllers\AVGPriceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {

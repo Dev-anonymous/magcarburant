@@ -509,16 +509,23 @@ function state_route(string $name, $entity)
 
 function initAvgPrice()
 {
-    $year =  now()->year;
+    $year  = now()->year;
+    $zones = Zone::all();
     foreach (mainfuels() as $product) {
-        for ($m = 1; $m <= 12; $m++) {
-            $month = Carbon::create($year, $m, 1)->toDateString();
-            AverageFuelPrice::firstOrCreate([
-                'product' => $product,
-                'month'   => $month,
-            ], [
-                'avg_price' => 0
-            ]);
+        foreach ($zones as $zone) {
+            for ($m = 1; $m <= 12; $m++) {
+                $month = Carbon::create($year, $m, 1)->toDateString();
+                AverageFuelPrice::firstOrCreate(
+                    [
+                        'product' => $product,
+                        'zone_id' => $zone->id,
+                        'month'   => $month,
+                    ],
+                    [
+                        'avg_price' => 0,
+                    ]
+                );
+            }
         }
     }
 }

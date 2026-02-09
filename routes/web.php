@@ -26,9 +26,7 @@ Route::get('def', function () {
     if ('migrate' == $action) {
         Artisan::call('migrate', ['--seed' => true]);
     }
-    if ('rb' == $action) {
-        Artisan::call('migrate:rollback', ['--step' => '1']);
-    }
+
     $out = Artisan::output();
     dd($out);
 });

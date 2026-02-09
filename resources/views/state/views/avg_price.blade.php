@@ -233,6 +233,7 @@
                         let html = `
                                 <div class="col-md-3" col>
                                 <h4 class="mt-4" mlabel>${monthNames[m]} ${data.year}</h4>
+                                <div class='table-responsive'>
                                 <table id="${id}" class="table table-striped table-hover text-nowrap table-sm">
                                     <thead>
                                         <tr>
@@ -269,7 +270,7 @@
                             }
                         }
 
-                        html += `</tbody></table></div>`;
+                        html += `</tbody></table></div></div>`;
                         container.insertAdjacentHTML('beforeend', html);
 
                     }

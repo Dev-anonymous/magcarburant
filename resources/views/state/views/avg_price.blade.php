@@ -32,7 +32,7 @@
                                         <label for="fuel" class="control-label d-block mb-0">Année</label>
                                         <select id="year" class="form-control select2" style="min-width:150px;">
                                             @foreach ($years as $e)
-                                                <option selected>{{ $e }}</option>
+                                                <option>{{ $e }}</option>
                                             @endforeach
                                         </select>
                                     </div>

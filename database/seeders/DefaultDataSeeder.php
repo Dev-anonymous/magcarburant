@@ -7,7 +7,6 @@ use App\Models\Fuel;
 use App\Models\Label;
 use App\Models\User;
 use App\Models\Zone;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +18,10 @@ class DefaultDataSeeder extends Seeder
      */
     public function run(): void
     {
+        if (!User::where('user_role', 'sudo')->first()) {
+            User::create(['name' => 'Admin', 'email' => 'admin@admin.admin', 'password' => Hash::make('admin1001'), 'user_role' => 'sudo']);
+        }
+
         $entities = [
             ['TOTAL', 'TOTAL ENERGIES SA', 'petrolier'],
             ['ENGEN', 'ENGEN RDC SA', 'petrolier'],

@@ -13,10 +13,6 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        if (!User::where('user_role', 'sudo')->first()) {
-            User::create(['name' => 'Admin', 'email' => 'admin@admin.admin', 'password' => Hash::make('admin1001'), 'user_role' => 'sudo']);
-        }
-
         $attr = $request->all();
         $validator = Validator::make($attr, [
             'email' => 'required|email',
@@ -29,7 +25,8 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $data = $validator->validate();
+        $data = $validator->validated();
+
         if (!Auth::attempt($data, request()->has('remember'))) {
             return response([
                 'message' => "Email ou mot de passe incorrect"

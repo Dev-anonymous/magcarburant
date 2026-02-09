@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\Structureprice;
 use App\Models\User;
@@ -113,5 +114,16 @@ class StateWebController extends Controller
     function taxation($mode, Entity $entity)
     {
         return view('state.views.taxation', compact('entity'));
+    }
+
+    function avg_price($mode, Entity $entity)
+    {
+        initAvgPrice();
+        $years = AverageFuelPrice::selectRaw('YEAR(month) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return view('state.views.avg_price', compact('years'));
     }
 }

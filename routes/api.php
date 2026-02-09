@@ -9,6 +9,7 @@ use App\Http\Controllers\API\RateController;
 use App\Http\Controllers\API\SaleController;
 use App\Http\Controllers\API\Structureprices;
 use App\Http\Controllers\API\TxStructure;
+use App\Http\Controllers\AVGPriceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('sale', SaleController::class);
     Route::resource('delivery', DeliveryController::class);
     Route::resource('purchase', PurchaseController::class);
+    Route::resource('avgprice', AVGPriceController::class);
 
     Route::get('products-z', [DataController::class, 'product_z'])->name('extra.product_z');
 });

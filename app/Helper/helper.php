@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Fuelprice;
@@ -7,6 +8,7 @@ use App\Models\Label;
 use App\Models\Structureprice;
 use App\Models\User;
 use App\Models\Zone;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -503,4 +505,20 @@ function state_route(string $name, $entity)
         $params = [...$params, ...$entity];
     }
     return route("state.$name", $params);
+}
+
+function initAvgPrice()
+{
+    $year =  now()->year;
+    foreach (mainfuels() as $product) {
+        for ($m = 1; $m <= 12; $m++) {
+            $month = Carbon::create($year, $m, 1)->toDateString();
+            AverageFuelPrice::firstOrCreate([
+                'product' => $product,
+                'month'   => $month,
+            ], [
+                'avg_price' => 0
+            ]);
+        }
+    }
 }

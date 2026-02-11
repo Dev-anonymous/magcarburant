@@ -102,7 +102,8 @@
                                             </div>
                                             <div class="">
                                                 {{-- @if (empty($structure->to)) --}}
-                                                @if (in_array(auth()->user()->user_role, ['logisticien', 'petrolier']))
+                                                @if (in_array(auth()->user()->user_role, ['logisticien', 'petrolier']) ||
+                                                        ('edit' === $mode && auth()->user()->user_role === 'etatique'))
                                                     <div class="text-right">
                                                         <button class="btn btn-sm btn-edit-table">
                                                             <i class="material-icons md-18">edit</i>

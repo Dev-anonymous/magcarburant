@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $zone_id
  * @property float|null $amount
  * @property string|null $currency
+ * @property bool $from_state
  * 
  * @property Fuel $fuel
  * @property Label $label
@@ -36,7 +37,8 @@ class Fuelprice extends Model
 		'fuel_id' => 'int',
 		'label_id' => 'int',
 		'zone_id' => 'int',
-		'amount' => 'float'
+		'amount' => 'float',
+		'from_state' => 'bool'
 	];
 
 	protected $fillable = [
@@ -45,7 +47,8 @@ class Fuelprice extends Model
 		'label_id',
 		'zone_id',
 		'amount',
-		'currency'
+		'currency',
+		'from_state'
 	];
 
 	public function fuel()

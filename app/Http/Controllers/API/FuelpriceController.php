@@ -41,14 +41,18 @@ class FuelpriceController extends Controller
             'price' => 'required|numeric',
         ]);
         $user = auth()->user();
-        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
-        abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
-        // abort_if($fuelprice->structureprice->to != null, 403, "Vous ne pouvez plus modifier les prix sur une structure dont la date de fin est déjà renseignée.");
+        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+            abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
+        } else {
+            //
+        }
         abort_if($fuelprice->zone->zone !==  "OUEST" && $fuelprice->label->tag === 'L', 403, "Can't edit");
         abort_if(in_array($fuelprice->label->label, noteditable($fuelprice->fuel->fuel_type, $fuelprice->zone->zone)), 403, "Can't edit");
 
         $fuelprice->amount = $request->price;
         $fuelprice->currency = 'USD';
+        $fuelprice->from_state = from_state();
         $fuelprice->save();
         return response()->json([
             'success' => true,

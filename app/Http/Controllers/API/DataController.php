@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Label;
@@ -10,6 +11,7 @@ use App\Models\Purchase;
 use App\Models\Rate;
 use App\Models\Sale;
 use App\Models\Structureprice;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -639,7 +641,7 @@ class DataController extends Controller
                 $line0 = [];
                 $line0[] = [
                     'label' => 'STOCK DE SÉCURITÉ COLLECTÉ NON REVERSÉ',
-                    'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails de tous les produits.",
                 ];
 
@@ -669,7 +671,7 @@ class DataController extends Controller
                         'title' => "Montant Stock de Sécurité du produit $fuel",
                         'tag' => 'stock_non_reverse',
                         'value' => $fuel,
-                        'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                        'href' => gb_href(['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
                         'title' => "Afficher les détails pour le produit $fuel.",
                     ];
                 }
@@ -678,7 +680,7 @@ class DataController extends Controller
                     'title' => "Total Montant Stock de Sécurité des produits.",
                     'tag' => 'stock_non_reverse',
                     'value' => "total",
-                    'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                 ];
                 $rows[] = $line0;
 
@@ -1088,12 +1090,13 @@ class DataController extends Controller
         $reqzone = (array) request('zone');
         $reqfuel = (array) request('fuel');
         $items = request('items');
-
+        $isState = false;
         $user = auth()->user();
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {
             $entity  = Entity::findOrFail(request('entity_id'));
+            $isState = true;
         } else {
             abort(403);
         }
@@ -1162,13 +1165,27 @@ class DataController extends Controller
             }
 
             $fuelObj = Fuel::where(compact('fuel'))->first();
+            $zoneObj = Zone::where(compact('zone'))->first();
 
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
-                $q->where('product', $fuel);
-            })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+            if ($isState) {
+                $pmfc_reel = (float) AverageFuelPrice::whereYear('month', $saledate->year)
+                    ->whereMonth('month', $saledate->month)
+                    ->where('product', $fuel)
+                    ->where('zone_id', $zoneObj->id)
+                    ->first()?->avg_price;
+                $pmlab = "Prix moyen d'achat $fuel (zone $zone) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
+                if (!$pmfc_reel) {
+                    $errors[] = "Aucun prix d'achat moyen n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+                }
+            } else {
+                $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
+                    $q->where('product', $fuel);
+                })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+                $pmlab = "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $zone) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
+            }
 
             $pmfc_struct = (float)@$structure?->fuelprices()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
@@ -1235,7 +1252,7 @@ class DataController extends Controller
                 ['v' => v($e->l15)],
                 ['v' => v($e->density)],
                 ['v' => v($m3)],
-                ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $zone) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}"],
+                ['v' => v($pmfc_reel), 'class' => 'bigtitle', 'title' => $pmlab],
                 ['v' => v($pmfc_struct)],
                 ['v' => v($ecart_pmf), 'class' => 'bigtitle', 'title' => "PMFC REEL - PMFC STRUCTURE"],
                 ['v' => v($pmag_pmfc_socom), 'vv' => $pmag_pmfc_socom,  'class' => 'bigtitle', 'title' => "ECART PMFC * M3"],
@@ -1446,7 +1463,6 @@ class DataController extends Controller
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {
             $entity  = Entity::findOrFail(request('entity_id'));
-            $isetatik = true;
         } else {
             abort(403);
         }

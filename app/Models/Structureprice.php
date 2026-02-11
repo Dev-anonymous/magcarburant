@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $to
  * @property float|null $usd_cdf
  * @property float|null $cdf_usd
+ * @property bool $from_state
  * 
  * @property Entity $entity
  * @property Collection|Fuelprice[] $fuelprices
@@ -36,7 +37,8 @@ class Structureprice extends Model
 		'from' => 'datetime',
 		'to' => 'datetime',
 		'usd_cdf' => 'float',
-		'cdf_usd' => 'float'
+		'cdf_usd' => 'float',
+		'from_state' => 'bool'
 	];
 
 	protected $fillable = [
@@ -45,7 +47,8 @@ class Structureprice extends Model
 		'from',
 		'to',
 		'usd_cdf',
-		'cdf_usd'
+		'cdf_usd',
+		'from_state'
 	];
 
 	public function entity()

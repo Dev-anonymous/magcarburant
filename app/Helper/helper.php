@@ -124,6 +124,12 @@ function mainWays()
 
 function initfuelprice(Structureprice $structure)
 {
+
+    $exists = FuelPrice::where(['structureprice_id' => $structure->id, 'from_state' => from_state()])
+        ->exists();
+    if ($exists) return;
+
+
     $zoneLabels = [
         'Nord' => [
             'terrestre' => [
@@ -305,7 +311,6 @@ function initfuelprice(Structureprice $structure)
         ],
     ];
 
-    // 2️⃣ Boucle sur zones et labels valides
     foreach ($zoneLabels as $zoneName => $types) {
         $zone = Zone::where('zone', $zoneName)->first();
         foreach ($types as $fuelType => $labels) {
@@ -323,6 +328,7 @@ function initfuelprice(Structureprice $structure)
                         if (! $exists) {
                             FuelPrice::create([
                                 'structureprice_id' => $structure->id,
+                                'from_state' => from_state(),
                                 'fuel_id' => $fuel->id,
                                 'zone_id' => $zone->id,
                                 'label_id' => $label->id,
@@ -483,7 +489,8 @@ function gb_href($params, $route = null)
 
 function rmode()
 {
-    return request()->header('x-page-mode', 'view');
+    $mode = request()->route('mode', request()->header('x-page-mode', 'view'));
+    return $mode;
 }
 
 function from_state()
@@ -495,7 +502,8 @@ function from_state()
 
 function state_route(string $name, $entity)
 {
-    $mode = request()->route('mode') ?? 'view';
+    $mode = request()->route('mode', rmode());
+
     $params = [
         'mode'   => $mode,
         'entity' => $entity,

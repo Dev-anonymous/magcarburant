@@ -28,7 +28,7 @@ class Structureprices extends Controller
             abort(403);
         }
         abort_if(!$entity, 422, "No entity");
-        $structureprices = $entity->structureprices;
+        $structureprices = $entity->structureprices()->where('from_state', from_state());
 
         return DataTables::of($structureprices)
             ->addIndexColumn()
@@ -94,9 +94,9 @@ class Structureprices extends Controller
                     </div>
                 DATA;
 
-                if ($user->user_role == 'petrolier') {
-                    return $t;
-                }
+                // if ($user->user_role == 'petrolier') {
+                return $t;
+                // }
             })
             ->rawColumns(['action', 'view', 'tx'])
             ->make(true);
@@ -108,7 +108,7 @@ class Structureprices extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
+        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
             $validated = $request->validate([
@@ -125,7 +125,14 @@ class Structureprices extends Controller
             $id = request('id');
             $str = Structureprice::findOrFail($id);
             $entity = $str->entity;
-            abort_if($entity->users_id != $user->id, 403, "No permission !!!");
+
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                abort_if($entity->users_id != $user->id, 403, "No permission !!!");
+            } elseif ($user->user_role == 'etatique') {
+                //
+            } else {
+                abort(403, "No permission");
+            }
 
             if ($str->to) {
                 DB::beginTransaction();
@@ -138,6 +145,7 @@ class Structureprices extends Controller
             }
 
             $strActif = $entity->structureprices()
+                ->where('from_state', from_state())
                 ->whereNull('to')
                 ->where('id', '!=', $str->id)
                 ->first();
@@ -150,6 +158,7 @@ class Structureprices extends Controller
             }
 
             $dernierStr = $entity->structureprices()
+                ->where('from_state', from_state())
                 ->whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
@@ -162,11 +171,6 @@ class Structureprices extends Controller
                         'message' => "La date de début doit être le lendemain de la dernière date de fin ({$dernierStr->to->format('d-m-Y')}) de la structure en cours.",
                     ], 422);
                 }
-            }
-
-            if (request('to')) {
-                //
-                // dd('?????');
             }
 
             DB::beginTransaction();
@@ -187,9 +191,16 @@ class Structureprices extends Controller
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
             ]);
 
-            $entity = $user->entities()->first();
+            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                $entity = $user->entities()->first();
+            } elseif ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
+            } else {
+                abort(403, "No permission");
+            }
+
             abort_if(!$entity, 422, "No entity");
-            $structureprices = $entity->structureprices();
+            $structureprices = $entity->structureprices()->where('from_state', from_state());
 
             DB::beginTransaction();
 
@@ -213,6 +224,7 @@ class Structureprices extends Controller
                     abort_if($from->toDateString() !== $expectedDate->toDateString(), 422, "La nouvelle structure doit commencer le {$expectedDate->format('d-m-Y')}.");
                 }
             }
+            $validated['from_state'] = from_state();
 
             $st = $structureprices->create($validated);
             $name = strname($entity, $st);
@@ -248,9 +260,14 @@ class Structureprices extends Controller
     public function destroy(Structureprice $structureprice)
     {
         $user = auth()->user();
-        abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        if ($user->user_role == 'etatique') {
+            //
+        } else {
+            abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
+        }
 
-        $last = $structureprice->entity->structureprices()->orderByDesc('from')->first();
+        $last = $structureprice->entity->structureprices()->where('from_state', from_state())->orderByDesc('from')->first();
         if ($last->id !== $structureprice->id) {
             return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci",], 422);
         }

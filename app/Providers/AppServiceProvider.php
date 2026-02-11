@@ -21,9 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('state.*', function ($view) {
+        View::composer(['state.*', 'common.*'], function ($view) {
             $view->with('mode', request()->route('mode') ?? 'view');
         });
+
         // Schema::disableForeignKeyConstraints();
     }
 }

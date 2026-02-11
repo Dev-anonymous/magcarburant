@@ -24,7 +24,7 @@ class TxStructure extends Controller
                 abort(403);
             }
             abort_if(!$entity, 422, "No entity");
-            $data = $entity->structureprices();
+            $data = $entity->structureprices()->where('from_state', from_state());
         } else {
             abort(403);
         }

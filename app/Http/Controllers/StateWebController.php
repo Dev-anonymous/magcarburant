@@ -94,7 +94,7 @@ class StateWebController extends Controller
                         'tag'    => $labelTag,
                     ];
                 }
-
+                
                 return view('common.strprices', compact('grouped', 'structure'));
             }
         }

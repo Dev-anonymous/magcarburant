@@ -28,7 +28,7 @@ class RateController extends Controller
                 abort(403);
             }
             abort_if(!$entity, 422, "No entity");
-            $data = $entity->rates();
+            $data = $entity->rates()->where('from_state', from_state());
             // }
         } else if ($user->user_role === 'sudo') {
             // $entity = Entity::find(request('entity_id'));
@@ -119,7 +119,7 @@ class RateController extends Controller
             $entity = $rate->entity;
             abort_if($user->user_role == 'petrolier' && $entity->users_id != $user->id, 403, "No permission !!!");
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+            if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
                 //
             } else {
                 abort(403);
@@ -136,6 +136,7 @@ class RateController extends Controller
             }
 
             $tauxActif = $entity->rates()
+                ->where('from_state', from_state())
                 ->whereNull('to')
                 ->where('id', '!=', $rate->id)
                 ->first();
@@ -148,6 +149,7 @@ class RateController extends Controller
             }
 
             $dernierTaux = $entity->rates()
+                ->where('from_state', from_state())
                 ->whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
@@ -186,8 +188,12 @@ class RateController extends Controller
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
                 abort_if(!$entity, 422, "No entity");
-                $rate = $entity->rates();
-                $lastTx = $entity->rates()->orderByDesc('from')->first();
+                $rate = $entity->rates()->where('from_state', 0);
+                $lastTx = $entity->rates()->where('from_state', 0)->orderByDesc('from')->first();
+            } elseif ($user->user_role == 'etatique') {
+                $entity  = Entity::findOrFail(request('entity_id'));
+                $rate = $entity->rates()->where('from_state', 1);
+                $lastTx = $entity->rates()->where('from_state', 1)->orderByDesc('from')->first();
             } else {
                 abort(403, "No permission");
             }
@@ -209,6 +215,7 @@ class RateController extends Controller
                 }
             }
 
+            $validated['from_state'] = from_state();
             $rate->create($validated);
 
             DB::commit();
@@ -242,9 +249,14 @@ class RateController extends Controller
     public function destroy(Rate $rate)
     {
         $user = auth()->user();
-        abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        if ($user->user_role == 'etatique') {
+            //
+        } else {
+            abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
+        }
 
-        $last = $rate->entity->rates()->orderByDesc('from')->first();
+        $last = $rate->entity->rates()->where('from_state', from_state())->orderByDesc('from')->first();
         if ($last->id !== $rate->id) {
             return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer un taux du milieu, commencer par supprimer les dernièrs taux jusqu'à celui-ci",], 422);
         }

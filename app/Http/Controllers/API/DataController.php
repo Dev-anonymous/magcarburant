@@ -37,12 +37,7 @@ class DataController extends Controller
                 } else {
                     $entity = $user->entities()->first();
                 }
-                $base = $entity->purchases()->whereBetween('date', [$from, $to]);
-                if (from_state()) {
-                    $base->where('from_state', 1);
-                } else {
-                    $base->where('from_state', 0);
-                }
+                $base = $entity->purchases()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 
                 $totalTm = v((clone $base)->sum('qtytm'));
                 $totalM3 = v((clone $base)->sum('qtym3'));
@@ -51,12 +46,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $purchases = $entity->purchases();
-                    if (from_state()) {
-                        $purchases->where('from_state', 1);
-                    } else {
-                        $purchases->where('from_state', 0);
-                    }
+                    $purchases = $entity->purchases()->where('from_state', from_state());
 
                     $data[] = round($purchases->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('unitprice * qtytm')), 3);
                     $labels[] = $el;
@@ -66,12 +56,8 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $purchases = $entity->purchases();
-                    if (from_state()) {
-                        $purchases->where('from_state', 1);
-                    } else {
-                        $purchases->where('from_state', 0);
-                    }
+                    $purchases = $entity->purchases()->where('from_state', from_state());
+
                     $data[] = round($purchases->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
                     $labels[] = $el;
                 }
@@ -118,12 +104,8 @@ class DataController extends Controller
                 } else {
                     $entity = $user->entities()->first();
                 }
-                $base = $entity->sales()->whereBetween('date', [$from, $to]);
-                if (from_state()) {
-                    $base->where('from_state', 1);
-                } else {
-                    $base->where('from_state', 0);
-                }
+                $base = $entity->sales()->whereBetween('date', [$from, $to])->where('from_state', from_state());
+
                 $from_mutuality = request('from_mutuality');
 
                 if ($from_mutuality === "1") {
@@ -139,12 +121,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $query = $entity->sales();
-                    if (from_state()) {
-                        $query->where('from_state', 1);
-                    } else {
-                        $query->where('from_state', 0);
-                    }
+                    $query = $entity->sales()->where('from_state', from_state());
 
                     if ($from_mutuality === "1") {
                         $query->where('from_mutuality', 1);
@@ -160,12 +137,7 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $query = $entity->sales();
-                    if (from_state()) {
-                        $query->where('from_state', 1);
-                    } else {
-                        $query->where('from_state', 0);
-                    }
+                    $query = $entity->sales()->where('from_state', from_state());
 
                     if ($from_mutuality === "1") {
                         $query->where('from_mutuality', 1);
@@ -224,22 +196,13 @@ class DataController extends Controller
                     $entity = $user->entities()->first();
                 }
 
-                $base = $entity->deliveries()->whereBetween('date', [$from, $to]);
-                if (from_state()) {
-                    $base->where('from_state', 1);
-                } else {
-                    $base->where('from_state', 0);
-                }
+                $base = $entity->deliveries()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 
                 $labels = [];
                 $data = [];
                 foreach (mainfuels() as $el) {
-                    $query = $entity->deliveries();
-                    if (from_state()) {
-                        $query->where('from_state', 1);
-                    } else {
-                        $query->where('from_state', 0);
-                    }
+                    $query = $entity->deliveries()->where('from_state', from_state());
+
                     $data[] =  round($query->where('product', $el)->whereBetween('date', [$from, $to])->whereIn('product', $fuels)->whereIn('way', $zones)->sum('lata'), 3);
                     $labels[] = $el;
                 }
@@ -248,12 +211,8 @@ class DataController extends Controller
                 $labels = [];
                 $data = [];
                 foreach (mainWays() as $el) {
-                    $query = $entity->deliveries();
-                    if (from_state()) {
-                        $query->where('from_state', 1);
-                    } else {
-                        $query->where('from_state', 0);
-                    }
+                    $query = $entity->deliveries()->where('from_state', from_state());
+
                     $data[] = round($query->where('way', $el)->whereBetween('date', [$from, $to])->whereIn('product', $fuels)->whereIn('way', $zones)->sum('lata'), 3);
                     $labels[] = $el;
                 }
@@ -566,7 +525,7 @@ class DataController extends Controller
 
                 $tot = 0;
                 foreach ($fuels as $k => $fuel) {
-                    $delivery = $entity->deliveries()->where('product', $fuel)->whereBetween('date', [$from, $to])->sum('lata');
+                    $delivery = $entity->deliveries()->where('from_state', from_state())->where('product', $fuel)->whereBetween('date', [$from, $to])->sum('lata');
                     $delivery = round($delivery, 3);
                     $tot += $delivery;
                     $line0[] = [
@@ -1140,7 +1099,7 @@ class DataController extends Controller
 
         $head = [...$head, ...$labels];
 
-        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+        $sales = $entity->sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
             $q->whereIn('product', $reqfuel);
             $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();
@@ -1181,7 +1140,7 @@ class DataController extends Controller
                     $errors[] = "Aucun prix d'achat moyen n'a été trouvé pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
                 }
             } else {
-                $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
+                $pmfc_reel = (float) ($entity->purchases()->where('from_state', 0)->where(function ($q) use ($fuel) {
                     $q->where('product', $fuel);
                 })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
                 $pmlab = "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $zone) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
@@ -1313,10 +1272,12 @@ class DataController extends Controller
         $items = request('items');
 
         $user = auth()->user();
+        $isState = false;
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {
             $entity  = Entity::findOrFail(request('entity_id'));
+            $isState = true;
         } else {
             abort(403);
         }
@@ -1352,7 +1313,7 @@ class DataController extends Controller
 
         $head = [...$head, ...$labels];
 
-        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+        $sales = $entity->sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
             $q->whereIn('product', $reqfuel);
             $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();
@@ -1377,13 +1338,22 @@ class DataController extends Controller
             }
 
             $fuelObj = Fuel::where(compact('fuel'))->first();
+            $zoneObj = Zone::where(compact('zone'))->first();
 
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            $pmfc_reel = (float) ($entity->purchases()->where(function ($q) use ($fuel) {
-                $q->where('product', $fuel);
-            })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+            if ($isState) { // en mode view, etatique ici pmfc_reel uhm uhm  uhm
+                $pmfc_reel = (float) AverageFuelPrice::whereYear('month', $saledate->year)
+                    ->whereMonth('month', $saledate->month)
+                    ->where('product', $fuel)
+                    ->where('zone_id', $zoneObj->id)
+                    ->first()?->avg_price;
+            } else {
+                $pmfc_reel = (float) ($entity->purchases()->where('from_state', 0)->where(function ($q) use ($fuel) {
+                    $q->where('product', $fuel);
+                })->where('way', $zone)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+            }
 
             $ss_1 = (float)@$structure?->fuelprices()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
@@ -1520,7 +1490,7 @@ class DataController extends Controller
 
         $head = [...$head, ...$labels];
 
-        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+        $sales = $entity->sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
             $q->whereIn('product', $reqfuel);
             $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();
@@ -1751,7 +1721,7 @@ class DataController extends Controller
 
         $head = [...$head, ...$labels];
 
-        $sales = $entity->sales()->where(function ($q) use ($reqfuel, $reqzone) {
+        $sales = $entity->sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
             $q->whereIn('product', $reqfuel);
             $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();

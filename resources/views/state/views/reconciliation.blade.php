@@ -62,26 +62,6 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="py-4">
-                            <div class="table-responsive">
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card transparent">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-6">
-                                    <h4 class="card-title font-weight-bold">
-                                        Réconciliation des achats entre {{ auth()->user()->name }} et
-                                        {{ $entity->shortname }}
-                                    </h4>
-                                </div>
-                                <div class="col-xs-12 col-sm-6">
-
-                                </div>
-                            </div>
-                        </div>
                         <div class="card-body">
                             <x-dataloader />
                             <x-alert />
@@ -91,6 +71,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

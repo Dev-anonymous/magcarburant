@@ -103,9 +103,8 @@
             font-weight: bold;
             background: #ccc;
         }
-        .bodld{
 
-        }
+        .bodld {}
     </style>
     <x-datatable />
     <x-flatpickr />
@@ -129,8 +128,15 @@
             buttonClass: 'btn btn-primary'
         });
 
-        $('.flatpickr').change(function() {
-            dashboard();
+        var ff = $('#ffilter');
+
+        let timer;
+        ff.change(function(e) {
+            clearTimeout(timer);
+            var e = $(e.target);
+            timer = setTimeout(() => {
+                dashboard();
+            }, 100);
         });
 
         function dashboard() {
@@ -152,7 +158,7 @@
                     `;
 
                     h += '<thead>';
-                    var tit = data.head;
+                    var tit = data.head || [];
                     tit.forEach(ttr => {
                         var tr = '<tr>';
                         ttr.map(th => {
@@ -165,7 +171,7 @@
                     });
                     h += '</thead><tbody>';
 
-                    data.body.forEach(row => {
+                    data.body?.forEach(row => {
                         h += `<tr>`
                         row.map(e => {
                             h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
@@ -179,26 +185,30 @@
                     $('[data]').css('opacity', 1);
                     rep.hide();
 
-                    $('#table').DataTable({
-                        dom: 'Brt',
-                        ordering: false,
-                        buttons: [{
-                            extend: 'excelHtml5',
-                            title: 'Export Excel',
-                            exportOptions: {
-                                format: {
-                                    body: function(data, row, column, node) {
-                                        if (!data) return data;
-                                        let cleaned = data.toString().replace(/\s+/g,
-                                            '');
-                                        cleaned = cleaned.replace(',', '.');
-                                        let num = parseFloat(cleaned);
-                                        return isNaN(num) ? data : num;
+                    try {
+                        $('#table').DataTable({
+                            dom: 'Brt',
+                            ordering: false,
+                            buttons: [{
+                                extend: 'excelHtml5',
+                                title: 'Export Excel',
+                                exportOptions: {
+                                    format: {
+                                        body: function(data, row, column, node) {
+                                            if (!data) return data;
+                                            let cleaned = data.toString().replace(/\s+/g,
+                                                '');
+                                            cleaned = cleaned.replace(',', '.');
+                                            let num = parseFloat(cleaned);
+                                            return isNaN(num) ? data : num;
+                                        }
                                     }
                                 }
-                            }
-                        }, ],
-                    });
+                            }, ],
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
 
                     $('.tooltip').remove();
                     $('td[title]').tooltip();

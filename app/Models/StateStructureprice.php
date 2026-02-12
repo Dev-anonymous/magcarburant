@@ -11,28 +11,25 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Structureprice
+ * Class StateStructureprice
  * 
  * @property int $id
- * @property int $entity_id
  * @property string|null $name
  * @property Carbon|null $from
  * @property Carbon|null $to
  * @property float|null $usd_cdf
  * @property float|null $cdf_usd
  * 
- * @property Entity $entity
- * @property Collection|Fuelprice[] $fuelprices
+ * @property Collection|StateFuelprice[] $state_fuelprices
  *
  * @package App\Models
  */
-class Structureprice extends Model
+class StateStructureprice extends Model
 {
-	protected $table = 'structureprice';
+	protected $table = 'state_structureprice';
 	public $timestamps = false;
 
 	protected $casts = [
-		'entity_id' => 'int',
 		'from' => 'datetime',
 		'to' => 'datetime',
 		'usd_cdf' => 'float',
@@ -40,7 +37,6 @@ class Structureprice extends Model
 	];
 
 	protected $fillable = [
-		'entity_id',
 		'name',
 		'from',
 		'to',
@@ -48,13 +44,8 @@ class Structureprice extends Model
 		'cdf_usd'
 	];
 
-	public function entity()
+	public function state_fuelprices()
 	{
-		return $this->belongsTo(Entity::class);
-	}
-
-	public function fuelprices()
-	{
-		return $this->hasMany(Fuelprice::class);
+		return $this->hasMany(StateFuelprice::class);
 	}
 }

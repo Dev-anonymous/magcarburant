@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Entity;
-use App\Models\Rate;
-use Carbon\Carbon;
+use App\Models\StateRate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
-class RateController extends Controller
+class StateRateController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,29 +17,9 @@ class RateController extends Controller
     public function index()
     {
         $user = auth()->user();
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif (in_array($user->user_role, ['etatique'])) {
-                $entity  = Entity::findOrFail(request('entity_id'));
-            } else {
-                abort(403);
-            }
-            abort_if(!$entity, 422, "No entity");
-            $data = $entity->rates();
-            // }
-        } else if ($user->user_role === 'sudo') {
-            // $entity = Entity::find(request('entity_id'));
-            // if ($type == 'structure') {
-            //     // admin structure rate
-            //     $rates = Rate::where('type', 'structure');
-            // } else {
-            //     $rates = $entity->rates;
-            // }
-            abort(403);
-        } else {
-            abort(403);
-        }
+        abort_if(!in_array($user->user_role, ['etatique']), 403, 'Not permit');
+
+        $data = StateRate::query();
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -114,15 +93,8 @@ class RateController extends Controller
 
             $user = auth()->user();
             $id = request('id');
-            $rate = Rate::findOrFail($id);
-            $entity = $rate->entity;
-            abort_if(in_array($user->user_role, ['petrolier', 'logisticien']) && $entity->users_id != $user->id, 403, "No permission !!!");
-
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                //
-            } else {
-                abort(403);
-            }
+            $rate = StateRate::findOrFail($id);
+            abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
             if ($rate->to) {
                 DB::beginTransaction();
@@ -134,8 +106,7 @@ class RateController extends Controller
                 ], 200);
             }
 
-            $tauxActif = $entity->rates()
-                ->whereNull('to')
+            $tauxActif = StateRate::whereNull('to')
                 ->where('id', '!=', $rate->id)
                 ->first();
 
@@ -146,8 +117,7 @@ class RateController extends Controller
                 ], 422);
             }
 
-            $dernierTaux = $entity->rates()
-                ->whereNotNull('to')
+            $dernierTaux = StateRate::whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
 
@@ -182,11 +152,9 @@ class RateController extends Controller
             ]);
 
             $user = auth()->user();
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-                abort_if(!$entity, 422, "No entity");
-                $rate = $entity->rates();
-                $lastTx = $entity->rates()->orderByDesc('from')->first();
+            if (in_array($user->user_role, ['etatique'])) {
+                $rate = new StateRate;
+                $lastTx = StateRate::orderByDesc('from')->first();
             } else {
                 abort(403, "No permission");
             }
@@ -222,7 +190,7 @@ class RateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Rate $rate)
+    public function show(StateRate $staterate)
     {
         //
     }
@@ -230,7 +198,7 @@ class RateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Rate $rate)
+    public function update(Request $request, StateRate $staterate)
     {
         //
     }
@@ -238,22 +206,21 @@ class RateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rate $rate)
+    public function destroy(StateRate $staterate)
     {
         $user = auth()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
-        abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
+        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
-        $last = $rate->entity->rates()->orderByDesc('from')->first();
-        if ($last->id !== $rate->id) {
+        $last = $staterate->orderByDesc('from')->first();
+        if ($last->id !== $staterate->id) {
             return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer un taux du milieu, commencer par supprimer les dernièrs taux jusqu'à celui-ci",], 422);
         }
 
-        $rate->delete();
+        $staterate->delete();
 
         return response()->json([
             'success' => true,
-            'message' => "Vous avez supprimé le taux #$rate->id avec succès !",
+            'message' => "Vous avez supprimé le taux #$staterate->id avec succès !",
         ], 200);
     }
 }

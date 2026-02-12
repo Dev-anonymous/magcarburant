@@ -21,7 +21,7 @@
         <hr />
         <div class="row">
             @if ($entity->user->user_role == 'petrolier')
-                {{-- <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
                         onclick="location.assign('{{ state_route('purchase', $entity) }}')">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -34,7 +34,7 @@
                             <p class="m-0">Voir les achats de {{ $entity->shortname }}</p>
                         </div>
                     </div>
-                </div> --}}
+                </div>
             @endif
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Entity;
+use App\Models\StateStructureprice;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -18,13 +19,13 @@ class TxStructure extends Controller
         if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
+                abort_if(!$entity, 422, "No entity");
+                $data = $entity->structureprices();
             } elseif (in_array($user->user_role, ['etatique'])) {
-                $entity  = Entity::findOrFail(request('entity_id'));
+                $data  = StateStructureprice::query();
             } else {
                 abort(403);
             }
-            abort_if(!$entity, 422, "No entity");
-            $data = $entity->structureprices()->where('from_state', from_state());
         } else {
             abort(403);
         }

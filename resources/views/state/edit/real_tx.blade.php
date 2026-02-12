@@ -4,8 +4,8 @@
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux Réels | {{ $entity->shortname }} </h2>
-                <p class="lead small m-0">Historique des taux réels pour {{ $entity->shortname }}</p>
+                <h2 class="font-weight-bold">Taux Réels</h2>
+                <p class="lead small m-0">Historique des taux réels</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -26,14 +26,12 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
-                        @if (in_array(auth()->user()->user_role, ['petrolier', 'logisticien']))
-                            <div class="">
-                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                                    <i class="material-icons md-24">add_circle_outline</i>
-                                    Nouveau taux
-                                </button>
-                            </div>
-                        @endif
+                        <div class="">
+                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                <i class="material-icons md-24">add_circle_outline</i>
+                                Nouveau taux
+                            </button>
+                        </div>
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
@@ -54,9 +52,9 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
+
 @section('modals')
     <div class="modal fade" id="mdladd" role="dialog">
         <div class="modal-dialog" role="document">
@@ -219,11 +217,8 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('rate.index') }}',
-                data: function(d) {
-                    d.entity_id = '{{ $entity->id }}';
-                    // d.type = 'RÉEL';
-                }
+                url: '{{ route('staterate.index') }}',
+                data: function(d) {}
             },
             order: [
                 [0, "desc"]
@@ -332,7 +327,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('rate.store') }}',
+                url: '{{ route('staterate.store') }}',
                 method: 'POST',
                 data: data,
                 success: function(resp) {
@@ -373,7 +368,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('rate.index') }}/' + id,
+                url: '{{ route('staterate.index') }}/' + id,
                 method: 'delete',
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";

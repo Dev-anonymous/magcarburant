@@ -78,14 +78,9 @@ Route::middleware('auth')->group(function () {
         Route::controller(LogisticsWebController::class)->group(function () {
             Route::get('', 'home')->name('logistics.home');
             Route::get('sale', 'sale')->name('logistics.sale');
-            // Route::get('apps', 'apps')->name('logistics.apps');
-            // Route::get('purchase', 'purchase')->name('logistics.purchase');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('logistics.accounting');
                 Route::get('analyse', 'analyse')->name('logistics.analyse');
-                //     Route::get('claim', 'claim')->name('logistics.claim');
-                //     Route::get('delivery', 'delivery')->name('logistics.delivery');
-                //     Route::get('taxation', 'taxation')->name('logistics.taxation');
             });
         });
     });
@@ -95,8 +90,11 @@ Route::middleware('auth')->group(function () {
             Route::get('', 'home')->name('state.home');
             Route::prefix('config')->group(function () {
                 Route::get('', 'config')->name('state.config');
-                Route::get('avg-price', 'avg_price')->name('state.avg-price');
                 Route::get('reconciliation', 'reconciliation')->name('state.reconciliation');
+                Route::get('avg-price', 'avg_price')->name('state.avg-price');
+                Route::get('r-tx', 'real_tx')->name('state.real-tx');
+                Route::get('s-tx', 'struct_tx')->name('state.struct-tx');
+                Route::get('str-price', 'str_price')->name('state.str-price');
             });
             Route::prefix('{mode}/{entity}')
                 ->whereIn('mode', ['view', 'edit'])

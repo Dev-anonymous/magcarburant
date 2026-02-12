@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
-class Structureprices extends Controller
+class StructurepriceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,7 +28,7 @@ class Structureprices extends Controller
             abort(403);
         }
         abort_if(!$entity, 422, "No entity");
-        $structureprices = $entity->structureprices()->where('from_state', from_state());
+        $structureprices = $entity->structureprices();
 
         return DataTables::of($structureprices)
             ->addIndexColumn()
@@ -145,7 +145,6 @@ class Structureprices extends Controller
             }
 
             $strActif = $entity->structureprices()
-                ->where('from_state', from_state())
                 ->whereNull('to')
                 ->where('id', '!=', $str->id)
                 ->first();
@@ -158,7 +157,6 @@ class Structureprices extends Controller
             }
 
             $dernierStr = $entity->structureprices()
-                ->where('from_state', from_state())
                 ->whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
@@ -200,7 +198,7 @@ class Structureprices extends Controller
             }
 
             abort_if(!$entity, 422, "No entity");
-            $structureprices = $entity->structureprices()->where('from_state', from_state());
+            $structureprices = $entity->structureprices();
 
             DB::beginTransaction();
 
@@ -224,7 +222,6 @@ class Structureprices extends Controller
                     abort_if($from->toDateString() !== $expectedDate->toDateString(), 422, "La nouvelle structure doit commencer le {$expectedDate->format('d-m-Y')}.");
                 }
             }
-            $validated['from_state'] = from_state();
 
             $st = $structureprices->create($validated);
             $name = strname($entity, $st);
@@ -267,7 +264,7 @@ class Structureprices extends Controller
             abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
         }
 
-        $last = $structureprice->entity->structureprices()->where('from_state', from_state())->orderByDesc('from')->first();
+        $last = $structureprice->entity->structureprices()->orderByDesc('from')->first();
         if ($last->id !== $structureprice->id) {
             return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci",], 422);
         }

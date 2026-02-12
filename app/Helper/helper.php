@@ -5,6 +5,8 @@ use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Fuelprice;
 use App\Models\Label;
+use App\Models\StateFuelprice;
+use App\Models\StateStructureprice;
 use App\Models\Structureprice;
 use App\Models\User;
 use App\Models\Zone;
@@ -122,11 +124,17 @@ function mainWays()
     return ['NORD', 'SUD', 'EST', 'OUEST'];
 }
 
-function initfuelprice(Structureprice $structure)
+function initfuelprice(Structureprice|StateStructureprice $structure)
 {
+    $isState = $structure instanceof StateStructureprice;
 
-    $exists = FuelPrice::where(['structureprice_id' => $structure->id, 'from_state' => from_state()])
-        ->exists();
+    if ($isState) {
+        $exists = StateFuelprice::where(['state_structureprice_id' => $structure->id])
+            ->exists();
+    } else {
+        $exists = FuelPrice::where(['structureprice_id' => $structure->id])
+            ->exists();
+    }
     if ($exists) return;
 
 
@@ -319,22 +327,40 @@ function initfuelprice(Structureprice $structure)
                 foreach ($labels as $labelName) {
                     $label = Label::where('label', $labelName)->first();
                     if ($label && $zone) {
-                        $exists = FuelPrice::where('structureprice_id', $structure->id)
-                            ->where('fuel_id', $fuel->id)
-                            ->where('zone_id', $zone->id)
-                            ->where('label_id', $label->id)
-                            ->exists();
+                        if ($isState) {
+                            $exists = StateFuelprice::where('state_structureprice_id', $structure->id)
+                                ->where('fuel_id', $fuel->id)
+                                ->where('zone_id', $zone->id)
+                                ->where('label_id', $label->id)
+                                ->exists();
+                        } else {
+                            $exists = FuelPrice::where('structureprice_id', $structure->id)
+                                ->where('fuel_id', $fuel->id)
+                                ->where('zone_id', $zone->id)
+                                ->where('label_id', $label->id)
+                                ->exists();
+                        }
 
                         if (! $exists) {
-                            FuelPrice::create([
-                                'structureprice_id' => $structure->id,
-                                'from_state' => from_state(),
-                                'fuel_id' => $fuel->id,
-                                'zone_id' => $zone->id,
-                                'label_id' => $label->id,
-                                'amount' => 0,
-                                'currency' => 'USD',
-                            ]);
+                            if ($isState) {
+                                StateFuelprice::create([
+                                    'state_structureprice_id' => $structure->id,
+                                    'fuel_id' => $fuel->id,
+                                    'zone_id' => $zone->id,
+                                    'label_id' => $label->id,
+                                    'amount' => 0,
+                                    'currency' => 'USD',
+                                ]);
+                            } else {
+                                FuelPrice::create([
+                                    'structureprice_id' => $structure->id,
+                                    'fuel_id' => $fuel->id,
+                                    'zone_id' => $zone->id,
+                                    'label_id' => $label->id,
+                                    'amount' => 0,
+                                    'currency' => 'USD',
+                                ]);
+                            }
                         }
                     }
                     // if (!$label) {
@@ -365,9 +391,13 @@ function userimg(?User $user = null)
     }
 }
 
-function strname(Entity $entity, Structureprice $str)
+function strname(?Entity $entity, Structureprice|StateStructureprice $str, $isState = false)
 {
-    $n = $entity->structureprices()->whereNotNull('name')->count() + 1;
+    if ($isState) {
+        $n = StateStructureprice::whereNotNull('name')->count() + 1;
+    } else {
+        $n = $entity->structureprices()->whereNotNull('name')->count() + 1;
+    }
     if ($n <= 9) {
         $n = "00$n";
     }

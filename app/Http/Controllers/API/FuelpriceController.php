@@ -52,7 +52,6 @@ class FuelpriceController extends Controller
 
         $fuelprice->amount = $request->price;
         $fuelprice->currency = 'USD';
-        $fuelprice->from_state = from_state();
         $fuelprice->save();
         return response()->json([
             'success' => true,

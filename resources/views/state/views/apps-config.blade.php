@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Comptabilité')
+@section('title', 'Configuration')
 @section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
@@ -32,6 +32,48 @@
                     <div class="p-2">
                         <h4 class="font-weight-bold">Prix moyen d'achat</h4>
                         <p class="m-0">Prix moyen d'achat des carburant</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('state.str-price') }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000">
+                        <path
+                            d="M480-40q-112 0-216-66T100-257v137H40v-240h240v60H143q51 77 145.5 138.5T480-100q78 0 147.5-30t121-81.5Q800-263 830-332.5T860-480h60q0 91-34.5 171T791-169q-60 60-140 94.5T480-40Zm-29-153v-54q-45-12-75.5-38.5T324-358l51-17q12 38 42.5 60t69.5 22q40 0 66.5-19.5T580-364q0-33-25-55.5T463-470q-60-25-90-54t-30-78q0-44 30-75t80-38v-51h55v51q38 4 66 24t45 55l-48 23q-15-28-37-42t-52-14q-39 0-61.5 18T398-602q0 32 26 51t84 43q69 29 98 61t29 83q0 25-9 46t-25.5 36Q584-267 560-257.5T506-245v52h-55ZM40-480q0-91 34.5-171T169-791q60-60 140-94.5T480-920q112 0 216 66t164 151v-137h60v240H680v-60h137q-51-77-145-138.5T480-860q-78 0-147.5 30t-121 81.5Q160-697 130-627.5T100-480H40Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Structure de prix</h4>
+                        <p class="m-0">Configuration de la structure des prix</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('state.real-tx') }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000">
+                        <path
+                            d="M196-331q-20-36-28-72.5t-8-74.5q0-131 94.5-225.5T480-798h43l-80-80 39-39 149 149-149 149-40-40 79-79h-41q-107 0-183.5 76.5T220-478q0 29 5.5 55t13.5 49l-43 43ZM476-40 327-189l149-149 39 39-80 80h45q107 0 183.5-76.5T740-479q0-29-5-55t-15-49l43-43q20 36 28.5 72.5T800-479q0 131-94.5 225.5T480-159h-45l80 80-39 39Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Taux réel</h4>
+                        <p class="m-0">Configuration des variations des taux réels</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px"
+                    onclick="location.assign('{{ route('state.struct-tx') }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000">
+                        <path
+                            d="M196-331q-20-36-28-72.5t-8-74.5q0-131 94.5-225.5T480-798h43l-80-80 39-39 149 149-149 149-40-40 79-79h-41q-107 0-183.5 76.5T220-478q0 29 5.5 55t13.5 49l-43 43ZM476-40 327-189l149-149 39 39-80 80h45q107 0 183.5-76.5T740-479q0-29-5-55t-15-49l43-43q20 36 28.5 72.5T800-479q0 131-94.5 225.5T480-159h-45l80 80-39 39Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Taux structure</h4>
+                        <p class="m-0">Configuration des variations des taux structures</p>
                     </div>
                 </div>
             </div>

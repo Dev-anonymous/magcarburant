@@ -1,11 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Voiex et Structure des prix')
+@section('title', 'Structure des prix')
 @section('body')
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Voies et Structures des prix
-                    | {{ $structure->entity->shortname }}
                 </h2>
                 <p class="lead small m-0">Gestion des structures des prix</p>
             </div>
@@ -101,14 +100,12 @@
                                                 </table>
                                             </div>
                                             <div class="">
-                                                @if (in_array(auth()->user()->user_role, ['logisticien', 'petrolier']))
-                                                    <div class="text-right">
-                                                        <button class="btn btn-sm btn-edit-table">
-                                                            <i class="material-icons md-18">edit</i>
-                                                            Modifier les prix
-                                                        </button>
-                                                    </div>
-                                                @endif
+                                                <div class="text-right">
+                                                    <button class="btn btn-sm btn-edit-table">
+                                                        <i class="material-icons md-18">edit</i>
+                                                        Modifier les prix
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -492,7 +489,7 @@
             });
 
             $.ajax({
-                url: `{{ route('fuelprice.index') }}/${fuelpriceId}`,
+                url: `{{ route('statefuelprice.index') }}/${fuelpriceId}`,
                 type: 'PUT',
                 data: {
                     price: numericPrice

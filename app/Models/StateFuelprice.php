@@ -9,10 +9,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Fuelprice
+ * Class StateFuelprice
  * 
  * @property int $id
- * @property int $structureprice_id
+ * @property int $state_structureprice_id
  * @property int $fuel_id
  * @property int $label_id
  * @property int $zone_id
@@ -21,18 +21,18 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property Fuel $fuel
  * @property Label $label
- * @property Structureprice $structureprice
+ * @property StateStructureprice $state_structureprice
  * @property Zone $zone
  *
  * @package App\Models
  */
-class Fuelprice extends Model
+class StateFuelprice extends Model
 {
-	protected $table = 'fuelprice';
+	protected $table = 'state_fuelprice';
 	public $timestamps = false;
 
 	protected $casts = [
-		'structureprice_id' => 'int',
+		'state_structureprice_id' => 'int',
 		'fuel_id' => 'int',
 		'label_id' => 'int',
 		'zone_id' => 'int',
@@ -40,7 +40,7 @@ class Fuelprice extends Model
 	];
 
 	protected $fillable = [
-		'structureprice_id',
+		'state_structureprice_id',
 		'fuel_id',
 		'label_id',
 		'zone_id',
@@ -58,9 +58,9 @@ class Fuelprice extends Model
 		return $this->belongsTo(Label::class);
 	}
 
-	public function structureprice()
+	public function state_structureprice()
 	{
-		return $this->belongsTo(Structureprice::class);
+		return $this->belongsTo(StateStructureprice::class);
 	}
 
 	public function zone()

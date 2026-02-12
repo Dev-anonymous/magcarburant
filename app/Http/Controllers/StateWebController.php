@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
+use App\Models\StateStructureprice;
 use App\Models\Structureprice;
 use App\Models\User;
 
@@ -132,5 +133,55 @@ class StateWebController extends Controller
     function config()
     {
         return view('state.views.apps-config');
+    }
+
+    function real_tx()
+    {
+        return view('state.edit.real_tx');
+    }
+
+    function struct_tx()
+    {
+        return view('state.views.strates_v');
+    }
+
+    function str_price()
+    {
+        $stx = request('stx');
+        if ($stx) {
+            $structure = StateStructureprice::with(['state_fuelprices.fuel', 'state_fuelprices.zone', 'state_fuelprices.label'])->find($stx);
+            if ($structure) {
+                initfuelprice($structure);
+                $structure->refresh();
+
+                $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE', 'FOMI'];
+                $aviation  = ['JET'];
+                $grouped = [
+                    'terrestre' => [],
+                    'aviation'  => [],
+                ];
+                foreach ($structure->state_fuelprices as $price) {
+                    $fuelName  = strtoupper($price->fuel->fuel);
+                    $zoneName  = $price->zone->zone;
+                    $labelName = $price->label->label;
+                    $labelTag  = $price->label->tag;
+
+                    $type = in_array($fuelName, $terrestre) ? 'terrestre' : 'aviation';
+
+                    if (!isset($grouped[$type][$zoneName][$fuelName])) {
+                        $grouped[$type][$zoneName][$fuelName] = [];
+                    }
+
+                    $grouped[$type][$zoneName][$fuelName][$labelName] = [
+                        'id' => $price->id,
+                        'amount' => $price->amount,
+                        'tag'    => $labelTag,
+                    ];
+                }
+
+                return view('state.edit.str_way', compact('grouped', 'structure'));
+            }
+        }
+        return view('state.edit.str_price');
     }
 }

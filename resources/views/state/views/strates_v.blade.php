@@ -1,11 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Taux Réels')
+@section('title', 'Taux Structures')
+@section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux Réels | {{ $entity->shortname }} </h2>
-                <p class="lead small m-0">Historique des taux réels pour {{ $entity->shortname }}</p>
+                <h2 class="font-weight-bold">Taux structure </h2>
+                <p class="lead small m-0">Historique de taux structure</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -26,6 +27,9 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
+                        <div class="">
+
+                        </div>
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
@@ -33,6 +37,7 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
+                                        <th>Structure</th>
                                         <th>Taux</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
@@ -45,6 +50,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 
@@ -56,10 +62,8 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('rate.index') }}',
+                url: '{{ route('tx-structure.index') }}',
                 data: function(d) {
-                    d.entity_id = '{{ $entity->id }}';
-                    // d.type = 'RÉEL';
                 }
             },
             order: [
@@ -69,12 +73,16 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 3,
+                targets: 4,
                 width: '1%'
             }],
             columns: [{
                     data: 'id',
                     name: 'id',
+                },
+                {
+                    data: 'name',
+                    name: 'name'
                 },
                 {
                     data: 'rate',
@@ -85,11 +93,13 @@
                 },
                 {
                     data: 'from',
-                    name: 'from'
+                    name: 'from',
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'to',
-                    name: 'to'
+                    name: 'to',
+                    className: 'text-nowrap',
                 },
             ],
             dom: 'Blfrtip',

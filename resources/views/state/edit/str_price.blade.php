@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Taux Réels')
+@section('title', 'Structure des prix')
 @section('body')
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux Réels | {{ $entity->shortname }} </h2>
-                <p class="lead small m-0">Historique des taux réels pour {{ $entity->shortname }}</p>
+                <h2 class="font-weight-bold">Structures des prix</h2>
+                <p class="lead small m-0">Gestion des structures des prix</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -24,26 +24,26 @@
                 <div class="card transparent">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title font-weight-bold">
-                            Historique des taux
+                            Historique des structures des prix
                         </h4>
-                        @if (in_array(auth()->user()->user_role, ['petrolier', 'logisticien']))
-                            <div class="">
-                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
-                                    <i class="material-icons md-24">add_circle_outline</i>
-                                    Nouveau taux
-                                </button>
-                            </div>
-                        @endif
+                        <div class="">
+                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                <i class="material-icons md-24">add_circle_outline</i>
+                                Nouvelle structure
+                            </button>
+                        </div>
                     </div>
                     <div class="py-4">
                         <div class="table-responsive">
                             <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Taux</th>
+                                        <th>ID </th>
+                                        <th>Structure</th>
+                                        <th>Taux Structure</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
+                                        <th class="no-export"></th>
                                         <th class="no-export"></th>
                                     </tr>
                                 </thead>
@@ -62,18 +62,18 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Nouveau taux</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Nouvelle structure</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form class="was-validated" fadd>
-                    <input type="hidden" name="type" value="RÉEL">
                     <div class="modal-body">
                         <div class="mb-2">
                             <label class="mb-0" for="dv1">Date validité du </label>
                             <input type="text" class="form-control flatpickr" id="dv1" required name="from">
                         </div>
+                        <h5>Taux structure</h5>
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
@@ -87,9 +87,9 @@
                             </div>
                         </div>
                         <p class="m-0 text-danger mb-3">
-                            Si vous créez un nouveau taux sans pour autant spécifier la date de clôture du
-                            taux actuel, la date clôture du taux actuel sera la date début du
-                            taux que vous créez – 1.
+                            Si vous créez une nouvelle structure de prix sans pour autant spécifier la date de clôture de la
+                            structure de prix actuelle, la date clôture de la structure actuelle sera la date début de la
+                            structure que vous créez – 1.
                         </p>
                         <x-alert />
                     </div>
@@ -114,7 +114,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="defaultModalLabel">Modification taux</h5>
+                    <h5 class="modal-title" id="defaultModalLabel">Modification structure</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -128,13 +128,14 @@
                             <input type="text" class="form-control" id="dv1" required name="from">
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0">Date validité au (optionnel)</label>
-                            <input type="text" class="form-control" name="to">
+                            <label class="mb-0">Date validité au </label>
+                            <input type="text" class="form-control" name="to" required>
                         </div>
                         <p class="m-0 text-danger mb-3">
-                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les dates
-                            du taux. Si vous vous êtes trompé les dates, veuillez supprimer ce taux et le recréer.
+                            Une fois la <b>"date validité au"</b> renseignée, vous ne pouvez plus modifier les dates de la
+                            structure. Si vous vous êtes trompé les dates, veuillez supprimer cette structure et la recréer.
                         </p>
+                        <h5>Taux structure</h5>
                         <div class="mb-2">
                             <div class="input-group">
                                 <div class="input-group-append">
@@ -166,6 +167,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="mdldel" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -174,7 +176,7 @@
                     <div class="modal-body">
                         <div class="mb-2 text-center">
                             <h3 class="text-danger">
-                                Voulez-vous supprimer le taux <span shortname></span> ?
+                                Voulez-vous supprimer la structure <span shortname></span> et toutes ses informations ?
                             </h3>
                         </div>
                         <x-alert />
@@ -219,11 +221,8 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('rate.index') }}',
-                data: function(d) {
-                    d.entity_id = '{{ $entity->id }}';
-                    // d.type = 'RÉEL';
-                }
+                url: '{{ route('statestructureprice.index') }}',
+                data: function(d) {}
             },
             order: [
                 [0, "desc"]
@@ -240,19 +239,33 @@
                     name: 'id',
                 },
                 {
-                    data: 'rate',
-                    name: 'rate',
-                    className: 'text-nowrap font-weight-bold',
+                    data: 'name',
+                    name: 'name',
+                    className: 'text-nowrap',
+                },
+                {
+                    data: 'tx',
+                    name: 'tx',
                     orderable: false,
                     searchable: false,
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'from',
-                    name: 'from'
+                    name: 'from',
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'to',
-                    name: 'to'
+                    name: 'to',
+                    className: 'text-nowrap',
+                },
+                {
+                    data: 'view',
+                    name: 'view',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-nowrap',
                 },
                 {
                     data: 'action',
@@ -287,6 +300,7 @@
                 $('[name="id"]', form).val(data.id);
                 $('[name="from"]', form).val(data.from);
                 $('[name="to"]', form).val(data.to);
+                $('[name="cdf_usd"]', form).val(data.cdf_usd);
                 $('[name="usd_cdf"]', form).val(data.usd_cdf);
                 if (data.to) {
                     $('[name="from"]', form).attr('disabled', true);
@@ -302,7 +316,7 @@
                 var mdl = $('#mdldel');
                 var form = $('[fdel]', mdl);
                 $('[name="id"]', form).val(data.id);
-                $('[shortname]', form).html('#' + data.id);
+                $('[shortname]', form).html(data.name);
                 mdl.modal('show');
             });
         });
@@ -332,7 +346,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('rate.store') }}',
+                url: '{{ route('statestructureprice.store') }}',
                 method: 'POST',
                 data: data,
                 success: function(resp) {
@@ -345,7 +359,7 @@
                     setTimeout(() => {
                         rep.hide();
                         $('#mdladd,#mdledit').modal('hide');
-                    }, 2000);
+                    }, 10000);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;
@@ -373,7 +387,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('rate.index') }}/' + id,
+                url: '{{ route('statestructureprice.index') }}/' + id,
                 method: 'delete',
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";

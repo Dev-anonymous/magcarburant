@@ -20,7 +20,7 @@
         </div>
         <hr />
         <div class="row">
-            @if ($entity->user->user_role == 'petrolier')
+            @if ($entity->user->user_role == 'petrolier' && 'view' == $mode)
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
                         onclick="location.assign('{{ state_route('purchase', $entity) }}')">

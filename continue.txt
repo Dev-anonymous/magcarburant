@@ -1,6 +1,8 @@
 Controler from_state sur donnee bilan : sale purchase, struct price
 
 
+#### StateStructure ... 
+
 
 # page livraison excedentaire : ajout achat , les donnee ne se charge pas
 

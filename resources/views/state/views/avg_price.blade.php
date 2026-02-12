@@ -20,23 +20,20 @@
             </div>
         </div>
         <hr />
-
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 p-0">
                     <div class="card transparent">
                         <div class="card-header">
                             <form id="ffilter" class="filters-form pull-right" role="form">
-                                @if ('edit' == $mode)
-                                    <div class="form-group mb-1">
-                                        <label for="fuel" class="control-label d-block mb-0">Année</label>
-                                        <select id="year" class="form-control select2" style="min-width:150px;">
-                                            @foreach ($years as $e)
-                                                <option>{{ $e }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                @endif
+                                <div class="form-group mb-1">
+                                    <label for="fuel" class="control-label d-block mb-0">Année</label>
+                                    <select id="year" class="form-control select2" style="min-width:150px;">
+                                        @foreach ($years as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </form>
                         </div>
                         <div class="py-4">

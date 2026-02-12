@@ -93,13 +93,17 @@ Route::middleware('auth')->group(function () {
     Route::prefix('state')->middleware(StateMiddleware::class)->group(function () {
         Route::controller(StateWebController::class)->group(function () {
             Route::get('', 'home')->name('state.home');
+            Route::prefix('config')->group(function () {
+                Route::get('', 'config')->name('state.config');
+                Route::get('avg-price', 'avg_price')->name('state.avg-price');
+                Route::get('reconciliation', 'reconciliation')->name('state.reconciliation');
+            });
             Route::prefix('{mode}/{entity}')
                 ->whereIn('mode', ['view', 'edit'])
                 ->group(function () {
                     Route::get('', 'apps')->name('state.apps');
                     Route::get('sale', 'sale')->name('state.sale');
                     Route::get('purchase', 'purchase')->name('state.purchase');
-                    Route::get('avg-price', 'avg_price')->name('state.avg-price');
                     Route::prefix('accounting')->group(function () {
                         Route::get('', 'accounting')->name('state.accounting');
                         Route::get('analyse', 'analyse')->name('state.analyse');

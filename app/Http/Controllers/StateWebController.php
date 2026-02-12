@@ -94,7 +94,7 @@ class StateWebController extends Controller
                         'tag'    => $labelTag,
                     ];
                 }
-                
+
                 return view('common.strprices', compact('grouped', 'structure'));
             }
         }
@@ -116,7 +116,7 @@ class StateWebController extends Controller
         return view('state.views.taxation', compact('entity'));
     }
 
-    function avg_price($mode, Entity $entity)
+    function avg_price()
     {
         initAvgPrice();
         $years = AverageFuelPrice::selectRaw('YEAR(month) as year')
@@ -125,5 +125,12 @@ class StateWebController extends Controller
             ->pluck('year');
 
         return view('state.views.avg_price', compact('years'));
+    }
+
+    function reconciliation() {}
+
+    function config()
+    {
+        return view('state.views.apps-config');
     }
 }

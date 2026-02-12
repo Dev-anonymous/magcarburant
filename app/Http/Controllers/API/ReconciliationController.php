@@ -71,10 +71,10 @@ class ReconciliationController extends Controller
                     $head[] = [['label' => "PRIX MOYEN D'ACHAT", 'class' => 'bold text-center', 'colspan' => 4]];
                     $head[] = [['label' => "VOIE $way", 'class' => 'bgred', 'colspan' => 4]];
                     $head[] = [
-                        ['label' => 'PRODUIT', 'class' => 'title'],
-                        ['label' => $me->shortname, 'class' => 'title'],
-                        ['label' => $entity->shortname, 'class' => 'title'],
-                        ['label' => 'ECART', 'class' => 'title']
+                        ['label' => 'PRODUIT', 'class' => 'title bgred'],
+                        ['label' => $me->shortname, 'class' => 'title bgred'],
+                        ['label' => $entity->shortname, 'class' => 'title bgred'],
+                        ['label' => 'ECART', 'class' => 'title bgred']
                     ];
                 } else {
                     if (!$sameMonth) {
@@ -103,7 +103,7 @@ class ReconciliationController extends Controller
                             ['label' => $fuel, 'class' => ''],
                             ['label' => v($avg), 'title' => $lab1],
                             ['label' => v($pmfc_reel), 'title' => $lab2],
-                            ['label' => v($ecart), 'class' => '', 'title' => "$me->shortname - $entity->shortname"],
+                            ['label' => v($ecart), 'class' => $avg !== $pmfc_reel ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
                         ];
 
                         $body[] = $t;

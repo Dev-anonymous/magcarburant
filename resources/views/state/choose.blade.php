@@ -40,8 +40,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 145px"
-                    onclick="location.assign('{{ route('state.reconciliation') }}')">
+                <div class="carte" mode="recon" style="cursor: pointer;min-height: 145px">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000">
@@ -129,12 +128,13 @@
         $('[entity]').click(function() {
             var entity = $(this).attr('entity');
             if (entity) {
-
                 var mode = $('#navmode').val();
                 if ('view' == mode) {
                     var href = '{{ route('state.apps', ['mode' => 'view', 'entity' => 'DATA_ID']) }}/';
                 } else if ('edit' == mode) {
                     var href = '{{ route('state.apps', ['mode' => 'edit', 'entity' => 'DATA_ID']) }}/';
+                }else if ('recon' == mode){
+                    var href = '{{ route('state.reconciliation','DATA_ID') }}'
                 } else {
                     return alert('Invalid mode');
                 }

@@ -128,7 +128,11 @@ class StateWebController extends Controller
         return view('state.views.avg_price', compact('years'));
     }
 
-    function reconciliation() {}
+    function reconciliation(Entity $entity)
+    {
+        $me = auth()->user()->entities()->first();
+        return view('state.views.reconciliation', compact('entity', 'me'));
+    }
 
     function config()
     {

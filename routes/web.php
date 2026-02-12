@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
             Route::get('', 'home')->name('state.home');
             Route::prefix('config')->group(function () {
                 Route::get('', 'config')->name('state.config');
-                Route::get('reconciliation', 'reconciliation')->name('state.reconciliation');
+                Route::get('reconciliation/{entity}', 'reconciliation')->name('state.reconciliation');
                 Route::get('avg-price', 'avg_price')->name('state.avg-price');
                 Route::get('r-tx', 'real_tx')->name('state.real-tx');
                 Route::get('s-tx', 'struct_tx')->name('state.struct-tx');

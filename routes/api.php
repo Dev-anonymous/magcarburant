@@ -7,6 +7,7 @@ use App\Http\Controllers\API\EntityController;
 use App\Http\Controllers\API\FuelpriceController;
 use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\RateController;
+use App\Http\Controllers\API\ReconciliationController;
 use App\Http\Controllers\API\SaleController;
 use App\Http\Controllers\API\StateFuelpriceController;
 use App\Http\Controllers\API\StateRateController;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
+    Route::get('reconciliation', [ReconciliationController::class, 'reconciliation'])->name('reconciliation');
     Route::resource('entity', EntityController::class);
     Route::resource('rate', RateController::class);
     Route::resource('staterate', StateRateController::class);

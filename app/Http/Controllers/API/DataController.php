@@ -63,34 +63,7 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                $resp = compact('totalTm', 'totalM3', 'totalAmount', 'chart1', 'chart2');
-                if ($user->user_role == 'etatique') {
-                    // les donnee que entity a chargee
-                    $ob = [];
-                    foreach (mainfuels() as $el) {
-                        $m31 = round($entity->purchases()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
-                        $m32 = round($entity->purchases()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtym3'), 3);
-
-                        $tm1 = round($entity->purchases()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtytm'), 3);
-                        $tm2 = round($entity->purchases()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum('qtytm'), 3);
-
-                        $t1 = round($entity->purchases()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('unitprice * qtytm')), 3);
-                        $t2 = round($entity->purchases()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('unitprice * qtytm')), 3);
-
-                        $ob[] = [
-                            'fuel' => $el,
-                            'm31' => $m31,
-                            'm32' => $m32,
-                            'tm1' => $tm1,
-                            'tm2' => $tm2,
-                            'usd1' => $t1,
-                            'usd2' => $t2,
-                        ];
-                    }
-                    $resp['rec'] = $ob;
-                }
-
-                return $resp;
+                return compact('totalTm', 'totalM3', 'totalAmount', 'chart1', 'chart2');
             }
             if ($type === 'sale') {
                 $date = request('date');
@@ -150,35 +123,7 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                $resp = compact('totalLata', 'totalL15', 'chart1', 'chart2');
-
-                if ($user->user_role == 'etatique') {
-                    // les donnee que entity a chargee
-                    $ob = [];
-                    foreach (mainfuels() as $el) {
-                        $m31 = round($entity->sales()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('lata/1000')), 3);
-                        $m32 = round($entity->sales()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('lata/1000')), 3);
-
-                        $lata1 = round($entity->sales()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
-                        $lata2 = round($entity->sales()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
-
-                        $l151 = round($entity->sales()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum('l15'), 3);
-                        $l152 = round($entity->sales()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum('l15'), 3);
-
-                        $ob[] = [
-                            'fuel' => $el,
-                            'm31' => $m31,
-                            'm32' => $m32,
-                            'lata1' => $lata1,
-                            'lata2' => $lata2,
-                            'l151' => $l151,
-                            'l152' => $l152,
-                        ];
-                    }
-                    $resp['rec'] = $ob;
-                }
-
-                return $resp;
+                return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
 
             if ($type === 'delivery') {
@@ -218,30 +163,7 @@ class DataController extends Controller
                 }
                 $chart2 = compact('labels', 'data');
 
-                $resp = compact('chart1', 'chart2');
-
-                if ($user->user_role == 'etatique') {
-                    // les donnee que entity a chargee
-                    $ob = [];
-                    foreach (mainfuels() as $el) {
-                        $lata1 = round($entity->deliveries()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
-                        $lata2 = round($entity->deliveries()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
-
-                        $t1 = round($entity->deliveries()->where('from_state', 1)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('lata*unitprice')), 3);
-                        $t2 = round($entity->deliveries()->where('from_state', 0)->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('lata*unitprice')), 3);
-
-                        $ob[] = [
-                            'fuel' => $el,
-                            'lata1' => $lata1,
-                            'lata2' => $lata2,
-                            't1' => $t1,
-                            't2' => $t2,
-                        ];
-                    }
-                    $resp['rec'] = $ob;
-                }
-
-                return $resp;
+                return compact('chart1', 'chart2');
             }
             if ($type === 'greatbook') {
                 return $this->greatBookData();

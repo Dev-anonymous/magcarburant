@@ -136,6 +136,7 @@
                     var tabid = [];
                     var html = '';
                     var keys = Object.keys(data);
+                    var errors = [];
                     keys.forEach(k => {
                         var _d = data[k];
                         var id = 'table_' + Math.random().toString().split('.').join('');
@@ -168,6 +169,13 @@
                         });
                         h += '</tbody></table></div></div>';
                         html += h;
+
+                        if (_d.errors) {
+                            _d.errors.forEach(el => {
+                                errors.push(`<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`);
+                            });
+                        }
+
                     });
 
                     if (html.length == 0) {
@@ -179,6 +187,10 @@
                     $('[data]').css('opacity', 1);
                     $('.tooltip').remove();
                     $('td[title]').tooltip();
+
+                    errors = [...new Set(errors)];
+                    $('[errdiv]').html(errors.join(''));
+
                     rep.hide();
 
                     tabid.forEach(id => {
@@ -209,15 +221,6 @@
                             console.log(id, '--', error);
                         }
                     });
-
-                    var e = '';
-                    if (data.errors) {
-                        data.errors.forEach(el => {
-                            e +=
-                                `<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`;
-                        });
-                    }
-                    $('[errdiv]').html(e);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

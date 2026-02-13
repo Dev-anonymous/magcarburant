@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
+use App\Models\StateRate;
+use App\Models\StateStructureprice;
 use App\Models\Zone;
 use DateTime;
 use Illuminate\Http\Request;
@@ -30,6 +32,14 @@ class ReconciliationController extends Controller
         $date1 = new DateTime($from);
         $date2 = new DateTime($to);
         $sameMonth = $date1->format('Y-m') === $date2->format('Y-m');
+
+        $fromObj = Carbon::parse($from);
+        $toObj = Carbon::parse($to);
+
+
+        // si meme mois ! ok
+        $startOfMonth = $fromObj->copy()->startOfMonth();
+        $endOfMonth   = $fromObj->copy()->endOfMonth();
 
         $data = [];
         $errors = [];
@@ -59,16 +69,12 @@ class ReconciliationController extends Controller
             $head = [];
             $body = [];
 
-            $fromObj = Carbon::parse($from);
-            $toObj = Carbon::parse($to);
-
-            abort_if(!$sameMonth, 403, "Pour afficher le prix moyen d'achat, les 2 dates ($from ... $to) doivent etre sur un meme mois.");
-
-            // si meme mois ! ok
-            $startOfMonth = $fromObj->copy()->startOfMonth();
-            $endOfMonth   = $fromObj->copy()->endOfMonth();
-
             foreach (mainWays() as $k => $way) {
+                if (!$sameMonth) {
+                    $errors[] = "Pour afficher le prix moyen d'achat, les 2 dates ($from ... $to) doivent etre sur un meme mois.";
+                    break;
+                }
+
                 $zoneObj = Zone::where('zone', $way)->first();
                 if ($k == 0) {
                     $head[] = [['label' => "PRIX MOYEN D'ACHAT (USD)", 'class' => 'bold text-center', 'colspan' => 4]];
@@ -145,9 +151,6 @@ class ReconciliationController extends Controller
             $head = [];
             $body = [];
 
-            $fromObj = Carbon::parse($from);
-            $toObj = Carbon::parse($to);
-
             foreach (mainWays() as $k => $way) {
                 $zoneObj = Zone::where('zone', $way)->first();
                 if ($k == 0) {
@@ -211,9 +214,6 @@ class ReconciliationController extends Controller
             $head = [];
             $body = [];
 
-            $fromObj = Carbon::parse($from);
-            $toObj = Carbon::parse($to);
-
             foreach (mainWays() as $k => $way) {
                 $zoneObj = Zone::where('zone', $way)->first();
                 if ($k == 0) {
@@ -254,6 +254,88 @@ class ReconciliationController extends Controller
             $errors = array_values(array_unique($errors));
 
             $data['livraison'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
+        }
+
+        if (in_array('taux', $item)) {
+            $head = [];
+            $body = [];
+            if ($sameMonth) {
+                $head[] = [['label' => "TAUX", 'class' => 'bold text-center', 'colspan' => 4]];
+                $head[] = [
+                    ['label' => 'ITEM', 'class' => 'title bgred'],
+                    ['label' => $me->shortname, 'class' => 'title bgred'],
+                    ['label' => $entity->shortname, 'class' => 'title bgred'],
+                    ['label' => 'ECART', 'class' => 'title bgred']
+                ];
+
+                $prov_structure = (float) $entity->structureprices()->where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first()?->usd_cdf;
+
+                $state_structure = (float) StateStructureprice::where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first()?->usd_cdf;
+
+                $state =  round($state_structure, 3);
+                $provider =  round($prov_structure, 3);
+                $lab1 = "Taux structure du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $me->shortname)";
+                $lab2 = "Taux structure du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $entity->shortname)";
+                $ecart = $state - $provider;
+
+                $t = [
+                    ['label' => 'Taux Structure', 'class' => ''],
+                    ['label' => v($state), 'title' => $lab1],
+                    ['label' => v($provider), 'title' => $lab2],
+                    ['label' => v($ecart), 'class' => $state !== $provider ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
+                ];
+
+                $body[] = $t;
+                ///
+                $prov_structure = (float) $entity->rates()->where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first()?->usd_cdf;
+
+                $state_structure = (float)  (float) StateRate::where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first()?->usd_cdf;
+
+                $state =  round($state_structure, 3);
+                $provider =  round($prov_structure, 3);
+                $lab1 = "Taux Réel du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $me->shortname)";
+                $lab2 = "Taux Réel du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $entity->shortname)";
+                $ecart = $state - $provider;
+
+                $t = [
+                    ['label' => 'Taux Réel', 'class' => ''],
+                    ['label' => v($state), 'title' => $lab1],
+                    ['label' => v($provider), 'title' => $lab2],
+                    ['label' => v($ecart), 'class' => $state !== $provider ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
+                ];
+
+                $body[] = $t;
+            } else {
+                $errors[] = "Pour afficher les taux, les 2 dates ($from ... $to) doivent etre sur un meme mois.";
+            }
+
+            $errors = array_values(array_unique($errors));
+
+            $data['taux'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
         }
 
 

@@ -32,6 +32,7 @@ class ReconciliationController extends Controller
         $sameMonth = $date1->format('Y-m') === $date2->format('Y-m');
 
         $data = [];
+        $errors = [];
 
         if (in_array('achat', $item)) {
             // $ob = [];
@@ -55,7 +56,6 @@ class ReconciliationController extends Controller
             //     ];
             // }
 
-            $errors = [];
             $head = [];
             $body = [];
 
@@ -114,7 +114,9 @@ class ReconciliationController extends Controller
                 }
             }
 
-            return response()->json(['head' => $head, 'body' => $body, 'errors' => $errors]);
+            $errors = array_values(array_unique($errors));
+
+            $data['achat'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
         }
 
         if (in_array('vente', $item)) {
@@ -139,6 +141,53 @@ class ReconciliationController extends Controller
             //         'l152' => $l152,
             //     ];
             // }
+
+            $head = [];
+            $body = [];
+
+            $fromObj = Carbon::parse($from);
+            $toObj = Carbon::parse($to);
+
+            foreach (mainWays() as $k => $way) {
+                $zoneObj = Zone::where('zone', $way)->first();
+                if ($k == 0) {
+                    $head[] = [['label' => "VENTE : QUANTITE VENDUE EN M3", 'class' => 'bold text-center', 'colspan' => 4]];
+                    $head[] = [['label' => "VOIE $way", 'class' => 'bgred', 'colspan' => 4]];
+                    $head[] = [
+                        ['label' => 'PRODUIT', 'class' => 'title bgred'],
+                        ['label' => $me->shortname, 'class' => 'title bgred'],
+                        ['label' => $entity->shortname, 'class' => 'title bgred'],
+                        ['label' => 'ECART', 'class' => 'title bgred']
+                    ];
+                } else {
+                    $body[] = [
+                        ['label' => "VOIE $way", 'class' => 'bgred'],
+                        ['label' => '', 'class' => 'bgred',],
+                        ['label' => '', 'class' => 'bgred',],
+                        ['label' => '', 'class' => 'bgred',],
+                    ];
+                }
+                foreach (mainfuels() as $fuel) {
+                    $state =  (float)  round($entity->sales()->where('from_state', 1)->where(['product' => $fuel, 'way' => $way])->whereBetween('date', [$from, $to])->sum(DB::raw('lata/1000')), 3);
+                    $provider =  (float)  round($entity->sales()->where('from_state', 0)->where(['product' => $fuel, 'way' => $way])->whereBetween('date', [$from, $to])->sum(DB::raw('lata/1000')), 3);
+                    $lab1 = "Total M3 vendu du carburant $fuel à la date du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $me->shortname)";
+                    $lab2 = "Total M3 vendu du carburant $fuel à la date du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $entity->shortname)";
+                    $ecart = $state - $provider;
+
+                    $t = [
+                        ['label' => $fuel, 'class' => ''],
+                        ['label' => v($state), 'title' => $lab1],
+                        ['label' => v($provider), 'title' => $lab2],
+                        ['label' => v($ecart), 'class' => $state !== $provider ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
+                    ];
+
+                    $body[] = $t;
+                }
+            }
+
+            $errors = array_values(array_unique($errors));
+
+            $data['vente'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
         }
 
         if (in_array('livraison', $item)) {
@@ -158,6 +207,56 @@ class ReconciliationController extends Controller
             //         't2' => $t2,
             //     ];
             // }
+
+            $head = [];
+            $body = [];
+
+            $fromObj = Carbon::parse($from);
+            $toObj = Carbon::parse($to);
+
+            foreach (mainWays() as $k => $way) {
+                $zoneObj = Zone::where('zone', $way)->first();
+                if ($k == 0) {
+                    $head[] = [['label' => "LIVRAISONS EXCEDENTAIRES : QUANTITE VENDUE EN LATA", 'class' => 'bold text-center', 'colspan' => 4]];
+                    $head[] = [['label' => "VOIE $way", 'class' => 'bgred', 'colspan' => 4]];
+                    $head[] = [
+                        ['label' => 'PRODUIT', 'class' => 'title bgred'],
+                        ['label' => $me->shortname, 'class' => 'title bgred'],
+                        ['label' => $entity->shortname, 'class' => 'title bgred'],
+                        ['label' => 'ECART', 'class' => 'title bgred']
+                    ];
+                } else {
+                    $body[] = [
+                        ['label' => "VOIE $way", 'class' => 'bgred'],
+                        ['label' => '', 'class' => 'bgred',],
+                        ['label' => '', 'class' => 'bgred',],
+                        ['label' => '', 'class' => 'bgred',],
+                    ];
+                }
+                foreach (mainfuels() as $fuel) {
+                    $state =  (float)  round($entity->deliveries()->where('from_state', 1)->where(['product' => $fuel, 'way' => $way])->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $provider =  (float)  round($entity->deliveries()->where('from_state', 0)->where(['product' => $fuel, 'way' => $way])->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $lab1 = "Total LATA vendu du carburant $fuel à la date du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $me->shortname)";
+                    $lab2 = "Total LATA vendu du carburant $fuel à la date du {$fromObj->format('d-m-Y')} au {$toObj->format('d-m-Y')} (source : $entity->shortname)";
+                    $ecart = $state - $provider;
+
+                    $t = [
+                        ['label' => $fuel, 'class' => ''],
+                        ['label' => v($state), 'title' => $lab1],
+                        ['label' => v($provider), 'title' => $lab2],
+                        ['label' => v($ecart), 'class' => $state !== $provider ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
+                    ];
+
+                    $body[] = $t;
+                }
+            }
+
+            $errors = array_values(array_unique($errors));
+
+            $data['livraison'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
         }
+
+
+        return $data;
     }
 }

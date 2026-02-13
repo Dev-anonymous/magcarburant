@@ -121,38 +121,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card transparent">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-6">
-                                    <h4 class="card-title font-weight-bold">
-                                        Réconciliation des ventes entre {{ auth()->user()->name }} et
-                                        {{ $entity->shortname }}
-                                    </h4>
-                                </div>
-                                <div class="col-xs-12 col-sm-6">
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="table2" class="table table-striped table-hover text-nowrap"
-                                    style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>Carburant</th>
-                                            <th>Unité</th>
-                                            <th>{{ auth()->user()->name }}</th>
-                                            <th>{{ $entity->shortname }}</th>
-                                            <th>Écart</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -864,82 +832,6 @@
                         chart1.update({}, true);
                         chart2.update({}, true);
                     }, 400);
-
-                    var rec = data.rec;
-                    var table = $('#table2');
-                    table.DataTable().destroy();
-                    const tbody = table.find("tbody");
-                    tbody.empty();
-                    rec.forEach(row => {
-                        // 3 lignes par carburant
-                        const units = [{
-                                label: "LATA",
-                                state: row.lata1,
-                                client: row.lata2,
-                            },
-                            {
-                                label: "USD",
-                                state: row.t1,
-                                client: row.t2,
-                            }
-                        ];
-
-                        units.forEach((u, i) => {
-                            const tr = document.createElement("tr");
-                            // Carburant (pas de rowspan)
-                            const tdFuel = document.createElement("td");
-                            tdFuel.innerHTML = i == 0 ? row.fuel : '';
-                            tdFuel.className = 'bold font-weight-bold';
-                            tr.appendChild(tdFuel);
-
-                            // Unité
-                            const tdUnit = document.createElement("td");
-                            tdUnit.textContent = u.label;
-                            tr.appendChild(tdUnit);
-
-                            // État
-                            const tdState = document.createElement("td");
-                            tdState.textContent = formatFr(u.state);
-                            tr.appendChild(tdState);
-
-                            // Client
-                            const tdClient = document.createElement("td");
-                            tdClient.textContent = formatFr(u.client);
-                            tr.appendChild(tdClient);
-
-                            // Écart
-                            const tdDiff = document.createElement("td");
-                            var v = u.state - u.client;
-                            tdDiff.textContent = formatFr(v);
-                            tdDiff.className = v != 0 ? 'text-danger' : '';
-                            tdDiff.style.fontWeight = "bold";
-                            tr.appendChild(tdDiff);
-                            tbody[0].appendChild(tr);
-                        });
-                    });
-
-                    table.DataTable({
-                        dom: 'Bfrt',
-                        searching: false,
-                        ordering: false,
-                        buttons: [{
-                            extend: 'excelHtml5',
-                            title: 'Export Excel',
-                            exportOptions: {
-                                columns: ':not(.no-export)',
-                                format: {
-                                    body: function(data, row, column, node) {
-                                        if (!data) return data;
-                                        let cleaned = data.toString().replace(/\s+/g,
-                                            '');
-                                        cleaned = cleaned.replace(',', '.');
-                                        let num = parseFloat(cleaned);
-                                        return isNaN(num) ? data : num;
-                                    }
-                                }
-                            }
-                        }, ],
-                    });
 
                     ldr.hide();
                 },

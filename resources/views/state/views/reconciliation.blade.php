@@ -133,66 +133,83 @@
                     date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },
                 success: function(data) {
-                    var h = `
-                    <div class='table-responsive'><div class='col-md-6'>
-                    <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
-                    `;
-
-                    h += '<thead>';
-                    var tit = data.head || [];
-                    tit.forEach(ttr => {
-                        var tr = '<tr>';
-                        ttr.map(th => {
-                            var csp = th.colspan;
-                            tr +=
-                                `<th ${csp?`colspan=${csp}`:''} class="${th.class??""}">${th.label}</th>`
+                    var tabid = [];
+                    var html = '';
+                    var keys = Object.keys(data);
+                    keys.forEach(k => {
+                        var _d = data[k];
+                        var id = 'table_' + Math.random().toString().split('.').join('');
+                        tabid.push(id);
+                        var h = `
+                        <div class='col-md-6 col-lg-4 col-sm-12'>
+                        <div class='table-responsive mb-5'>
+                        <table id="${id}" class="table table-striped table-hover text-nowrap" style="width:100%">
+                        `;
+                        h += '<thead>';
+                        var tit = _d.head || [];
+                        tit.forEach(ttr => {
+                            var tr = '<tr>';
+                            ttr.map(th => {
+                                var csp = th.colspan;
+                                tr +=
+                                    `<th ${csp?`colspan=${csp}`:''} class="${th.class??""}">${th.label}</th>`
+                            });
+                            tr += '</tr>';
+                            h += tr;
                         });
-                        tr += '</tr>';
-                        h += tr;
-                    });
-                    h += '</thead><tbody>';
+                        h += '</thead><tbody>';
 
-                    data.body?.forEach(row => {
-                        h += `<tr>`
-                        row.map(e => {
-                            h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
-                        })
-                        h += '</tr>'
-                    });
-
-                    h += '</tbody></table></div></div>';
-
-                    $('[data]').html(h);
-                    $('[data]').css('opacity', 1);
-                    rep.hide();
-
-                    try {
-                        $('#table').DataTable({
-                            dom: 'Brt',
-                            ordering: false,
-                            buttons: [{
-                                extend: 'excelHtml5',
-                                title: 'Export Excel',
-                                exportOptions: {
-                                    format: {
-                                        body: function(data, row, column, node) {
-                                            if (!data) return data;
-                                            let cleaned = data.toString().replace(/\s+/g,
-                                                '');
-                                            cleaned = cleaned.replace(',', '.');
-                                            let num = parseFloat(cleaned);
-                                            return isNaN(num) ? data : num;
-                                        }
-                                    }
-                                }
-                            }, ],
+                        _d.body?.forEach(row => {
+                            h += `<tr>`
+                            row.map(e => {
+                                h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
+                            })
+                            h += '</tr>'
                         });
-                    } catch (error) {
-                        console.log(error);
+                        h += '</tbody></table></div></div>';
+                        html += h;
+                    });
+
+                    if (html.length == 0) {
+                        html =
+                            '<h4 class="text-center text-danger w-100">Veuillez sélectionner un item dans le filtre ci-haut.</h4>';
                     }
 
+                    $('[data]').html(html);
+                    $('[data]').css('opacity', 1);
                     $('.tooltip').remove();
                     $('td[title]').tooltip();
+                    rep.hide();
+
+                    tabid.forEach(id => {
+                        try {
+                            $('#' + id).DataTable({
+                                dom: 'Brt',
+                                ordering: false,
+                                buttons: [{
+                                    extend: 'excelHtml5',
+                                    title: 'Export Excel',
+                                    exportOptions: {
+                                        format: {
+                                            body: function(data, row, column, node) {
+                                                if (!data) return data;
+                                                let cleaned = data.toString()
+                                                    .replace(
+                                                        /\s+/g,
+                                                        '');
+                                                cleaned = cleaned.replace(',', '.');
+                                                let num = parseFloat(cleaned);
+                                                return isNaN(num) ? data : num;
+                                            }
+                                        }
+                                    }
+                                }, ],
+                            });
+                        } catch (error) {
+                            console.log(id, '--', error);
+                        }
+                    });
+
                     var e = '';
                     if (data.errors) {
                         data.errors.forEach(el => {

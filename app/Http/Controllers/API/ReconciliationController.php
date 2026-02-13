@@ -70,9 +70,8 @@ class ReconciliationController extends Controller
 
             foreach (mainWays() as $k => $way) {
                 $zoneObj = Zone::where('zone', $way)->first();
-
                 if ($k == 0) {
-                    $head[] = [['label' => "PRIX MOYEN D'ACHAT", 'class' => 'bold text-center', 'colspan' => 4]];
+                    $head[] = [['label' => "PRIX MOYEN D'ACHAT (USD)", 'class' => 'bold text-center', 'colspan' => 4]];
                     $head[] = [['label' => "VOIE $way", 'class' => 'bgred', 'colspan' => 4]];
                     $head[] = [
                         ['label' => 'PRODUIT', 'class' => 'title bgred'],
@@ -80,31 +79,6 @@ class ReconciliationController extends Controller
                         ['label' => $entity->shortname, 'class' => 'title bgred'],
                         ['label' => 'ECART', 'class' => 'title bgred']
                     ];
-                    foreach (mainfuels() as $fuel) {
-                        $avg =  (float) AverageFuelPrice::whereYear('month', $fromObj->year)
-                            ->whereMonth('month', $fromObj->month)
-                            ->where('product', $fuel)
-                            ->where('zone_id', $zoneObj->id)
-                            ->first()?->avg_price;
-                        $lab1 = "Prix moyen d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
-                        if (!$avg) {
-                            $errors[] = "Aucun prix d'achat moyen n'a été trouvé à la date du {$fromObj->format('d-m-Y')} ($fuel, $way)";
-                        }
-                        $pmfc_reel = (float) ($entity->purchases()->where('from_state', 0)->where(function ($q) use ($fuel) {
-                            $q->where('product', $fuel);
-                        })->where('way', $way)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
-                        $lab2 = "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
-                        $ecart = $avg - $pmfc_reel;
-
-                        $t = [
-                            ['label' => $fuel, 'class' => ''],
-                            ['label' => v($avg), 'title' => $lab1],
-                            ['label' => v($pmfc_reel), 'title' => $lab2],
-                            ['label' => v($ecart), 'class' => $avg !== $pmfc_reel ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
-                        ];
-
-                        $body[] = $t;
-                    }
                 } else {
                     $body[] = [
                         ['label' => "VOIE $way", 'class' => 'bgred'],
@@ -112,34 +86,33 @@ class ReconciliationController extends Controller
                         ['label' => '', 'class' => 'bgred',],
                         ['label' => '', 'class' => 'bgred',],
                     ];
-                    foreach (mainfuels() as $fuel) {
-                        $avg =  (float) AverageFuelPrice::whereYear('month', $fromObj->year)
-                            ->whereMonth('month', $fromObj->month)
-                            ->where('product', $fuel)
-                            ->where('zone_id', $zoneObj->id)
-                            ->first()?->avg_price;
-                        $lab1 = "Prix moyen d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
-                        if (!$avg) {
-                            $errors[] = "Aucun prix d'achat moyen n'a été trouvé à la date du {$fromObj->format('d-m-Y')} ($fuel, $way)";
-                        }
-                        $pmfc_reel = (float) ($entity->purchases()->where('from_state', 0)->where(function ($q) use ($fuel) {
-                            $q->where('product', $fuel);
-                        })->where('way', $way)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
-                        $lab2 = "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
-                        $ecart = $avg - $pmfc_reel;
-
-                        $t = [
-                            ['label' => $fuel, 'class' => ''],
-                            ['label' => v($avg), 'title' => $lab1],
-                            ['label' => v($pmfc_reel), 'title' => $lab2],
-                            ['label' => v($ecart), 'class' => $avg !== $pmfc_reel ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
-                        ];
-
-                        $body[] = $t;
+                }
+                foreach (mainfuels() as $fuel) {
+                    $avg =  (float) AverageFuelPrice::whereYear('month', $fromObj->year)
+                        ->whereMonth('month', $fromObj->month)
+                        ->where('product', $fuel)
+                        ->where('zone_id', $zoneObj->id)
+                        ->first()?->avg_price;
+                    $lab1 = "Prix moyen d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
+                    if (!$avg) {
+                        $errors[] = "Aucun prix d'achat moyen n'a été trouvé à la date du {$fromObj->format('d-m-Y')} ($fuel, $way)";
                     }
+                    $pmfc_reel = (float) ($entity->purchases()->where('from_state', 0)->where(function ($q) use ($fuel) {
+                        $q->where('product', $fuel);
+                    })->where('way', $way)->whereBetween('date', [$startOfMonth, $endOfMonth])->avg('unitprice') ?? 0);
+                    $lab2 = "Moyenne mensuelle du prix unitaire d'achat $fuel (zone $way) du {$startOfMonth->format('d-m-Y')} au {$endOfMonth->format('d-m-Y')}";
+                    $ecart = $avg - $pmfc_reel;
+
+                    $t = [
+                        ['label' => $fuel, 'class' => ''],
+                        ['label' => v($avg), 'title' => $lab1],
+                        ['label' => v($pmfc_reel), 'title' => $lab2],
+                        ['label' => v($ecart), 'class' => $avg !== $pmfc_reel ? 'text-danger font-weight-bold' : '', 'title' => "$me->shortname - $entity->shortname"],
+                    ];
+
+                    $body[] = $t;
                 }
             }
-
 
             return response()->json(['head' => $head, 'body' => $body, 'errors' => $errors]);
         }

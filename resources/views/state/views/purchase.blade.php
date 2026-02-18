@@ -430,7 +430,9 @@
                         <div class="mb-2">
                             <input type="file" required multiple class="form-control" name="file">
                         </div>
-                        <x-alert />
+                        <div style="max-height: 100px; overflow: auto">
+                            <x-alert />
+                        </div>
                         <div class="mt-3">
                             <a href="{{ asset('ModeleImportationAchat.xlsx') }}" class="btn text-danger">
                                 <i class="material-icons md-18">insert_drive_file</i>

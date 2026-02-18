@@ -358,8 +358,8 @@
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdladd,#mdledit').modal('hide');
-                    }, 10000);
+                        $('.modal.show').modal('hide');
+                    }, 5000);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;
@@ -397,7 +397,7 @@
                     dtObj.ajax.reload(null, false);
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdldel').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {

@@ -622,7 +622,6 @@
                     }
                 }
             }, ],
-
         }).on('draw.dt', function(e, settings, data, xhr) {
             $('[bedit]').off('click').click(function() {
                 var data = JSON.parse($(this).attr('data'));
@@ -662,11 +661,26 @@
             });
         });
 
+        let isRefreshing = false;
+        setInterval(function() {
+            var spin = $('#table_processing');
+            if (!isRefreshing) {
+                isRefreshing = true;
+                spin.css('opacity', 0);
+                dtObj.ajax.reload(function() {
+                    isRefreshing = false;
+                    spin.css('opacity', 1);
+                }, false);
+            }
+        }, 3000);
+
         var ff = $('#ffilter');
 
         let timer;
+        var showspin = true;
         ff.change(function(e) {
             clearTimeout(timer);
+            showspin = true;
             var e = $(e.target);
             timer = setTimeout(() => {
                 dtObj.ajax.reload(null, false);
@@ -715,7 +729,7 @@
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdladd,#mdledit').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {
@@ -754,7 +768,7 @@
                     dtObj.ajax.reload(null, false);
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdldel').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {
@@ -773,7 +787,9 @@
 
         function dashboard() {
             var ldr = $('[dataloader]');
-            ldr.show();
+            if (showspin) {
+                ldr.show();
+            }
             $.ajax({
                 url: '{{ route('dashboard') }}',
                 data: {
@@ -803,7 +819,13 @@
                 error: function(xhr, a, b) {
 
                 },
-            })
+            }).always(function() {
+                showspin = true;
+                setTimeout(() => {
+                    showspin = false;
+                    dashboard();
+                }, 3000);
+            });
         }
 
         function formatNumber(val) {

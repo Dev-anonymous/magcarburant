@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
+use App\Models\Fuel;
 use App\Models\Label;
 use App\Models\StateRate;
 use App\Models\StateStructureprice;
@@ -345,9 +346,63 @@ class ReconciliationController extends Controller
             $head = [];
             $body = [];
             if ($sameMonth) {
+                $tab = [];
+                foreach (Zone::all() as $z) {
+                    foreach (['terrestre', 'aviation'] as $t) {
+                        $tab = [...$tab, ...noteditable($t, $z->zone)];
+                    }
+                }
 
-                $labels = Label::orderBy('tag')->get();
-                // dd(noteditable());
+                $tab = array_values(array_unique($tab));
+                $labels = Label::orderBy('tag')->whereNotIn('label', $tab)->get();
+                $fuels = Fuel::all();
+                $zones = Zone::all();
+
+                $head[] = [['label' => "STRUCTURE DES PRIX", 'class' => 'bold text-center', 'colspan' => 6]];
+                $head[] = [
+                    ['label' => ""],
+                    ...array_map(function ($item) {
+                        return ['label' => $item['fuel']];
+                    }, $fuels->toArray()),
+                ];
+                $prov_structure = $entity->structureprices()->where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first();
+
+                $state_structure = StateStructureprice::where(function ($q) use ($fromObj) {
+                    $q->where(function ($q) use ($fromObj) {
+                        $q->where('from', '<=', $fromObj)->where('to', '>=', $fromObj);
+                    })->orWhere(function ($q) use ($fromObj) {
+                        $q->whereNull('to')->where('from', '<=', $fromObj);
+                    });
+                })->orderByDesc('from')->first();
+
+
+                foreach ($labels as $label) {
+                    $d = [
+                        ['label' => $label->label],
+                    ];
+                    foreach ($fuels as $k => $fuel) {
+                        $err = [];
+                        foreach ($zones as $zone) {
+                            $prov_price = (float) $prov_structure?->fuelprices()->where(['zone_id' => $zone->id, 'fuel_id' => $fuel->id, 'label_id' => $label->id])->first()?->amount;
+                            $state_price = (float) $state_structure?->state_fuelprices()->where(['zone_id' => $zone->id, 'fuel_id' => $fuel->id, 'label_id' => $label->id])->first()?->amount;
+                            if ($prov_price !== $state_price) {
+                                $ec = $prov_price - $state_price;
+                                $prov_price = v($prov_price);
+                                $state_price = v($state_price);
+                                $ec = v($ec);
+                                $err[] = "$fuel->fuel ($zone->zone), $me->shortname : $state_price | $entity->shortname : $prov_price | Ecart : $ec";
+                            }
+                        }
+                        $d[] = ['label' => count($err) ? implode('<br>', $err) : '-', 'class' => count($err) ? 'text-danger' : ''];
+                    }
+                    $body[] = $d;
+                }
 
                 $errors = array_values(array_unique($errors));
                 $data['structure'] = ['head' => $head, 'body' => $body, 'errors' => $errors];

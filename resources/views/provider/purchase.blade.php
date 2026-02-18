@@ -671,7 +671,7 @@
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdladd,#mdledit').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {
@@ -711,7 +711,7 @@
                     dashboard();
                     setTimeout(() => {
                         rep.hide();
-                        $('#mdldel').modal('hide');
+                        $('.modal.show').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {

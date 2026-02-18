@@ -140,12 +140,13 @@
                     var errors = [];
                     keys.forEach(k => {
                         var _d = data[k];
+                        var grid = k == 'structure' ? 8 : 4;
                         var id = 'table_' + Math.random().toString().split('.').join('');
                         tabid.push(id);
                         var h = `
-                        <div class='col-md-6 col-lg-4 col-sm-12'>
+                        <div class='col-md-6 col-lg-${grid} col-sm-12'>
                         <div class='table-responsive mb-5'>
-                        <table id="${id}" class="table table-striped table-hover text-nowrap" style="width:100%">
+                        <table id="${id}" class="table table-striped table-bordered table-hover text-nowrap" style="width:100%">
                         `;
                         h += '<thead>';
                         var tit = _d.head || [];
@@ -173,7 +174,9 @@
 
                         if (_d.errors) {
                             _d.errors.forEach(el => {
-                                errors.push(`<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`);
+                                errors.push(
+                                    `<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`
+                                    );
                             });
                         }
 

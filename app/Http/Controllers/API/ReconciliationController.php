@@ -11,13 +11,15 @@ use App\Models\Zone;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReconciliationController extends Controller
 {
     function reconciliation()
     {
-        $user = auth()->user();
+        $user = request()->user();
+
         abort_unless($user->user_role == 'etatique', 403, 'Not permit');
         $entity_id = request('entity_id');
         $entity = Entity::findOrFail($entity_id);
@@ -298,6 +300,7 @@ class ReconciliationController extends Controller
                 ];
 
                 $body[] = $t;
+
                 ///
                 $prov_structure = (float) $entity->rates()->where(function ($q) use ($fromObj) {
                     $q->where(function ($q) use ($fromObj) {

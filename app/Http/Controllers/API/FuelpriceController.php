@@ -40,7 +40,7 @@ class FuelpriceController extends Controller
         $validated = $request->validate([
             'price' => 'required|numeric',
         ]);
-        $user = auth()->user();
+        $user = request()->user();
         abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");

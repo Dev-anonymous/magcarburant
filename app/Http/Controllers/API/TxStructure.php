@@ -15,7 +15,7 @@ class TxStructure extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();

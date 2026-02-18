@@ -17,7 +17,7 @@ class StructurepriceController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['sudo', 'petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
@@ -107,7 +107,7 @@ class StructurepriceController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
@@ -121,7 +121,7 @@ class StructurepriceController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             $id = request('id');
             $str = Structureprice::findOrFail($id);
             $entity = $str->entity;
@@ -256,7 +256,7 @@ class StructurepriceController extends Controller
      */
     public function destroy(Structureprice $structureprice)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
         if ($user->user_role == 'etatique') {
             //

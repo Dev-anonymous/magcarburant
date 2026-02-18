@@ -22,7 +22,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
@@ -123,7 +123,7 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
 
         if (request('action') == 'update') {
             abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
@@ -466,7 +466,7 @@ class SaleController extends Controller
      */
     public function destroy(Sale $sale)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
         if ($user->user_role == 'etatique') {
             //

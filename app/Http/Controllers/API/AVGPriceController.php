@@ -51,7 +51,7 @@ class AVGPriceController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
         $validated = $request->validate([

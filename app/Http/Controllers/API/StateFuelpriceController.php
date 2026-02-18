@@ -40,7 +40,7 @@ class StateFuelpriceController extends Controller
         $validated = $request->validate([
             'price' => 'required|numeric',
         ]);
-        $user = auth()->user();
+        $user = request()->user();
         abort_unless(in_array($user->user_role, ['etatique']), 403, "No permission");
 
         abort_if($statefuelprice->zone->zone !==  "OUEST" && $statefuelprice->label->tag === 'L', 403, "Can't edit");

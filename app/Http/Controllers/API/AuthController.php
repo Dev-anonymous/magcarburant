@@ -34,7 +34,7 @@ class AuthController extends Controller
         }
 
         /** @var \App\Models\User $user **/
-        $user = auth()->user();
+        $user = Auth::user();
 
         $user->update(['last_activity' => nnow()]);
 

@@ -16,7 +16,7 @@ class ProviderWebController extends Controller
 {
     function home()
     {
-        $entity = auth()->user()->entities()->first();
+        $entity = request()->user()->entities()->first();
         return view('provider.apps', compact('entity'));
     }
 
@@ -24,19 +24,19 @@ class ProviderWebController extends Controller
     {
         $item = request('item');
         if ($item == 'rtx') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('provider.structrates', compact('entity'));
         }
 
         if ($item == 'pricestr') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('common.structprices', compact('entity'));
         }
@@ -55,7 +55,7 @@ class ProviderWebController extends Controller
 
         $stx = request('stx');
         if ($stx) {
-            $entity = auth()->user()->entities()->first();
+            $entity = request()->user()->entities()->first();
             $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
                 initfuelprice($structure);
@@ -104,7 +104,7 @@ class ProviderWebController extends Controller
 
     function analyse()
     {
-        $user = auth()->user();
+        $user = request()->user();
         $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.analyse', compact('ps'));
@@ -112,7 +112,7 @@ class ProviderWebController extends Controller
 
     function claim()
     {
-        $user = auth()->user();
+        $user = request()->user();
         $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.claim', compact('ps'));

@@ -16,7 +16,7 @@ class StateRateController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, 'Not permit');
 
         $data = StateRate::query();
@@ -91,7 +91,7 @@ class StateRateController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             $id = request('id');
             $rate = StateRate::findOrFail($id);
             abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
@@ -151,7 +151,7 @@ class StateRateController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             if (in_array($user->user_role, ['etatique'])) {
                 $rate = new StateRate;
                 $lastTx = StateRate::orderByDesc('from')->first();
@@ -208,7 +208,7 @@ class StateRateController extends Controller
      */
     public function destroy(StateRate $staterate)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
         $last = $staterate->orderByDesc('from')->first();

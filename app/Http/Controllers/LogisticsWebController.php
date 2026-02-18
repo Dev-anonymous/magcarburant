@@ -16,7 +16,7 @@ class LogisticsWebController extends Controller
 {
     function home()
     {
-        $entity = auth()->user()->entities()->first();
+        $entity = request()->user()->entities()->first();
         return view('logistics.apps', compact('entity'));
     }
 
@@ -29,19 +29,19 @@ class LogisticsWebController extends Controller
     {
         $item = request('item');
         if ($item == 'rtx') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('provider.structrates', compact('entity'));
         }
 
         if ($item == 'pricestr') {
-            $user = auth()->user();
+            $user = request()->user();
             $entity = $user->entities()->first();
             return view('common.structprices', compact('entity'));
         }
@@ -60,7 +60,7 @@ class LogisticsWebController extends Controller
 
         $stx = request('stx');
         if ($stx) {
-            $entity = auth()->user()->entities()->first();
+            $entity = request()->user()->entities()->first();
             $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
                 initfuelprice($structure);
@@ -99,7 +99,7 @@ class LogisticsWebController extends Controller
 
     function analyse()
     {
-        $user = auth()->user();
+        $user = request()->user();
         $entity = $user->entities()->first();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('logistics.analyse', compact('ps'));

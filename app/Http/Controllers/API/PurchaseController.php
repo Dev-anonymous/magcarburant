@@ -21,7 +21,7 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if ($user->user_role == 'petrolier') {
@@ -114,7 +114,7 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
@@ -367,7 +367,7 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
         if ($user->user_role == 'etatique') {
             //

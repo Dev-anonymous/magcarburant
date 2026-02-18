@@ -20,7 +20,7 @@ class DataController extends Controller
 {
     function dashboard()
     {
-        $user = auth()->user();
+        $user = request()->user();
 
         $type = request('type');
 
@@ -972,7 +972,7 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
         $isState = false;
-        $user = auth()->user();
+        $user = request()->user();
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {
@@ -1193,7 +1193,7 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
 
-        $user = auth()->user();
+        $user = request()->user();
         $isState = false;
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
@@ -1350,7 +1350,7 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
 
-        $user = auth()->user();
+        $user = request()->user();
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {
@@ -1596,7 +1596,7 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
 
-        $user = auth()->user();
+        $user = request()->user();
         if ($user->user_role == 'logisticien') {
             $entity = $user->entities()->first();
         } else if ($user->user_role == 'etatique') {

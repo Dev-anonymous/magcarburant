@@ -16,7 +16,7 @@ class StateStructurepriceController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
         $structureprices = StateStructureprice::query();
@@ -89,7 +89,7 @@ class StateStructurepriceController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_unless(in_array($user->user_role, ['etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
@@ -103,7 +103,7 @@ class StateStructurepriceController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             $id = request('id');
             $str = StateStructureprice::findOrFail($id);
 
@@ -219,7 +219,7 @@ class StateStructurepriceController extends Controller
      */
     public function destroy(StateStructureprice $statestructureprice)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
         $last = StateStructureprice::orderByDesc('from')->first();

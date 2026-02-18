@@ -17,7 +17,7 @@ class RateController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
         if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
@@ -112,7 +112,7 @@ class RateController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             $id = request('id');
             $rate = Rate::findOrFail($id);
             $entity = $rate->entity;
@@ -181,7 +181,7 @@ class RateController extends Controller
                 'to.after_or_equal' => 'La date de fin doit être postérieure à la date de début.',
             ]);
 
-            $user = auth()->user();
+            $user = request()->user();
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
                 abort_if(!$entity, 422, "No entity");
@@ -240,7 +240,7 @@ class RateController extends Controller
      */
     public function destroy(Rate $rate)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
         abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
 

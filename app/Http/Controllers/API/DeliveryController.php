@@ -21,7 +21,8 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = request()->user();
+
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if ($user->user_role == 'petrolier') {
@@ -112,7 +113,7 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = request()->user();
 
         if (request('action') == 'update') {
             $id = request('id');
@@ -414,7 +415,7 @@ class DeliveryController extends Controller
      */
     public function destroy(Delivery $delivery)
     {
-        $user = auth()->user();
+        $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         if ($user->user_role == 'etatique') {

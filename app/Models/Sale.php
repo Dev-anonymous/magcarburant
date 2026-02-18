@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Sale
- * 
+ *
  * @property int $id
  * @property string|null $terminal
  * @property int $entity_id
@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $from_mutuality
  * @property int|null $parent_id
  * @property bool $from_state
- * 
+ *
  * @property Entity $entity
  * @property Sale|null $sale
  * @property Collection|Sale[] $sales
@@ -39,55 +39,79 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Sale extends Model
 {
-	protected $table = 'sale';
-	public $timestamps = false;
+    protected $table = 'sale';
+    public $timestamps = false;
 
-	protected $casts = [
-		'entity_id' => 'int',
-		'date' => 'datetime',
-		'lata' => 'float',
-		'l15' => 'float',
-		'density' => 'float',
-		'from_mutuality' => 'bool',
-		'parent_id' => 'int',
-		'from_state' => 'bool'
-	];
+    protected $casts = [
+        'entity_id' => 'int',
+        'date' => 'datetime',
+        'lata' => 'float',
+        'l15' => 'float',
+        'density' => 'float',
+        'from_mutuality' => 'bool',
+        'parent_id' => 'int',
+        'from_state' => 'bool'
+    ];
 
-	protected $fillable = [
-		'terminal',
-		'entity_id',
-		'date',
-		'locality',
-		'way',
-		'product',
-		'delivery_note',
-		'delivery_program',
-		'client',
-		'lata',
-		'l15',
-		'density',
-		'from_mutuality',
-		'parent_id',
-		'from_state'
-	];
+    protected $fillable = [
+        'terminal',
+        'entity_id',
+        'date',
+        'locality',
+        'way',
+        'product',
+        'delivery_note',
+        'delivery_program',
+        'client',
+        'lata',
+        'l15',
+        'density',
+        'from_mutuality',
+        'parent_id',
+        'from_state'
+    ];
 
-	public function entity()
-	{
-		return $this->belongsTo(Entity::class);
-	}
+    public function entity()
+    {
+        return $this->belongsTo(Entity::class);
+    }
 
-	public function sale()
-	{
-		return $this->belongsTo(Sale::class, 'parent_id');
-	}
+    public function sale()
+    {
+        return $this->belongsTo(Sale::class, 'parent_id');
+    }
 
-	public function sales()
-	{
-		return $this->hasMany(Sale::class, 'parent_id');
-	}
+    public function sales()
+    {
+        return $this->hasMany(Sale::class, 'parent_id');
+    }
 
-	public function salefiles()
-	{
-		return $this->hasMany(Salefile::class);
-	}
+    public function salefiles()
+    {
+        return $this->hasMany(Salefile::class);
+    }
+
+    protected static function booted()
+    {
+        $throwClosureError = function ($lastClosure) {
+            $d = \Carbon\Carbon::parse($lastClosure);
+            throw new \Exception(
+                "Vous ne pouvez plus ajouter, modifier ni supprimer les données avant le {$d->format('d-m-Y')}, car cette période est déjà clôturée après réconciliation."
+            );
+        };
+
+        static::saving(function ($model) use ($throwClosureError) {
+            $lastClosure = AccountingClosure::lastClosedDate($model->entity_id);
+            if ($lastClosure && $model->date <= $lastClosure) {
+                $throwClosureError($lastClosure);
+            }
+        });
+
+        static::deleting(function ($model) use ($throwClosureError) {
+            $lastClosure = AccountingClosure::lastClosedDate($model->entity_id);
+            if ($lastClosure && $model->date <= $lastClosure) {
+                $throwClosureError($lastClosure);
+            }
+        });
+    }
 }

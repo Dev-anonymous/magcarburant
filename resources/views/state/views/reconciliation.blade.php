@@ -58,6 +58,7 @@
                                         <option selected value="vente">Ventes</option>
                                         <option selected value="livraison">Livraisons excédentaires</option>
                                         <option selected value="taux">Taux</option>
+                                        <option selected value="structure">Structure des prix</option>
                                     </select>
                                 </div>
                             </form>
@@ -101,7 +102,7 @@
         $('#item').multiselect({
             includeSelectAllOption: true,
             nonSelectedText: 'Aucun filtre',
-            nSelectedText: 'zones sélectionnées',
+            nSelectedText: 'items sélectionnés',
             allSelectedText: 'Tous les items',
             numberDisplayed: 1,
             selectAllText: 'Tous',
@@ -210,7 +211,7 @@
                                                         /\s+/g,
                                                         '');
                                                 cleaned = cleaned.replace(',', '.');
-                                                let num = parseFloat(cleaned);
+                                                let num = Number(cleaned);
                                                 return isNaN(num) ? data : num;
                                             }
                                         }

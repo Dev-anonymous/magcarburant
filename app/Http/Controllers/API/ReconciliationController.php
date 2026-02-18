@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
+use App\Models\Label;
 use App\Models\StateRate;
 use App\Models\StateStructureprice;
 use App\Models\Zone;
@@ -337,10 +338,23 @@ class ReconciliationController extends Controller
             }
 
             $errors = array_values(array_unique($errors));
-
             $data['taux'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
         }
 
+        if (in_array('structure', $item)) {
+            $head = [];
+            $body = [];
+            if ($sameMonth) {
+
+                $labels = Label::orderBy('tag')->get();
+                // dd(noteditable());
+
+                $errors = array_values(array_unique($errors));
+                $data['structure'] = ['head' => $head, 'body' => $body, 'errors' => $errors];
+            } else {
+                $errors[] = "Pour afficher la structure des prix, les 2 dates ($from ... $to) doivent etre sur un meme mois.";
+            }
+        }
 
         return $data;
     }

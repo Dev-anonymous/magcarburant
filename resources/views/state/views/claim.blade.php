@@ -336,7 +336,7 @@
                                         let cleaned = data.toString().replace(/\s+/g,
                                             '');
                                         cleaned = cleaned.replace(',', '.');
-                                        let num = parseFloat(cleaned);
+                                        let num = Number(cleaned);
                                         return isNaN(num) ? data : num;
                                     }
                                 }

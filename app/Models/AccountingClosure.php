@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class AccountingClosure extends Model
 {
+    use HasAuditLogs;
+    
     protected $table = 'accounting_closures';
 
     protected $casts = [

@@ -21,67 +21,14 @@ class AccountingClosureController extends Controller
 
         $entity = Entity::findOrFail(request('entity_id'));
 
-        $data = AccountingClosure::orderByDesc('id')->where('entity_id', request('enti'));
+        $data = AccountingClosure::orderByDesc('id')->where('entity_id', $entity->id);
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->editColumn('date', function ($row) {
-                return $row->date?->format('d-m-Y');
-            })->editColumn('salefile', function ($row) {
-                if ($row->sale) {
-                    $sf = $row->sale->salefiles; // parent
-                } else {
-                    $sf = $row->salefiles;
-                }
-                $f = '';
-                foreach ($sf as $i => $e) {
-                    $u = asset('storage/' . $e->file);
-                    $f .= "<a href='$u' class='text-nowrap mr-2' target='_blank'><i class='material-icons md-18 align-middle mb-1 text-primary'>attach_file</i> Fichier " . ($i + 1) . "</a>";
-                }
-                return "<div class=''>$f</div>";
-            })
-            ->addColumn('action', function ($row) use ($user) {
-                $eb = "";
-                $d = $row->toArray();
-                $d['date'] = $row->date?->format('Y-m-d');
-                $data = e(json_encode($d));
-                $eb = "
-                    <a class='dropdown-item' href='#' bedit data='$data'>
-                        <i class='material-icons md-14 align-middle'>edit</i>
-                        <span class='align-middle'>Modifier</span>
-                    </a>
-                ";
-                $t = <<<DATA
-                    <div class="dropdown">
-                        <a
-                            class="btn btn-primary2 btn-sm"
-                            href="#"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        >
-                            <i class="material-icons md-18 align-middle"
-                            >more_vert</i
-                            >
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
-                        </div>
-                    </div>
-                DATA;
-
-                if ($row->from_mutuality) {
-                    $t = '';
-                }
-
-                if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-                    return $t;
-                }
+            ->editColumn('closed_until', function ($row) {
+                return $row->closed_until?->format('d-m-Y');
+            })->editColumn('closed_by', function ($row) {
+                return $row->user?->name;
             })
             ->rawColumns([])
             ->make(true);
@@ -92,7 +39,6 @@ class AccountingClosureController extends Controller
      */
     public function store(Request $request)
     {
-
         $user = request()->user();
         abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
 
@@ -100,20 +46,32 @@ class AccountingClosureController extends Controller
             'closed_until' => 'required|date|before_or_equal:today',
             'entity_id' => 'required|numeric|exists:entity,id',
         ], [
-            'closed_until.required' => 'Veuillez renseigner la date de cloture de la cession.',
+            'closed_until.required' => 'Veuillez renseigner la date de clôture de la cession.',
         ]);
+
+        // Vérifier la dernière clôture existante pour cette entité
+        $lastClosure = AccountingClosure::where('entity_id', $validated['entity_id'])
+            ->orderBy('closed_until', 'desc')
+            ->first();
+
+        if ($lastClosure && $validated['closed_until'] <= $lastClosure->closed_until) {
+            return response()->json([
+                'success' => false,
+                'message' => "La nouvelle date de clôture doit être postérieure à la dernière clôture enregistrée ({$lastClosure->closed_until->format('d-m-Y')}).",
+            ], 422);
+        }
 
         DB::beginTransaction();
         $validated['closed_by'] = $user->id;
         AccountingClosure::create($validated);
-
         DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => "Vous avez clôturé la cession  avec succès !",
+            'message' => "Vous avez clôturé la cession avec succès !",
         ], 201);
     }
+
 
     /**
      * Display the specified resource.

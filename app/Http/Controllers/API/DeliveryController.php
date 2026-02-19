@@ -52,6 +52,15 @@ class DeliveryController extends Controller
 
         return DataTables::of($deliveries)
             ->addIndexColumn()
+            ->addColumn('selall', function ($row) {
+                return "
+                <div class='custom-control custom-checkbox mt-3'>
+                    <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
+                    <label class='custom-control-label' for='id$row->id'>
+                    </label>
+                </div>
+                ";
+            })
             ->addColumn('total', function ($row) {
                 $v = v(($row->lata) * $row->unitprice);
                 return "<span title='LATA * Prix unitaire' tooltip>$v</span>";
@@ -104,7 +113,7 @@ class DeliveryController extends Controller
                     return $t;
                 }
             })
-            ->rawColumns(['action', 'deliveryfile', 'total'])
+            ->rawColumns(['action', 'deliveryfile', 'total', 'selall'])
             ->make(true);
     }
 
@@ -276,7 +285,7 @@ class DeliveryController extends Controller
                 if (empty($colF)) {
                     $lineErrors[] = "Cellule F$rowNumber : veuillez renseigner le bon de livraison";
                 } else {
-                    if (Delivery::where(['delivery_note' => $colF, 'entity_id' => $entity->id])->exists()) {
+                    if (Delivery::where(['delivery_note' => $colF, 'entity_id' => $entity->id, 'from_state' => from_state()])->exists()) {
                         $lineErrors[] = "Cellule F{$rowNumber} : le bon de livraison $colF existe déjà";
                     }
                 }
@@ -438,6 +447,25 @@ class DeliveryController extends Controller
         } else {
             $entity = $user->entities()->first();
             abort_if($entity->id != $delivery->entity_id, 403, "Not permit");
+        }
+
+        if ('bulk' == request('action')) {
+            $ids = (array) json_decode(request('ids'));
+            $deliveries = Delivery::whereIn('id', $ids)->get();
+            DB::beginTransaction();
+            foreach ($deliveries as $delivery) {
+                foreach ($delivery->deliveryfiles as $f) {
+                    File::delete("storage/" . $f->file);
+                }
+                $delivery->delete();
+            }
+            DB::commit();
+            $n = count($ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Vous avez supprimé $n livraison(s) avec succès !",
+            ], 200);
         }
 
         foreach ($delivery->deliveryfiles as $f) {

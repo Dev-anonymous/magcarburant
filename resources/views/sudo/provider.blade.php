@@ -388,7 +388,7 @@
                         loaddata();
                         setTimeout(() => {
                             rep.hide();
-                            $('#mdldel').modal('hide');
+                            $('.modal.show').modal('hide');
                         }, 2000);
                     },
                     error: function(xhr, a, b) {

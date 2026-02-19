@@ -56,6 +56,15 @@ class SaleController extends Controller
 
         return DataTables::of($sales)
             ->addIndexColumn()
+            ->addColumn('selall', function ($row) {
+                return "
+                <div class='custom-control custom-checkbox mt-3'>
+                    <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
+                    <label class='custom-control-label' for='id$row->id'>
+                    </label>
+                </div>
+                ";
+            })
             ->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('salefile', function ($row) {
@@ -114,7 +123,7 @@ class SaleController extends Controller
                     return $t;
                 }
             })
-            ->rawColumns(['action', 'salefile'])
+            ->rawColumns(['action', 'salefile', 'selall'])
             ->make(true);
     }
 
@@ -472,6 +481,31 @@ class SaleController extends Controller
         } else {
             $entity = $user->entities()->first();
             abort_if($entity->id != $sale->entity_id, 403, "Not permit");
+        }
+
+        if ('bulk' == request('action')) {
+            $ids = (array) json_decode(request('ids'));
+            $sales = Sale::whereIn('id', $ids)->get();
+            DB::beginTransaction();
+            foreach ($sales as $sale) {
+                foreach ($sale->sales as $s) {
+                    foreach ($s->salefiles as $f) {
+                        File::delete("storage/" . $f->file);
+                    }
+                    $s->delete();
+                }
+                foreach ($sale->salefiles as $f) {
+                    File::delete("storage/" . $f->file);
+                }
+                $sale->delete();
+            }
+            DB::commit();
+            $n = count($ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Vous avez supprimé $n vente(s) avec succès !",
+            ], 200);
         }
 
         DB::beginTransaction();

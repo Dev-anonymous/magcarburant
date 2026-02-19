@@ -48,6 +48,15 @@ class PurchaseController extends Controller
 
         return DataTables::of($purchases)
             ->addIndexColumn()
+            ->addColumn('selall', function ($row) {
+                return "
+                <div class='custom-control custom-checkbox mt-3'>
+                    <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
+                    <label class='custom-control-label' for='id$row->id'>
+                    </label>
+                </div>
+                ";
+            })
             ->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('unitprice', function ($row) {
@@ -105,7 +114,7 @@ class PurchaseController extends Controller
                     return $t;
                 }
             })
-            ->rawColumns(['action', 'purchasefile'])
+            ->rawColumns(['action', 'purchasefile', 'selall'])
             ->make(true);
     }
 
@@ -375,6 +384,27 @@ class PurchaseController extends Controller
             $entity = $user->entities()->first();
             abort_if($entity->id != $purchase->entity_id, 403, "Not permit");
         }
+
+
+        if ('bulk' == request('action')) {
+            $ids = (array) json_decode(request('ids'));
+            $purchases = Purchase::whereIn('id', $ids)->get();
+            DB::beginTransaction();
+            foreach ($purchases as $purchase) {
+                foreach ($purchase->purchasefiles as $f) {
+                    File::delete("storage/" . $f->file);
+                }
+                $purchase->delete();
+            }
+            DB::commit();
+            $n = count($ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Vous avez supprimé $n achats(s) avec succès !",
+            ], 200);
+        }
+
 
         foreach ($purchase->purchasefiles as $f) {
             File::delete("storage/" . $f->file);

@@ -106,12 +106,24 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="py-4">
+                        <div class="card-body">
+                            <button style="display: none" type="button" class="btn btn-sm btn-danger mb-2"
+                                data-toggle="modal" data-target="#mdldelall" id="btnDelAll">
+                                <i class="material-icons md-18">delete</i> <span text></span>
+                            </button>
                             <div class="table-responsive">
                                 <table id="table" class="table table-striped table-hover text-center text-nowrap"
                                     style="width:100%">
                                     <thead>
                                         <tr>
+                                            <th>
+                                                <div class="custom-control custom-checkbox mt-3">
+                                                    <input type="checkbox" name="remember" class="custom-control-input"
+                                                        id="selall">
+                                                    <label class="custom-control-label" for="selall">
+                                                    </label>
+                                                </div>
+                                            </th>
                                             <th>ID</th>
                                             <th>Date</th>
                                             <th>Voie</th>
@@ -399,6 +411,43 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="mdldelall" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fdel fdel2>
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="ids">
+                    <input type="hidden" name="action" value="bulk">
+                    <div class="modal-body">
+                        <div class="mb-2 text-center">
+                            <h3 class="text-danger">
+                                Voulez-vous <span deltext></span> ?
+                            </h3>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="mdladd2" role="dialog" style="overflow-y: auto;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -507,19 +556,24 @@
                 }
             },
             order: [
-                [0, "desc"]
+                [1, "desc"]
             ],
             columnDefs: [{
-                targets: 0,
-                width: '1%'
-            }, {
                 targets: 1,
                 width: '1%'
             }, {
-                targets: 10,
+                targets: 2,
+                width: '1%'
+            }, {
+                targets: 11,
                 width: '1%'
             }],
             columns: [{
+                    data: 'selall',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
                     data: 'id',
                     name: 'id',
                 },
@@ -591,6 +645,9 @@
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
+            sell[0].checked = false;
+            canshow();
+
             $('[bedit]').off('click').click(function() {
                 var data = JSON.parse($(this).attr('data'));
                 var mdl = $('#mdledit');
@@ -626,6 +683,45 @@
                 mdl.modal('show');
             });
         });
+
+        var sell = $('#selall');
+
+        function canshow() {
+            var show = false;
+            var n = 0;
+            var ids = [];
+            $('.selall').each((i, s) => {
+                if (s.checked) {
+                    ids.push(s.value);
+                    show = true;
+                    n++;
+                }
+            });
+            if (show) {
+                var t = `Supprimer ${n} élément` + (n > 1 ? 's' : '');
+                $('#btnDelAll').slideDown().find('[text]').html(t);
+                $('[deltext]').html(t.toLowerCase());
+                var f = $('[fdel2]');
+                $('[name="ids"]', f).val(JSON.stringify(ids));
+                $('[name="id"]', f).val(ids[0]);
+            } else {
+                $('#btnDelAll').slideUp();
+                $('[name="id"]', f).val('');
+                $('[name="ids"]', f).val('');
+            }
+        }
+        canshow();
+        sell.change(function() {
+            var e = this;
+            $('.selall').each((i, s) => {
+                s.checked = e.checked;
+            });
+            canshow();
+        });
+
+        $(document).on('click', '.selall', function() {
+            canshow();
+        })
 
         $('.flatpickr2').change(function() {
             dtObj.ajax.reload(null, false);
@@ -697,6 +793,7 @@
             var rep = $('#rep', form);
             var id = $('[name="id"]', form).val();
             rep.hide();
+            var data = form.serialize();
             $(':input', form).attr('disabled', true);
             $('[loader]', btn).show();
             $('[text]', btn).hide();
@@ -704,6 +801,7 @@
             $.ajax({
                 url: '{{ route('purchase.index') }}/' + id,
                 method: 'delete',
+                data: data,
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(

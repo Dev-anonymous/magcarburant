@@ -22,7 +22,7 @@ class TxStructure extends Controller
                 abort_if(!$entity, 422, "No entity");
                 $data = $entity->structureprices();
             } elseif (in_array($user->user_role, ['etatique'])) {
-                if (from_state()) { // mode edit
+                if (from_state() || ('view' === rmode() && null == request('entity_id'))) { // mode edit
                     $data  = StateStructureprice::query();
                 } else {
                     $entity = Entity::findOrFail(request('entity_id'));

@@ -6,13 +6,15 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAccountingLock;
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Delivery
- * 
+ *
  * @property int $id
  * @property string|null $terminal
  * @property int $entity_id
@@ -26,7 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float|null $lata
  * @property float|null $unitprice
  * @property bool $from_state
- * 
+ *
  * @property Entity $entity
  * @property Collection|Deliveryfile[] $deliveryfiles
  *
@@ -34,39 +36,41 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Delivery extends Model
 {
-	protected $table = 'delivery';
-	public $timestamps = false;
+    use HasAccountingLock, HasAuditLogs;
 
-	protected $casts = [
-		'entity_id' => 'int',
-		'date' => 'datetime',
-		'lata' => 'float',
-		'unitprice' => 'float',
-		'from_state' => 'bool'
-	];
+    protected $table = 'delivery';
+    public $timestamps = false;
 
-	protected $fillable = [
-		'terminal',
-		'entity_id',
-		'date',
-		'locality',
-		'way',
-		'product',
-		'delivery_note',
-		'delivery_program',
-		'client',
-		'lata',
-		'unitprice',
-		'from_state'
-	];
+    protected $casts = [
+        'entity_id' => 'int',
+        'date' => 'datetime',
+        'lata' => 'float',
+        'unitprice' => 'float',
+        'from_state' => 'bool'
+    ];
 
-	public function entity()
-	{
-		return $this->belongsTo(Entity::class);
-	}
+    protected $fillable = [
+        'terminal',
+        'entity_id',
+        'date',
+        'locality',
+        'way',
+        'product',
+        'delivery_note',
+        'delivery_program',
+        'client',
+        'lata',
+        'unitprice',
+        'from_state'
+    ];
 
-	public function deliveryfiles()
-	{
-		return $this->hasMany(Deliveryfile::class);
-	}
+    public function entity()
+    {
+        return $this->belongsTo(Entity::class);
+    }
+
+    public function deliveryfiles()
+    {
+        return $this->hasMany(Deliveryfile::class);
+    }
 }

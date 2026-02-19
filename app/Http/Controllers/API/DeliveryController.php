@@ -275,6 +275,10 @@ class DeliveryController extends Controller
                 // === F : Bon de livraison ===
                 if (empty($colF)) {
                     $lineErrors[] = "Cellule F$rowNumber : veuillez renseigner le bon de livraison";
+                } else {
+                    if (Delivery::where(['delivery_note' => $colF, 'entity_id' => $entity->id])->exists()) {
+                        $lineErrors[] = "Cellule F{$rowNumber} : le bon de livraison $colF existe déjà";
+                    }
                 }
 
                 // === G : Programme de livraison ===
@@ -338,7 +342,18 @@ class DeliveryController extends Controller
                 ], 422);
             }
 
-            Delivery::insertOrIgnore($insert);
+            // Delivery::insertOrIgnore($insert);
+
+            foreach ($insert as $data) {
+                Delivery::firstOrCreate(
+                    [
+                        'delivery_note' => $colF,
+                        'entity_id' => $entity->id
+                    ],
+                    $data
+                );
+            }
+
 
             return response()->json([
                 'success' => true,

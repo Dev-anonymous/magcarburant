@@ -6,6 +6,8 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAccountingLock;
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +41,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Sale extends Model
 {
+    use HasAccountingLock, HasAuditLogs;
+
     protected $table = 'sale';
     public $timestamps = false;
 
@@ -89,29 +93,5 @@ class Sale extends Model
     public function salefiles()
     {
         return $this->hasMany(Salefile::class);
-    }
-
-    protected static function booted()
-    {
-        $throwClosureError = function ($lastClosure) {
-            $d = \Carbon\Carbon::parse($lastClosure);
-            throw new \Exception(
-                "Vous ne pouvez plus ajouter, modifier ni supprimer les données avant le {$d->format('d-m-Y')}, car cette période est déjà clôturée après réconciliation."
-            );
-        };
-
-        static::saving(function ($model) use ($throwClosureError) {
-            $lastClosure = AccountingClosure::lastClosedDate($model->entity_id);
-            if ($lastClosure && $model->date <= $lastClosure) {
-                $throwClosureError($lastClosure);
-            }
-        });
-
-        static::deleting(function ($model) use ($throwClosureError) {
-            $lastClosure = AccountingClosure::lastClosedDate($model->entity_id);
-            if ($lastClosure && $model->date <= $lastClosure) {
-                $throwClosureError($lastClosure);
-            }
-        });
     }
 }

@@ -368,7 +368,6 @@ class SaleController extends Controller
                 ], 422);
             }
 
-            // Sale::insertOrIgnore($insert);
             DB::commit();
 
             return response()->json([

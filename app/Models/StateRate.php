@@ -6,12 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAccountingLock;
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class StateRate
- * 
+ *
  * @property int $id
  * @property Carbon|null $from
  * @property Carbon|null $to
@@ -22,20 +24,22 @@ use Illuminate\Database\Eloquent\Model;
  */
 class StateRate extends Model
 {
-	protected $table = 'state_rates';
-	public $timestamps = false;
+    use HasAuditLogs;
 
-	protected $casts = [
-		'from' => 'datetime',
-		'to' => 'datetime',
-		'usd_cdf' => 'float',
-		'cdf_usd' => 'float'
-	];
+    protected $table = 'state_rates';
+    public $timestamps = false;
 
-	protected $fillable = [
-		'from',
-		'to',
-		'usd_cdf',
-		'cdf_usd'
-	];
+    protected $casts = [
+        'from' => 'datetime',
+        'to' => 'datetime',
+        'usd_cdf' => 'float',
+        'cdf_usd' => 'float'
+    ];
+
+    protected $fillable = [
+        'from',
+        'to',
+        'usd_cdf',
+        'cdf_usd'
+    ];
 }

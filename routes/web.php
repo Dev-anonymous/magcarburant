@@ -33,7 +33,7 @@ Route::get('def', function () {
 
 Route::get('', function () {
     if (Auth::check()) {
-        $role = auth()->user()->user_role;
+        $role = request()->user()->user_role;
         if ($role === 'sudo') {
             return redirect(route('sudo.home'));
         }

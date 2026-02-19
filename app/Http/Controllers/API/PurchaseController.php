@@ -294,7 +294,7 @@ class PurchaseController extends Controller
                 ], 422);
             }
 
-            Purchase::insert($insert);
+            foreach ($insert as $data) Purchase::create($data);
 
             return response()->json([
                 'success' => true,

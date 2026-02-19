@@ -6,24 +6,27 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class AverageFuelPrice
- * 
+ *
  * @property int $id
  * @property Carbon $month
  * @property string $product
  * @property int $zone_id
  * @property float $avg_price
- * 
+ *
  * @property Zone $zone
  *
  * @package App\Models
  */
 class AverageFuelPrice extends Model
 {
+    use HasAuditLogs;
+
 	protected $table = 'average_fuel_prices';
 	public $timestamps = false;
 

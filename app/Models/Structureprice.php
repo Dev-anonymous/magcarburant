@@ -6,13 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Structureprice
- * 
+ *
  * @property int $id
  * @property int $entity_id
  * @property string|null $name
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $to
  * @property float|null $usd_cdf
  * @property float|null $cdf_usd
- * 
+ *
  * @property Entity $entity
  * @property Collection|Fuelprice[] $fuelprices
  *
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Structureprice extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'structureprice';
 	public $timestamps = false;
 

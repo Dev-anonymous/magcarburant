@@ -6,11 +6,12 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class StateFuelprice
- * 
+ *
  * @property int $id
  * @property int $state_structureprice_id
  * @property int $fuel_id
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $zone_id
  * @property float|null $amount
  * @property string|null $currency
- * 
+ *
  * @property Fuel $fuel
  * @property Label $label
  * @property StateStructureprice $state_structureprice
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class StateFuelprice extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'state_fuelprice';
 	public $timestamps = false;
 

@@ -525,7 +525,7 @@ function rmode()
 
 function from_state()
 {
-    $user = auth()->user();
+    $user = request()->user();
     // mode view on charge les donnees selon $entity from_state => 0
     return $user->user_role === 'etatique' && rmode() === 'edit';
 }

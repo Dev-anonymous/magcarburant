@@ -66,10 +66,21 @@ class AVGPriceController extends Controller
         ]);
 
         DB::beginTransaction();
-        AverageFuelPrice::where('id', request('nord_id'))->update(['avg_price' => request('nord')]);
-        AverageFuelPrice::where('id', request('sud_id'))->update(['avg_price' => request('sud')]);
-        AverageFuelPrice::where('id', request('est_id'))->update(['avg_price' => request('est')]);
-        AverageFuelPrice::where('id', request('ouest_id'))->update(['avg_price' => request('ouest')]);
+        $north = AverageFuelPrice::findOrFail($validated['nord_id']);
+        $north->avg_price = $validated['nord'];
+        $north->save();
+
+        $south = AverageFuelPrice::findOrFail($validated['sud_id']);
+        $south->avg_price = $validated['sud'];
+        $south->save();
+
+        $est = AverageFuelPrice::findOrFail($validated['est_id']);
+        $est->avg_price = $validated['est'];
+        $est->save();
+
+        $ouest = AverageFuelPrice::findOrFail($validated['ouest_id']);
+        $ouest->avg_price = $validated['ouest'];
+        $ouest->save();
         DB::commit();
 
         return response()->json([

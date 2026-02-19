@@ -64,7 +64,6 @@
             ajax: {
                 url: '{{ route('tx-structure.index') }}',
                 data: function(d) {
-                    console.log(d);
                     d.entity_id = '{{ $entity->id }}';
                 }
             },

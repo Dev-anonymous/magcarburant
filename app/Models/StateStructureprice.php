@@ -6,26 +6,29 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class StateStructureprice
- * 
+ *
  * @property int $id
  * @property string|null $name
  * @property Carbon|null $from
  * @property Carbon|null $to
  * @property float|null $usd_cdf
  * @property float|null $cdf_usd
- * 
+ *
  * @property Collection|StateFuelprice[] $state_fuelprices
  *
  * @package App\Models
  */
 class StateStructureprice extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'state_structureprice';
 	public $timestamps = false;
 

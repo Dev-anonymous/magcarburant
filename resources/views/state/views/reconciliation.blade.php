@@ -28,18 +28,30 @@
                 <div class="col-12 p-0">
                     <div class="card transparent">
                         <div class="card-header">
-                            <div class="row">
+                            <div class="row mb-4">
                                 <div class="col-xs-12 col-sm-6">
                                     <h4 class="card-title font-weight-bold">
                                         Tableaux de rapprochement : {{ $me->shortname }} - {{ $entity->shortname }}
                                     </h4>
                                 </div>
+                                <div class="col-sm-6 text-md-right">
+                                    <div class="">
+                                        <button data-toggle="modal" data-target="#warnmdl" class="btn btn-danger btn-sm "
+                                            type="button">
+                                            <i class="material-icons align-middle md-18">done_all</i>
+                                            Clôturer la cession
+                                        </button>
+                                        <button id="btnhisto" class="btn btn-primary btn-sm appcol" type="button">
+                                            <i class="material-icons his md-18">history</i> Historique
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <form id="ffilter" class="filters-form pull-right" role="form">
                                 @php
                                     $d = now()->startOfMonth()->toDateString();
                                     $d2 = now()->toDateString();
                                 @endphp
-                            </div>
-                            <form id="ffilter" class="filters-form pull-right" role="form">
                                 <div class="form-group mb-1">
                                     <label for="dv222" class="control-label d-block mb-0">Du</label>
                                     <input type="text" class="form-control flatpickr" id="dv222" name="date1"
@@ -74,6 +86,96 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('modals')
+    <div class="modal fade" id="warnmdl" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fcl>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <h3 class="text-danger text-center">
+                                Etes-vous sur de vouloir clôturer la cession de réconciliation de {{ $entity->shortname }}?
+                            </h3>
+                            <h4>
+                                Une fois la cession clôturée :
+                            </h4>
+                            <ul>
+                                <li>Vous ne pouvez plus annuler cette opération,</li>
+                                <li>Il sera impossible d’enregistrer les données (achats, ventes, ... antérieures à la date
+                                    de
+                                    clôture). </li>
+                            </ul>
+                            <p class="text-danger mb-3">
+                                Pour clôture la cession, entrez la date de clôture puis valider.
+                            </p>
+                            <div class="form-group mb-1">
+                                <input type="hidden" name="entity_id" value="{{ $entity->id }}">
+                                <label class="control-label d-block mb-0">Date de clôture</label>
+                                <input required type="text" class="form-control flatpickr" name="closed_until"
+                                    id="datecl" style="min-width:120px;">
+                            </div>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                Annuler
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn btn-danger d-flex align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">done_all</i>
+                                    OUI CLOTURER LA CESSION
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdlhistory" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Historique des clôtures de cession</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fadd>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table id="tablecl" class="table table-striped table-hover text-center text-nowrap"
+                                style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date clôture</th>
+                                        <th>Clôturé par</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -176,7 +278,7 @@
                             _d.errors.forEach(el => {
                                 errors.push(
                                     `<p class='m-0 font-weight-bold'><i class="material-icons md-18 align-middle">error_outline</i> ${el}</p>`
-                                    );
+                                );
                             });
                         }
 
@@ -240,5 +342,88 @@
         }
 
         dashboard();
+
+        $('#btnhisto').click(function() {
+            dtObj.ajax.reload(null, false);
+            $('#mdlhistory').modal('show');
+        });
+
+        var dtObj = $('#tablecl').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('accountingclosure.index') }}',
+                data: function(d) {
+                    d.entity_id = '{{ @$entity->id }}';
+                }
+            },
+            columnDefs: [{
+                targets: 0,
+                width: '1%'
+            }, ],
+            columns: [{
+                    data: 'id',
+                    name: 'id',
+                },
+                {
+                    data: 'closed_until',
+                    name: 'closed_until',
+                },
+                {
+                    data: 'closed_by',
+                    name: 'closed_by',
+                    orderable: false,
+                    searchable: false,
+                },
+            ],
+            dom: 'Blfrtip',
+            buttons: [{
+                extend: 'excelHtml5',
+                title: 'Export Excel',
+            }, ],
+        });
+
+        $('[fcl]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var data = new FormData(this);
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('accountingclosure.store') }}',
+                method: 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    form[0].reset();
+                    setTimeout(() => {
+                        rep.hide();
+                        $('.modal.show').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            });
+        });
     </script>
 @endsection

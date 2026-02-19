@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AccountingClosureController;
 use App\Http\Controllers\API\AVGPriceController;
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\DeliveryController;
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('delivery', DeliveryController::class);
     Route::resource('purchase', PurchaseController::class);
     Route::resource('avgprice', AVGPriceController::class);
+    Route::resource('accountingclosure', AccountingClosureController::class)->only(['index', 'store']);
 
     Route::get('products-z', [DataController::class, 'product_z'])->name('extra.product_z');
 });

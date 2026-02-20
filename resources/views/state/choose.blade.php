@@ -55,6 +55,20 @@
                 </div>
             </div>
             <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 120px;"
+                    onclick="location.assign('{{ route('state.dash') }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000000">
+                        <path
+                            d="M313-407v-317h98v312l-49-45-49 50Zm198 88v-569h96v472l-96 97ZM116-212v-346h97v250l-97 96ZM97-111l267-267 149 131 265-265h-85v-80h222v220h-80v-84L513-135 367-270 209-111H97Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Tableau de bord</h4>
+                        <p class="m-0">Acceder aux statistiques de {{ $entity->shortname }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 145px"
                     onclick="location.assign('{{ route('state.config') }}')">
                     <div>
@@ -133,8 +147,8 @@
                     var href = '{{ route('state.apps', ['mode' => 'view', 'entity' => 'DATA_ID']) }}/';
                 } else if ('edit' == mode) {
                     var href = '{{ route('state.apps', ['mode' => 'edit', 'entity' => 'DATA_ID']) }}/';
-                }else if ('recon' == mode){
-                    var href = '{{ route('state.reconciliation','DATA_ID') }}'
+                } else if ('recon' == mode) {
+                    var href = '{{ route('state.reconciliation', 'DATA_ID') }}'
                 } else {
                     return alert('Invalid mode');
                 }

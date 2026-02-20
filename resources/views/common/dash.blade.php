@@ -168,7 +168,6 @@
                 shared: true,
                 valueSuffix: ' M3'
             },
-
             plotOptions: {
                 column: {
                     depth: 25,
@@ -177,7 +176,10 @@
                     groupPadding: 0.15,
                     dataLabels: {
                         enabled: true,
-                        format: '{point.y} M3',
+                        // format: '{point.y} M3',
+                        formatter: function() {
+                            return formatNumber(this.y) + ' M3';
+                        },
                         style: {
                             fontSize: '13px',
                             color: '#000'

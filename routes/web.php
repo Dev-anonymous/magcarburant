@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('state')->middleware(StateMiddleware::class)->group(function () {
         Route::controller(StateWebController::class)->group(function () {
             Route::get('', 'home')->name('state.home');
+            Route::get('dash', 'dash')->name('state.dash');
             Route::prefix('config')->group(function () {
                 Route::get('', 'config')->name('state.config');
                 Route::get('reconciliation/{entity}', 'reconciliation')->name('state.reconciliation');

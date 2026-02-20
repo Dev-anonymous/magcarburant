@@ -17,6 +17,11 @@ class StateWebController extends Controller
         return view('state.choose', compact('entity', 'entities'));
     }
 
+    function dash()
+    {
+        return view('common.dash');
+    }
+
     function apps($mode, Entity $entity)
     {
         return view('state.views.apps', compact('entity'));

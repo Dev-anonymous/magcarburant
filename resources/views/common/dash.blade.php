@@ -117,14 +117,21 @@
                         return data.map((_, i) => slope * i + intercept);
                     }
 
-                    const ventesData = data.chart1.series[0].data; // ex: Ventes
+                    const ventesData = data.chart1.series
+                        .find(s => s.name === "Ventes").data;
+
                     const trendData = calculateTrend(ventesData);
+                    const existingTrend = chart1.series.find(s => s.name === "Trend Ventes");
+                    if (existingTrend) {
+                        existingTrend.remove(false);
+                    }
 
                     chart1.addSeries({
                         type: 'line',
                         name: 'Trend Ventes',
                         data: trendData,
                         color: '#000',
+                        dashStyle: 'Dash',
                         marker: {
                             enabled: false
                         },

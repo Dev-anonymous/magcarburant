@@ -672,19 +672,22 @@
                 extend: 'excelHtml5',
                 title: 'Export Excel',
                 exportOptions: {
+                    stripHtml: true,
                     columns: ':not(.no-export)',
                     format: {
                         body: function(data, row, column, node) {
                             if (!data) return data;
-                            let cleaned = data.toString().replace(/\s+/g,
-                                '');
-                            cleaned = cleaned.replace(',', '.');
+                            let text = $('<div>').html(data).text().trim();
+                            if ($(node).find('input[type="checkbox"]').length > 0) {
+                                return '';
+                            }
+                            let cleaned = text.replace(/\s+/g, '').replace(',', '.');
                             let num = Number(cleaned);
-                            return isNaN(num) ? data : num;
+                            return isNaN(num) ? text : num;
                         }
                     }
                 }
-            }, ],
+            }]
 
         }).on('draw.dt', function(e, settings, data, xhr) {
             sell[0].checked = false;

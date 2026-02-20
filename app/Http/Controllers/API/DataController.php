@@ -963,6 +963,53 @@ class DataController extends Controller
 
                 return response()->json(['rows' => $rows, 'errors' => $data['errors']]);
             }
+
+            if ($type === 'dash') {
+                $date = request('date');
+                $date = explode(' to ', $date);
+                $date = array_filter($date);
+                $from = @$date[0] ?? nnow()->toDateString();
+                $to = @$date[1] ?? $from;
+
+                // if ($user->user_role == 'etatique') {
+                //     $entity  = Entity::findOrFail(request('entity_id'));
+                // } else {
+                $entity = $user->entities()->first();
+                // }
+
+                $categories = [];
+                $data = [];
+
+                $da = $dv = $dl = [];
+                foreach (mainfuels() as $fuel) {
+                    $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum('qtym3'), 3);
+                    $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
+                    $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
+                    $categories[] = $fuel;
+                }
+
+                $series = [
+                    (object) [
+                        'name' => 'Achats',
+                        'data' => $da,
+                    ],
+                    (object) [
+                        'name' => 'Ventes',
+                        'data' => $dv,
+                    ],
+                    (object) [
+                        'name' => 'Livraisons excédentaires',
+                        'data' => $dl,
+                    ],
+                ];
+
+                if ($entity->user->user_role == 'logisticien') {
+                    $series = [$series[1]];
+                }
+
+                $chart1 = compact('series', 'categories');
+                return compact('chart1');
+            }
         }
     }
 

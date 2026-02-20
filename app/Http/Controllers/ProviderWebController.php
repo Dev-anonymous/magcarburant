@@ -20,6 +20,10 @@ class ProviderWebController extends Controller
         return view('provider.apps', compact('entity'));
     }
 
+    function dash(){
+        return view('common.dash');
+    }
+
     function accounting()
     {
         $item = request('item');

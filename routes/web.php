@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('provider')->middleware(ProviderMiddleware::class)->group(function () {
         Route::controller(ProviderWebController::class)->group(function () {
             Route::get('', 'home')->name('provider.home');
+            Route::get('dash', 'dash')->name('provider.dash');
             Route::get('apps', 'apps')->name('provider.apps');
             Route::get('sale', 'sale')->name('provider.sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
@@ -77,6 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('logistics')->middleware(LogisticsMiddleware::class)->group(function () {
         Route::controller(LogisticsWebController::class)->group(function () {
             Route::get('', 'home')->name('logistics.home');
+            Route::get('dash', 'dash')->name('logistics.dash');
             Route::get('sale', 'sale')->name('logistics.sale');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('logistics.accounting');

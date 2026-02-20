@@ -988,7 +988,7 @@
             },
             tooltip: {
                 pointFormatter: function() {
-                    return 'Total M³ Vendus : ' + formatNumber(this.y);
+                    return 'Total LATA Vendus : ' + formatNumber(this.y);
                 }
             },
             series: [{

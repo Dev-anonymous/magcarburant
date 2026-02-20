@@ -19,6 +19,11 @@ class LogisticsWebController extends Controller
         $entity = request()->user()->entities()->first();
         return view('logistics.apps', compact('entity'));
     }
+    
+    function dash()
+    {
+        return view('common.dash');
+    }
 
     function sale()
     {

@@ -103,6 +103,34 @@
                             data: serie.data
                         }, false);
                     });
+
+
+                    function calculateTrend(data) {
+                        const n = data.length;
+                        const xSum = (n - 1) * n / 2;
+                        const ySum = data.reduce((a, b) => a + b, 0);
+                        const xySum = data.reduce((sum, y, i) => sum + i * y, 0);
+                        const x2Sum = data.reduce((sum, _, i) => sum + i * i, 0);
+                        const slope = (n * xySum - xSum * ySum) /
+                            (n * x2Sum - xSum * xSum);
+                        const intercept = (ySum - slope * xSum) / n;
+                        return data.map((_, i) => slope * i + intercept);
+                    }
+
+                    const ventesData = data.chart1.series[0].data; // ex: Ventes
+                    const trendData = calculateTrend(ventesData);
+
+                    chart1.addSeries({
+                        type: 'line',
+                        name: 'Trend Ventes',
+                        data: trendData,
+                        color: '#000',
+                        marker: {
+                            enabled: false
+                        },
+                        enableMouseTracking: false
+                    }, false);
+
                     chart1.redraw();
                     ldr.hide();
                 },

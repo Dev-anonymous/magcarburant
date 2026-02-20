@@ -120,7 +120,7 @@
                                             <th class="text-nowrap">Client</th>
                                             <th class="text-nowrap">LATA</th>
                                             <th class="text-nowrap">Prix unitaire LATA</th>
-                                            <th class="text-nowrap">Total</th>
+                                            <th class="text-nowrap">Prix de vente</th>
                                             <th class="text-nowrap no-export">Factures</th>
                                             <th class="no-export"></th>
                                         </tr>

@@ -447,7 +447,7 @@ class DataController extends Controller
 
                 $tot = 0;
                 foreach ($fuels as $k => $fuel) {
-                    $delivery = $entity->deliveries()->where('from_state', from_state())->where('product', $fuel)->whereBetween('date', [$from, $to])->sum('lata');
+                    $delivery = $entity->deliveries()->where('from_state', from_state())->where('product', $fuel)->whereBetween('date', [$from, $to])->sum(DB::raw('lata*unitprice'));
                     $delivery = round($delivery, 3);
                     $tot += $delivery;
                     $line0[] = [

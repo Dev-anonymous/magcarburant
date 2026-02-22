@@ -11,6 +11,7 @@ use App\Models\Purchase;
 use App\Models\Rate;
 use App\Models\Sale;
 use App\Models\Structureprice;
+use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -971,44 +972,158 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                // if ($user->user_role == 'etatique') {
-                //     $entity  = Entity::findOrFail(request('entity_id'));
-                // } else {
-                $entity = $user->entities()->first();
-                // }
+                if ($user->user_role == 'etatique') {
+                    $ids = User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id');
+                    $entities = Entity::whereIn('users_id', $ids)->get();
 
-                $categories = [];
-                $data = [];
+                    $categories_achat = $categories_vente = $categories_livr = [];
+                    $da = $dv = $dl = [];
+                    foreach ($entities as $entity) {
+                        if ($entity->user->user_role == 'logisticien') {
+                            $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
+                            $categories_vente[] = $entity->shortname;
+                        } else {
+                            $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum('qtym3'), 3);
+                            $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
+                            $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
+                            $categories_achat[] = $entity->shortname;
+                            $categories_livr[] = $entity->shortname;
+                            $categories_vente[] = $entity->shortname;
+                        }
+                    }
 
-                $da = $dv = $dl = [];
-                foreach (mainfuels() as $fuel) {
-                    $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum('qtym3'), 3);
-                    $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
-                    $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
-                    $categories[] = $fuel;
+
+                    $vente_zone = [];
+                    $cat_vente_zone = mainWays();
+                    foreach ($entities as $entity) {
+                        $t = [];
+                        foreach (mainWays() as $way) {
+                            $t[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'way' => $way])->sum(DB::raw('lata/1000')), 3);
+                        }
+                        $vente_zone[] = [
+                            'name' =>  $entity->shortname,
+                            'data' =>  $t,
+                        ];
+                    }
+
+                    $tab = [];
+                    foreach ($dv as $i => $val) {
+                        $tab[] = ['label' => $categories_vente[$i], 'value' => $val];
+                    }
+                    usort($tab, fn($a, $b) => $b['value'] <=> $a['value']);
+                    $dv = array_column($tab, 'value');
+                    $categories_vente = array_column($tab, 'label');
+
+
+                    $tab = [];
+                    foreach ($da as $i => $val) {
+                        $tab[] = ['label' => $categories_achat[$i], 'value' => $val];
+                    }
+                    usort($tab, fn($a, $b) => $b['value'] <=> $a['value']);
+                    $da = array_column($tab, 'value');
+                    $categories_achat = array_column($tab, 'label');
+
+                    $tab = [];
+                    foreach ($dl as $i => $val) {
+                        $tab[] = ['label' => $categories_livr[$i], 'value' => $val];
+                    }
+                    usort($tab, fn($a, $b) => $b['value'] <=> $a['value']);
+                    $dl = array_column($tab, 'value');
+                    $categories_livr = array_column($tab, 'label');
+
+                    $data = [
+                        'achat' => [
+                            'categories' => $categories_achat,
+                            'series' =>  [
+                                'name' => 'Achats',
+                                'data' => $da,
+                            ]
+                        ],
+
+                        'vente' => [
+                            'categories' => $categories_vente,
+                            'series' => [
+                                'name' => 'Ventes',
+                                'data' => $dv,
+                            ]
+                        ],
+                        'livraison' =>  [
+                            'categories' => $categories_livr,
+                            'series' => [
+                                'name' => 'Livraisons excédentaires',
+                                'data' => $dl,
+                            ]
+                        ],
+                        'vente_zone' => ['categories' => $cat_vente_zone, 'series' => $vente_zone],
+                    ];
+
+                    return compact('data');
+                } else {
+                    $entity = $user->entities()->first();
+
+                    $categories = [];
+                    $da = $dv = $dl = [];
+
+                    foreach (mainfuels() as $fuel) {
+                        $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum('qtym3'), 3);
+                        $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
+                        $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
+                        $categories[] = $fuel;
+                    }
+
+                    $series = [
+                        (object)[
+                            'name' => 'Achats',
+                            'data' => $da,
+                        ],
+                        (object)[
+                            'name' => 'Ventes',
+                            'data' => $dv,
+                        ],
+                        (object)[
+                            'name' => 'Livraisons excédentaires',
+                            'data' => $dl,
+                        ],
+                    ];
+
+                    if ($entity->user->user_role == 'logisticien') {
+                        $series = [$series[1]];
+                    }
+
+                    $chart1 = compact('series', 'categories');
+
+                    //
+                    $categories = [];
+                    $da = $dv = $dl = [];
+                    foreach (mainWays() as $way) {
+                        $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'way' => $way])->sum('qtym3'), 3);
+                        $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'way' => $way])->sum(DB::raw('lata/1000')), 3);
+                        $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'way' => $way])->sum(DB::raw('lata/1000')), 3);
+                        $categories[] = $way;
+                    }
+
+                    $series = [
+                        (object) [
+                            'name' => 'Achats',
+                            'data' => $da,
+                        ],
+                        (object) [
+                            'name' => 'Ventes',
+                            'data' => $dv,
+                        ],
+                        (object) [
+                            'name' => 'Livraisons excédentaires',
+                            'data' => $dl,
+                        ],
+                    ];
+
+                    if ($entity->user->user_role == 'logisticien') {
+                        $series = [$series[1]];
+                    }
+
+                    $chart2 = compact('series', 'categories');
+                    return compact('chart1', 'chart2');
                 }
-
-                $series = [
-                    (object) [
-                        'name' => 'Achats',
-                        'data' => $da,
-                    ],
-                    (object) [
-                        'name' => 'Ventes',
-                        'data' => $dv,
-                    ],
-                    (object) [
-                        'name' => 'Livraisons excédentaires',
-                        'data' => $dl,
-                    ],
-                ];
-
-                if ($entity->user->user_role == 'logisticien') {
-                    $series = [$series[1]];
-                }
-
-                $chart1 = compact('series', 'categories');
-                return compact('chart1');
             }
         }
     }

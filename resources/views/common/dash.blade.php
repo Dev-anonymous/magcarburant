@@ -2,11 +2,14 @@
 @section('title', 'Dashboard')
 @section('bg-class', 'bg-img-3')
 @section('body')
+    @php
+        $isState = !in_array(Auth::user()->user_role, ['petrolier', 'logisticien']);
+    @endphp
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Dashboard </h2>
-                <p class="lead small m-0">Statistiques générales sur les achats et ventes</p>
+                <p class="lead small m-0">Statistiques des sur les achats et ventes</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -50,11 +53,39 @@
 
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
-                                    <div class="">
-                                        <div id="chart1"></div>
+                                @if ($isState)
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart4"></div>
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart2"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart3"></div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart2"></div>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="col-12">
                                     <x-dataloader />
                                 </div>
@@ -93,52 +124,68 @@
                     date: $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val(),
                 },
                 success: function(data) {
-                    chart1.xAxis[0].setCategories(data.chart1.categories, false);
-                    while (chart1.series.length > 0) {
-                        chart1.series[0].remove(false);
-                    }
-                    data.chart1.series.forEach(function(serie) {
-                        chart1.addSeries({
-                            name: serie.name,
-                            data: serie.data
-                        }, false);
-                    });
+                    @if ($isState)
+                        var achat = data.data.achat;
+                        var vente = data.data.vente;
+                        var livraison = data.data.livraison;
 
+                        chart1.xAxis[0].setCategories(vente.categories, false);
+                        while (chart1.series.length > 0) {
+                            chart1.series[0].remove(false);
+                        }
+                        chart1.addSeries(vente.series, false);
+                        chart1.redraw();
 
-                    function calculateTrend(data) {
-                        const n = data.length;
-                        const xSum = (n - 1) * n / 2;
-                        const ySum = data.reduce((a, b) => a + b, 0);
-                        const xySum = data.reduce((sum, y, i) => sum + i * y, 0);
-                        const x2Sum = data.reduce((sum, _, i) => sum + i * i, 0);
-                        const slope = (n * xySum - xSum * ySum) /
-                            (n * x2Sum - xSum * xSum);
-                        const intercept = (ySum - slope * xSum) / n;
-                        return data.map((_, i) => slope * i + intercept);
-                    }
+                        chart2.xAxis[0].setCategories(achat.categories, false);
+                        while (chart2.series.length > 0) {
+                            chart2.series[0].remove(false);
+                        }
+                        chart2.addSeries(achat.series, false);
+                        chart2.redraw();
 
-                    const ventesData = data.chart1.series
-                        .find(s => s.name === "Ventes").data;
+                        chart3.xAxis[0].setCategories(livraison.categories, false);
+                        while (chart3.series.length > 0) {
+                            chart3.series[0].remove(false);
+                        }
+                        chart3.addSeries(livraison.series, false);
+                        chart3.redraw();
 
-                    const trendData = calculateTrend(ventesData);
-                    const existingTrend = chart1.series.find(s => s.name === "Trend Ventes");
-                    if (existingTrend) {
-                        existingTrend.remove(false);
-                    }
+                        var vente_zone = data.data.vente_zone;
 
-                    chart1.addSeries({
-                        type: 'line',
-                        name: 'Trend Ventes',
-                        data: trendData,
-                        color: '#000',
-                        dashStyle: 'Dash',
-                        marker: {
-                            enabled: false
-                        },
-                        enableMouseTracking: false
-                    }, false);
+                        chart4.xAxis[0].setCategories(vente_zone.categories, false);
+                        while (chart4.series.length > 0) {
+                            chart4.series[0].remove(false);
+                        }
+                        vente_zone.series.forEach(function(serie) {
+                            chart4.addSeries(serie, false);
+                        });
+                        chart4.redraw();
+                    @else
+                        chart1.xAxis[0].setCategories(data.chart1.categories, false);
+                        while (chart1.series.length > 0) {
+                            chart1.series[0].remove(false);
+                        }
+                        data.chart1.series.forEach(function(serie) {
+                            chart1.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
 
-                    chart1.redraw();
+                        chart2.xAxis[0].setCategories(data.chart2.categories, false);
+                        while (chart2.series.length > 0) {
+                            chart2.series[0].remove(false);
+                        }
+                        data.chart2.series.forEach(function(serie) {
+                            chart2.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
+
+                        chart1.redraw();
+                        chart2.redraw();
+                    @endif
                     ldr.hide();
                 },
                 error: function(xhr, a, b) {
@@ -154,109 +201,524 @@
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         }
 
-        var chart1 = Highcharts.chart('chart1', {
-            chart: {
-                type: 'column',
-                height: 600,
-                backgroundColor: 'transparent',
-                options3d: {
-                    enabled: true,
-                    alpha: 35,
-                    beta: 0,
-                    depth: 50,
-                    viewDistance: 25
-                }
-            },
-            title: {
-                text: 'Statistiques générales sur les achats, les ventes et les livraisons excédentaires'
-            },
-            credits: {
-                enabled: false
-            },
-            xAxis: {
-                categories: [],
-                crosshair: true
-            },
-            yAxis: {
-                min: 0,
+        @if ($isState)
+            var chart1 = Highcharts.chart('chart1', {
+                chart: {
+                    type: 'bar',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                },
                 title: {
-                    text: 'Volume (M3)'
-                }
-            },
-            legend: {
-                enabled: true,
-                align: 'center',
-                verticalAlign: 'bottom',
-                layout: 'horizontal',
-                itemMarginTop: 8,
-                itemMarginBottom: 8,
-                symbolRadius: 6,
-                symbolHeight: 12,
-                symbolWidth: 12,
-                itemStyle: {
-                    fontSize: '14px',
-                    color: '#1a3b5d'
-                }
-            },
-
-            tooltip: {
-                shared: true,
-                valueSuffix: ' M3'
-            },
-            plotOptions: {
-                column: {
-                    depth: 25,
-                    borderRadius: 4,
-                    pointPadding: 0.1,
-                    groupPadding: 0.15,
-                    dataLabels: {
-                        enabled: true,
-                        // format: '{point.y} M3',
-                        formatter: function() {
-                            return formatNumber(this.y) + ' M3';
-                        },
-                        style: {
-                            fontSize: '13px',
-                            color: '#000'
+                    text: 'Statistiques des ventes par société'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
                         }
                     }
                 },
-            },
-
-            series: [
-                // {
-                //     name: "",
-                //     data: []
-                // },
-                // {
-                //     name: "Ventes",
-                //     data: []
-                // },
-                // {
-                //     name: "Livraisons excédentaires",
-                //     data: []
-                // }
-            ],
-
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        legend: {
-                            align: 'center',
-                            verticalAlign: 'bottom',
-                            layout: 'horizontal'
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
                         },
-                        chart: {
-                            height: 400
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart2 = Highcharts.chart('chart2', {
+                chart: {
+                    type: 'bar',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des achats par société'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
                         }
                     }
-                }]
-            }
-        });
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
 
+            var chart3 = Highcharts.chart('chart3', {
+                chart: {
+                    type: 'bar',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des livraisons excédentaires par société'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart4 = Highcharts.chart('chart4', {
+                chart: {
+                    type: 'column',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des ventes par zone'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                        name: 'TOTAL',
+                        data: [120, 90, 75, 60]
+                    },
+                    {
+                        name: 'ENGEN',
+                        data: [80, 110, 95, 70]
+                    },
+                    {
+                        name: 'SEP CONGO',
+                        data: [150, 130, 100, 85]
+                    },
+                    {
+                        name: 'SOCIR',
+                        data: [60, 70, 55, 40]
+                    }
+                ],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+        @else
+            var chart1 = Highcharts.chart('chart1', {
+                chart: {
+                    type: 'column',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                    options3d: {
+                        enabled: true,
+                        alpha: 35,
+                        beta: 0,
+                        depth: 50,
+                        viewDistance: 25
+                    }
+                },
+                title: {
+                    text: 'Statistiques des achats, ventes et livraisons excédentaires par carburant'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25,
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    },
+                },
+
+                series: [
+                    // {
+                    //     name: "Achats",
+                    //     data: []
+                    // },
+                    // {
+                    //     name: "Ventes",
+                    //     data: []
+                    // },
+                    // {
+                    //     name: "Livraisons excédentaires",
+                    //     data: []
+                    // }
+                ],
+
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart2 = Highcharts.chart('chart2', {
+                chart: {
+                    type: 'column',
+                    height: 600,
+                    backgroundColor: 'transparent',
+                    options3d: {
+                        enabled: true,
+                        alpha: 35,
+                        beta: 0,
+                        depth: 50,
+                        viewDistance: 25
+                    }
+                },
+                title: {
+                    text: 'Statistiques des achats, les ventes et les livraisons excédentaires par zone'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25,
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    },
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+        @endif
 
         dashboard();
     </script>

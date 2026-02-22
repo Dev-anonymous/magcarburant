@@ -151,7 +151,6 @@
                         chart3.redraw();
 
                         var vente_zone = data.data.vente_zone;
-
                         chart4.xAxis[0].setCategories(vente_zone.categories, false);
                         while (chart4.series.length > 0) {
                             chart4.series[0].remove(false);
@@ -160,6 +159,7 @@
                             chart4.addSeries(serie, false);
                         });
                         chart4.redraw();
+                        
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {

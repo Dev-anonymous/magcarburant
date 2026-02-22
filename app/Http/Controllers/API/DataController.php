@@ -992,7 +992,6 @@ class DataController extends Controller
                         }
                     }
 
-
                     $vente_zone = [];
                     $cat_vente_zone = mainWays();
                     foreach ($entities as $entity) {

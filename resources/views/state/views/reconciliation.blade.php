@@ -105,7 +105,7 @@
                                 Une fois la cession clôturée :
                             </h4>
                             <ul>
-                                <li>Vous ne pouvez plus annuler cette opération,</li>
+                                {{-- <li>Vous ne pouvez plus annuler cette opération,</li> --}}
                                 <li>Il sera impossible d’enregistrer les données (achats, ventes, ... antérieures à la date
                                     de
                                     clôture). </li>
@@ -116,8 +116,45 @@
                             <div class="form-group mb-1">
                                 <input type="hidden" name="entity_id" value="{{ $entity->id }}">
                                 <label class="control-label d-block mb-0">Date de clôture</label>
-                                <input required type="text" class="form-control flatpickr" name="closed_until"
-                                    id="datecl" style="min-width:120px;">
+                                <input required type="text" class="form-control flatpickr" name="closed_until">
+                            </div>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                Annuler
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit" class="btn btn-danger d-flex align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">done_all</i>
+                                    OUI CLOTURER LA CESSION
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editmdl" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fedit>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <h3 class="text-center mb-3">
+                                Modification de la date de clôture
+                            </h3>
+                            <div class="form-group mb-1">
+                                <input type="hidden" name="id">
+                                <label class="control-label d-block mb-0">Date de clôture</label>
+                                <input required type="text" class="form-control" name="closed_until" id="datecl">
                             </div>
                         </div>
                         <x-alert />
@@ -131,11 +168,11 @@
                         </div>
                         <div class="">
                             <button type="submit"
-                                class="btn btn-danger d-flex align-items-center justify-content-center">
+                                class="btn btn-primary d-flex align-items-center justify-content-center">
                                 <x-loader />
                                 <span text>
-                                    <i class="material-icons md-18 mr-1 m-0 p-0">done_all</i>
-                                    OUI CLOTURER LA CESSION
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                    Valider
                                 </span>
                             </button>
                         </div>
@@ -163,6 +200,7 @@
                                         <th>ID</th>
                                         <th>Date clôture</th>
                                         <th>Clôturé par</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -201,6 +239,13 @@
                 firstDayOfWeek: 1
             }
         });
+        var datecl = flatpickr("#datecl", {
+            maxDate: "today",
+            locale: {
+                firstDayOfWeek: 1
+            }
+        });
+
         $('#item').multiselect({
             includeSelectAllOption: true,
             nonSelectedText: 'Aucun filtre',
@@ -360,6 +405,9 @@
             columnDefs: [{
                 targets: 0,
                 width: '1%'
+            }, {
+                targets: 3,
+                width: '1%'
             }, ],
             columns: [{
                     data: 'id',
@@ -375,12 +423,29 @@
                     orderable: false,
                     searchable: false,
                 },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                },
             ],
             dom: 'Blfrtip',
             buttons: [{
                 extend: 'excelHtml5',
                 title: 'Export Excel',
             }, ],
+        });
+
+        $(document).on('click', '[bedit]', function() {
+            var data = $(this).data('data');
+            var mdl = $('#editmdl');
+            $('[name="id"]', mdl).val(data.id);
+            datecl.setDate(data.closed_until);
+            $('.modal.show').modal('hide');
+            setTimeout(() => {
+                mdl.modal('show');
+            }, 300);
         });
 
         $('[fcl]').on('submit', function(e) {
@@ -400,6 +465,47 @@
                 data: data,
                 contentType: false,
                 processData: false,
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    form[0].reset();
+                    setTimeout(() => {
+                        rep.hide();
+                        $('.modal.show').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            });
+        });
+        $('[fedit]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var id = $('[name="id"]', form).val();
+            var data = form.serialize();
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('accountingclosure.index') }}/' + id,
+                method: 'PUT',
+                data: data,
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(

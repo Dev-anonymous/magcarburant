@@ -42,7 +42,6 @@
                             <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>ID </th>
                                         <th>Structure</th>
                                         <th>Taux Structure</th>
                                         <th>Date validité du</th>
@@ -231,20 +230,16 @@
                 }
             },
             order: [
-                [0, "desc"]
+                [2, "desc"]
             ],
             columnDefs: [{
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 4,
+                targets: 5,
                 width: '1%'
             }],
             columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
                     data: 'name',
                     name: 'name',
                     className: 'text-nowrap',

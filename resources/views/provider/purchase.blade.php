@@ -124,7 +124,6 @@
                                                     </label>
                                                 </div>
                                             </th>
-                                            <th>ID</th>
                                             <th>Date</th>
                                             <th>Voie</th>
                                             <th class="text-nowrap">Produit</th>
@@ -559,7 +558,7 @@
                 [1, "desc"]
             ],
             columnDefs: [{
-                targets: 1,
+                targets: 0,
                 width: '1%'
             }, {
                 targets: 2,
@@ -572,10 +571,6 @@
                     data: 'selall',
                     orderable: false,
                     searchable: false,
-                },
-                {
-                    data: 'id',
-                    name: 'id',
                 },
                 {
                     data: 'date',

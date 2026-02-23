@@ -36,7 +36,6 @@
                             <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Structure</th>
                                         <th>Taux</th>
                                         <th>Date validité du</th>
@@ -63,24 +62,19 @@
             serverSide: true,
             ajax: {
                 url: '{{ route('tx-structure.index') }}',
-                data: function(d) {
-                }
+                data: function(d) {}
             },
             order: [
-                [0, "desc"]
+                [2, "desc"]
             ],
             columnDefs: [{
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 4,
+                targets: 3,
                 width: '1%'
             }],
             columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
                     data: 'name',
                     name: 'name'
                 },

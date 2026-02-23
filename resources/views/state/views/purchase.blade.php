@@ -114,7 +114,6 @@
                                     style="width:100%">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>Date</th>
                                             <th>Voie</th>
                                             <th class="text-nowrap">Produit</th>
@@ -538,10 +537,6 @@
                 width: '1%'
             }],
             columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
                     data: 'date',
                     name: 'date'
                 },

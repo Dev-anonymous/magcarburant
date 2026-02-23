@@ -197,7 +197,6 @@
                                 style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Date clôture</th>
                                         <th>Clôturé par</th>
                                         <th></th>
@@ -406,14 +405,10 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 3,
+                targets: 2,
                 width: '1%'
             }, ],
             columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
                     data: 'closed_until',
                     name: 'closed_until',
                 },

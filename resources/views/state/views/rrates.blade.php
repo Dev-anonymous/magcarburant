@@ -32,7 +32,6 @@
                             <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Taux</th>
                                         <th>Date validité du</th>
                                         <th>Date validité au</th>
@@ -63,20 +62,16 @@
                 }
             },
             order: [
-                [0, "desc"]
+                [1, "desc"]
             ],
             columnDefs: [{
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 3,
+                targets: 2,
                 width: '1%'
             }],
             columns: [{
-                    data: 'id',
-                    name: 'id',
-                },
-                {
                     data: 'rate',
                     name: 'rate',
                     className: 'text-nowrap font-weight-bold',

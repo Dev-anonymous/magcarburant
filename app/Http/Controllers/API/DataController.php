@@ -224,8 +224,8 @@ class DataController extends Controller
 
                             foreach ($drows as $r) {
                                 $v = (float) @$r[$index]['vv'];
-                                $zo = $r[4]['v'];
-                                $pro = $r[5]['v'];
+                                $zo = $r[3]['v'];
+                                $pro = $r[4]['v'];
                                 abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                                 abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                                 if ($pro === $fuel && $zone === $zo) {
@@ -387,8 +387,8 @@ class DataController extends Controller
 
                         foreach ($drows as $r) {
                             $v = (float) @$r[$index]['vv'];
-                            $zo = @$r[4]['v'];
-                            $pro = @$r[5]['v'];
+                            $zo = @$r[3]['v'];
+                            $pro = @$r[4]['v'];
                             abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                             abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                             if ($pro === $fuel && in_array($zo, $zones)) {
@@ -539,8 +539,8 @@ class DataController extends Controller
                     $t = 0;
                     foreach ($drows2 as $r) {
                         $v = (float) @$r[$index]['vv'];
-                        $zo = @$r[4]['v'];
-                        $pro = @$r[5]['v'];
+                        $zo = @$r[3]['v'];
+                        $pro = @$r[4]['v'];
                         abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                         abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                         if ($pro === $fuel && in_array($zo, $zones)) {
@@ -695,9 +695,9 @@ class DataController extends Controller
 
                         //
                         foreach ($drows as $r) {
-                            $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
-                            $zo = @$r[4]['v'];
-                            $pro = @$r[5]['v'];
+                            $v = (float) $r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = $r[3]['v'];
+                            $pro = $r[4]['v'];
                             abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                             abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                             if ($pro === $fuel && in_array($zo, $zones)) {
@@ -783,9 +783,9 @@ class DataController extends Controller
 
                         //
                         foreach ($drows as $r) {
-                            $v = (float) @$r[$index + 1]['vv']; // colonne suivante qui represente le montant
-                            $zo = @$r[4]['v'];
-                            $pro = @$r[5]['v'];
+                            $v = (float) $r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = @$r[3]['v'];
+                            $pro = @$r[4]['v'];
                             abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                             abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                             if ($pro === $fuel && in_array($zo, $zones)) {
@@ -883,9 +883,9 @@ class DataController extends Controller
                             abort_if(is_null($index), 422, "Can't process: label \"$ti->label\" not found in greatebook");
 
                             foreach ($drows as $r) {
-                                $v = (float) @$r[$index]['vv'];
-                                $zo = $r[4]['v'];
-                                $pro = $r[5]['v'];
+                                $v = (float) $r[$index]['vv'];
+                                $zo = $r[3]['v'];
+                                $pro = $r[4]['v'];
                                 abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
                                 abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
                                 if ($pro === $fuel && $zone === $zo) {
@@ -1147,7 +1147,6 @@ class DataController extends Controller
         $to = request('date2') ?? nnow()->toDateString();
 
         $head = [
-            ['label' => 'ID'],
             ['label' => 'Terminal'],
             ['label' => 'Date'],
             ['label' => 'Localité'],
@@ -1281,7 +1280,6 @@ class DataController extends Controller
 
             $d1 = $e->date->copy()->startOfMonth();
             $pline = [
-                ['v' => $e->id],
                 ['v' => $e->terminal],
                 ['v' => $e->date?->format('d-m-Y')],
                 ['v' => $e->locality],
@@ -1314,6 +1312,15 @@ class DataController extends Controller
         $errors = array_values(array_unique($errors));
 
         if ($items == 'item1') {
+            $head = array_slice($head, 0, 16);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 16);
+            }
+            $rows = $t;
+        }
+
+        if ($items == 'item2') {
             $head = array_slice($head, 0, 17);
             $t = [];
             foreach ($rows as $r) {
@@ -1322,28 +1329,24 @@ class DataController extends Controller
             $rows = $t;
         }
 
-        if ($items == 'item2') {
-            $head = array_slice($head, 0, 18);
-            $t = [];
-            foreach ($rows as $r) {
-                $t[] = array_slice($r, 0, 18);
-            }
-            $rows = $t;
-        }
-
         if ($items == 'item3') {
-            $head0 = array_slice($head, 0, 16);
-            $head1 = array_slice($head, 18);
+            $head0 = array_slice($head, 0, 15);
+            $head1 = array_slice($head, 17);
             $head = [...$head0, ...$head1];
 
             $t = [];
             foreach ($rows as $r) {
-                $head0 = array_slice($r, 0, 16);
-                $head1 = array_slice($r, 18);
+                $head0 = array_slice($r, 0, 15);
+                $head1 = array_slice($r, 17);
                 $t[] = [...$head0, ...$head1];
             }
             $rows = $t;
         }
+
+        foreach ($head as &$item) {
+            $item['label'] = ucfirst(strtolower($item['label']));
+        }
+        unset($item);
 
         return compact('head', 'rows', 'errors');
     }
@@ -1369,7 +1372,6 @@ class DataController extends Controller
         $to = request('date2') ?? nnow()->toDateString();;
 
         $head = [
-            ['label' => 'ID'],
             ['label' => 'Terminal'],
             ['label' => 'Date'],
             ['label' => 'Localité'],
@@ -1452,7 +1454,6 @@ class DataController extends Controller
 
             $d1 = $e->date->copy()->startOfMonth();
             $pline = [
-                ['v' => $e->id],
                 ['v' => $e->terminal],
                 ['v' => $e->date?->format('d-m-Y')],
                 ['v' => $e->locality],
@@ -1476,6 +1477,15 @@ class DataController extends Controller
         $errors = array_values(array_unique($errors));
 
         if ($items == 'item1') {
+            $head = array_slice($head, 0, 13);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 13);
+            }
+            $rows = $t;
+        }
+
+        if ($items == 'item2') {
             $head = array_slice($head, 0, 14);
             $t = [];
             foreach ($rows as $r) {
@@ -1484,7 +1494,7 @@ class DataController extends Controller
             $rows = $t;
         }
 
-        if ($items == 'item2') {
+        if ($items == 'item3') {
             $head = array_slice($head, 0, 15);
             $t = [];
             foreach ($rows as $r) {
@@ -1493,14 +1503,10 @@ class DataController extends Controller
             $rows = $t;
         }
 
-        if ($items == 'item3') {
-            $head = array_slice($head, 0, 16);
-            $t = [];
-            foreach ($rows as $r) {
-                $t[] = array_slice($r, 0, 16);
-            }
-            $rows = $t;
+        foreach ($head as &$item) {
+            $item['label'] = ucfirst(strtolower($item['label']));
         }
+        unset($item);
 
         return compact('head', 'rows', 'errors');
     }
@@ -1524,7 +1530,6 @@ class DataController extends Controller
         $to = request('date2') ?? nnow()->toDateString();
 
         $head = [
-            ['label' => 'ID'],
             ['label' => 'Terminal'],
             ['label' => 'Date'],
             ['label' => 'Localité'],
@@ -1679,7 +1684,6 @@ class DataController extends Controller
             $mt_tva_interieur = $tva_interieur * $m3;
 
             $pline = [
-                ['v' => $e->id],
                 ['v' => $e->terminal],
                 ['v' => $e->date?->format('d-m-Y')],
                 ['v' => $e->locality],
@@ -1726,27 +1730,32 @@ class DataController extends Controller
         $errors = array_values(array_unique($errors));
 
         if ($items == 'item1') {
-            $head = array_slice($head, 0, 29);
+            $head = array_slice($head, 0, 28);
             $t = [];
             foreach ($rows as $r) {
-                $t[] = array_slice($r, 0, 29);
+                $t[] = array_slice($r, 0, 28);
             }
             $rows = $t;
         }
 
         if ($items == 'item2') {
-            $head0 = array_slice($head, 0, 13);
-            $head1 = array_slice($head, 29);
+            $head0 = array_slice($head, 0, 12);
+            $head1 = array_slice($head, 28);
             $head  = [...$head0, ...$head1];
 
             $t = [];
             foreach ($rows as $r) {
-                $head0 = array_slice($r, 0, 13);
-                $head1 = array_slice($r, 29);
+                $head0 = array_slice($r, 0, 12);
+                $head1 = array_slice($r, 28);
                 $t[]   = [...$head0, ...$head1];
             }
             $rows = $t;
         }
+
+        foreach ($head as &$item) {
+            $item['label'] = ucfirst(strtolower($item['label']));
+        }
+        unset($item);
 
         return compact('head', 'rows', 'errors');
     }
@@ -1770,7 +1779,6 @@ class DataController extends Controller
         $to = request('date2') ?? nnow()->toDateString();
 
         $head = [
-            ['label' => 'ID'],
             ['label' => 'Terminal'],
             ['label' => 'Date'],
             ['label' => 'Localité'],
@@ -1889,7 +1897,6 @@ class DataController extends Controller
             $pmag_change_lerexcom = $charge_lerexcom * $variation_change * $m3;
 
             $pline = [
-                ['v' => $e->id],
                 ['v' => $e->terminal],
                 ['v' => $e->date?->format('d-m-Y')],
                 ['v' => $e->locality],
@@ -1925,36 +1932,35 @@ class DataController extends Controller
         if ($user->user_role === 'logisticien') {
             $name = $user->entities()->first()?->shortname;
             if ($name == 'SEP CONGO') {
-                $indexes = array_merge(range(0, 15), [17, 21]);
+                $indexes = array_merge(range(0, 14), [16, 20]);
             }
             if ($name == 'LEREXCOM') {
-                $indexes = array_merge(range(0, 15), [19, 23]);
+                $indexes = array_merge(range(0, 14), [18, 22]);
             }
             if ($name == 'SPSA') {
-                $indexes = array_merge(range(0, 15), [18, 22]);
+                $indexes = array_merge(range(0, 13), [17, 21]);
             }
             if ($name == 'SOCIR') {
-                $indexes = array_merge(range(0, 15), [16, 20]);
+                $indexes = array_merge(range(0, 13), [15, 19]);
             }
         } else if ($user->user_role == 'etatique') {
             if ($items == 'item1') {
-                // Colonnes 0 à 20
-                $indexes = range(0, 20);
+                $indexes = range(0, 19);
             }
 
             if ($items == 'item2') {
                 // Colonnes 0 à 19 + 21
-                $indexes = array_merge(range(0, 19), [21]);
+                $indexes = array_merge(range(0, 18), [20]);
             }
 
             if ($items == 'item3') {
-                // Colonnes 0 à 19 + 22
-                $indexes = array_merge(range(0, 19), [22]);
+                // Colonnes 0 à 18 + 22
+                $indexes = array_merge(range(0, 18), [21]);
             }
 
             if ($items == 'item4') {
-                // Colonnes 0 à 19 + 23
-                $indexes = array_merge(range(0, 19), [23]);
+                // Colonnes 0 à 18 + 23
+                $indexes = array_merge(range(0, 18), [22]);
             }
         }
 
@@ -1969,6 +1975,11 @@ class DataController extends Controller
             }
             $rows = $t;
         }
+
+        foreach ($head as &$item) {
+            $item['label'] = ucfirst(strtolower($item['label']));
+        }
+        unset($item);
 
         return compact('head', 'rows', 'errors');
     }

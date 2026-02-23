@@ -122,7 +122,6 @@
                                                     </label>
                                                 </div>
                                             </th>
-                                            <th>ID</th>
                                             <th>Terminal</th>
                                             <th>Date</th>
                                             <th>Localité</th>
@@ -585,22 +584,19 @@
                 }
             },
             order: [
-                [1, "desc"]
+                [2, "desc"]
             ],
             columnDefs: [{
-                targets: 1,
+                targets: 0,
                 width: '1%'
             }, {
-                targets: 14,
+                targets: 13,
                 width: '1%'
             }],
             columns: [{
                     data: 'selall',
                     orderable: false,
                     searchable: false,
-                }, {
-                    data: 'id',
-                    name: 'id',
                 },
                 {
                     data: 'terminal',

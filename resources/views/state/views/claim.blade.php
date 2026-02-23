@@ -2,7 +2,7 @@
 @section('title', 'Croisement des créances')
 @section('bg-class', 'bg-img-3')
 @section('body')
-    <div class="container-fluid">
+    <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Croisement des créances | {{ $entity->shortname }}</h2>

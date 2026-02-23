@@ -153,6 +153,13 @@ a.nav-link {
 .table-striped tbody tr:nth-of-type(odd) td {
     color: #000;
 }
+table {
+    font-size: 13px !important;
+}
+
+[dir="ltr"] .table tr th {
+    text-transform: none;
+}
 
 /* theme des input */
 
@@ -288,9 +295,4 @@ input.form-control:focus {
 
 .cursor {
     cursor: pointer;
-}
-
-[dir="ltr"] .table tr th {
-    font-size: 13px;
-    text-transform: none;
 }

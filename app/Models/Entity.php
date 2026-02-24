@@ -19,7 +19,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $logo
  * 
  * @property User $user
+ * @property Collection|AccountingClosure[] $accounting_closures
  * @property Collection|Delivery[] $deliveries
+ * @property Collection|MiningSale[] $mining_sales
  * @property Collection|Purchase[] $purchases
  * @property Collection|Rate[] $rates
  * @property Collection|Sale[] $sales
@@ -49,9 +51,19 @@ class Entity extends Model
 		return $this->belongsTo(User::class, 'users_id');
 	}
 
+	public function accounting_closures()
+	{
+		return $this->hasMany(AccountingClosure::class);
+	}
+
 	public function deliveries()
 	{
 		return $this->hasMany(Delivery::class);
+	}
+
+	public function mining_sales()
+	{
+		return $this->hasMany(MiningSale::class);
 	}
 
 	public function purchases()

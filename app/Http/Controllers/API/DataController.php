@@ -127,6 +127,67 @@ class DataController extends Controller
                 return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
 
+             if ($type === 'mining-sale') {
+                $date = request('date');
+                $date = explode(' to ', $date);
+                $date = array_filter($date);
+                $from = @$date[0] ?? nnow()->toDateString();
+                $to = @$date[1] ?? $from;
+
+                if ($user->user_role == 'etatique') {
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    $entity = $user->entities()->first();
+                }
+                $base = $entity->mining_sales()->whereBetween('date', [$from, $to])->where('from_state', from_state());
+
+                $from_mutuality = request('from_mutuality');
+
+                if ($from_mutuality === "1") {
+                    $base->where('from_mutuality', 1);
+                }
+                if ($from_mutuality === "0") {
+                    $base->where('from_mutuality', 0);
+                }
+
+                $totalLata = v((clone $base)->sum('lata'));
+                $totalL15 = v((clone $base)->sum('l15'));
+
+                $labels = [];
+                $data = [];
+                foreach (mainfuels() as $el) {
+                    $query = $entity->mining_sales()->where('from_state', from_state());
+
+                    if ($from_mutuality === "1") {
+                        $query->where('from_mutuality', 1);
+                    }
+                    if ($from_mutuality === "0") {
+                        $query->where('from_mutuality', 0);
+                    }
+                    $data[] =  round($query->where('product', $el)->whereBetween('date', [$from, $to])->sum(DB::raw('lata/1000')), 3);
+                    $labels[] = $el;
+                }
+                $chart1 = compact('labels', 'data');
+
+                $labels = [];
+                $data = [];
+                foreach (mainfuels() as $el) {
+                    $query = $entity->mining_sales()->where('from_state', from_state());
+
+                    if ($from_mutuality === "1") {
+                        $query->where('from_mutuality', 1);
+                    }
+                    if ($from_mutuality === "0") {
+                        $query->where('from_mutuality', 0);
+                    }
+                    $data[] = round($query->where('product', $el)->whereBetween('date', [$from, $to])->sum('lata'), 3);
+                    $labels[] = $el;
+                }
+                $chart2 = compact('labels', 'data');
+
+                return compact('totalLata', 'totalL15', 'chart1', 'chart2');
+            }
+
             if ($type === 'delivery') {
                 $date = request('date');
                 $date = explode(' to ', $date);

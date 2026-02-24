@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
             Route::get('dash', 'dash')->name('provider.dash');
             Route::get('apps', 'apps')->name('provider.apps');
             Route::get('sale', 'sale')->name('provider.sale');
+            Route::get('mining-sale', 'mining_sale')->name('provider.mining-sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
@@ -80,6 +81,7 @@ Route::middleware('auth')->group(function () {
             Route::get('', 'home')->name('logistics.home');
             Route::get('dash', 'dash')->name('logistics.dash');
             Route::get('sale', 'sale')->name('logistics.sale');
+            Route::get('mining-sale', 'mining_sale')->name('logistics.mining-sale');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('logistics.accounting');
                 Route::get('analyse', 'analyse')->name('logistics.analyse');

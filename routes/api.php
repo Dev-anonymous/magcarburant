@@ -6,6 +6,7 @@ use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\DeliveryController;
 use App\Http\Controllers\API\EntityController;
 use App\Http\Controllers\API\FuelpriceController;
+use App\Http\Controllers\API\MiningsaleAPIController;
 use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\RateController;
 use App\Http\Controllers\API\ReconciliationController;
@@ -29,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('fuelprice', FuelpriceController::class);
     Route::resource('statefuelprice', StateFuelpriceController::class);
     Route::resource('sale', SaleController::class);
+    Route::resource('miningsale', MiningsaleAPIController::class);
     Route::resource('delivery', DeliveryController::class);
     Route::resource('purchase', PurchaseController::class);
     Route::resource('avgprice', AVGPriceController::class);

@@ -106,6 +106,10 @@ class ProviderWebController extends Controller
         return view('provider.sale');
     }
 
+    function mining_sale(){
+        return view('provider.mining_sale');
+    }
+
     function analyse()
     {
         $user = request()->user();

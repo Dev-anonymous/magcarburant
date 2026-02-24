@@ -19,7 +19,7 @@ class LogisticsWebController extends Controller
         $entity = request()->user()->entities()->first();
         return view('logistics.apps', compact('entity'));
     }
-    
+
     function dash()
     {
         return view('common.dash');
@@ -28,6 +28,11 @@ class LogisticsWebController extends Controller
     function sale()
     {
         return view('logistics.sale');
+    }
+
+    function mining_sale()
+    {
+        return view('logistics.mining_sale');
     }
 
     function accounting()

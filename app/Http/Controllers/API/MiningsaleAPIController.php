@@ -4,18 +4,18 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Entity;
-use App\Models\Sale;
-use App\Models\Salefile;
+use App\Models\MiningSale;
+use App\Models\MiningSaleFile;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Facades\Excel;
-use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Yajra\DataTables\DataTables;
 
-class SaleController extends Controller
+class MiningsaleAPIController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,7 +41,8 @@ class SaleController extends Controller
         $to = @$date[1] ?? $from;
         $from_mutuality = request('from_mutuality');
 
-        $sales = $entity->sales()->whereBetween('date', [$from, $to]);
+        $sales = $entity->mining_sales()->whereBetween('date', [$from, $to]);
+
         $sales->where('from_state', from_state());
 
         if ($from_mutuality === "1") {
@@ -65,10 +66,10 @@ class SaleController extends Controller
             ->editColumn('date', function ($row) {
                 return $row->date?->format('d-m-Y');
             })->editColumn('salefile', function ($row) {
-                if ($row->sale) {
-                    $sf = $row->sale->salefiles; // parent
+                if ($row->mining_sale) {
+                    $sf = $row->mining_sale->mining_sale_files; // parent
                 } else {
-                    $sf = $row->salefiles;
+                    $sf = $row->mining_sale_files;
                 }
                 $f = '';
                 foreach ($sf as $i => $e) {
@@ -135,7 +136,7 @@ class SaleController extends Controller
             abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
             $id = request('id');
-            $sale = Sale::findOrFail($id);
+            $sale = MiningSale::findOrFail($id);
 
             $validated = $request->validate([
                 'date' => 'required|string|date|before_or_equal:today',
@@ -158,7 +159,7 @@ class SaleController extends Controller
             DB::beginTransaction();
 
             $sale->update($validated);
-            foreach ($sale->sales as $ch) { // children
+            foreach ($sale->mining_sales as $ch) { // children
                 $ch->update($validated);
             }
 
@@ -166,17 +167,17 @@ class SaleController extends Controller
                 $insertFiles = [];
                 foreach ($request->file('salefile') as $file) {
                     $insertFiles[] = [
-                        'sale_id' => $sale->id,
+                        'mining_sale_id' => $sale->id,
                         'file' => $file->store('bills', 'public')
                     ];
                 }
 
                 if (!empty($insertFiles)) {
-                    foreach ($sale->salefiles as $f) {
+                    foreach ($sale->mining_sale_files as $f) {
                         File::delete("storage/" . $f->file);
                         $f->delete();
                     }
-                    Salefile::insert($insertFiles);
+                    MiningSaleFile::insert($insertFiles);
                 }
             }
 
@@ -307,7 +308,7 @@ class SaleController extends Controller
                 }
 
                 if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                    if (Sale::where([
+                    if (MiningSale::where([
                         'way' => $colD,
                         'product' => $colE,
                         'delivery_note' => $colF,
@@ -334,7 +335,7 @@ class SaleController extends Controller
                     'density'          => $colK,
                     'from_state' => from_state(),
                 ];
-                $sale = Sale::create($ins);
+                $sale = MiningSale::create($ins);
                 $insert[] = $ins;
 
                 if ($user->user_role !== 'etatique') {
@@ -349,7 +350,7 @@ class SaleController extends Controller
                                         $ins['parent_id'] = $sale->id;
                                         $ins['from_mutuality'] = 1;
                                         $ins['entity_id'] = $ent->id;
-                                        Sale::create($ins);
+                                        MiningSale::create($ins);
                                     }
                                 }
                             }
@@ -412,7 +413,7 @@ class SaleController extends Controller
             $validated['entity_id'] = $entity->id;
             $validated['from_state'] = from_state();
 
-            $sale = Sale::create($validated);
+            $sale = MiningSale::create($validated);
 
             if ($entity->user->user_role == 'logisticien') {
                 if ($user->user_role !== 'etatique') {
@@ -426,7 +427,7 @@ class SaleController extends Controller
                                 $validated['parent_id'] = $sale->id;
                                 $validated['from_mutuality'] = 1;
                                 $validated['entity_id'] = $ent->id;
-                                Sale::create($validated);
+                                MiningSale::create($validated);
                             }
                         }
                     }
@@ -436,10 +437,10 @@ class SaleController extends Controller
             $f = [];
             if ($request->hasFile('salefile')) {
                 foreach ($request->file('salefile') as $file) {
-                    $f[] = ['sale_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
+                    $f[] = ['mining_sale_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
-            Salefile::insert($f);
+            MiningSaleFile::insert($f);
 
             DB::commit();
 
@@ -453,7 +454,7 @@ class SaleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sale $sale)
+    public function show(MiningSale $miningsale)
     {
         //
     }
@@ -461,7 +462,7 @@ class SaleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, MiningSale $miningsale)
     {
         //
     }
@@ -469,7 +470,7 @@ class SaleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Sale $sale)
+    public function destroy(MiningSale $miningsale)
     {
         $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
@@ -477,21 +478,21 @@ class SaleController extends Controller
             //
         } else {
             $entity = $user->entities()->first();
-            abort_if($entity->id != $sale->entity_id, 403, "Not permit");
+            abort_if($entity->id != $miningsale->entity_id, 403, "Not permit");
         }
 
         if ('bulk' == request('action')) {
             $ids = (array) json_decode(request('ids'));
-            $sales = Sale::whereIn('id', $ids)->get();
+            $sales = MiningSale::whereIn('id', $ids)->get();
             DB::beginTransaction();
             foreach ($sales as $sale) {
-                foreach ($sale->sales as $s) {
-                    foreach ($s->salefiles as $f) {
+                foreach ($sale->mining_sales as $s) {
+                    foreach ($s->mining_sale_files as $f) {
                         File::delete("storage/" . $f->file);
                     }
                     $s->delete();
                 }
-                foreach ($sale->salefiles as $f) {
+                foreach ($sale->mining_sale_files as $f) {
                     File::delete("storage/" . $f->file);
                 }
                 $sale->delete();
@@ -506,22 +507,22 @@ class SaleController extends Controller
         }
 
         DB::beginTransaction();
-        foreach ($sale->sales as $s) {
-            foreach ($s->salefiles as $f) {
+        foreach ($miningsale->mining_sales as $s) {
+            foreach ($s->mining_sale_files as $f) {
                 File::delete("storage/" . $f->file);
             }
             $s->delete();
         }
 
-        foreach ($sale->salefiles as $f) {
+        foreach ($miningsale->mining_sale_files as $f) {
             File::delete("storage/" . $f->file);
         }
-        $sale->delete();
+        $miningsale->delete();
         DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => "Vous avez supprimé la vente #$sale->id avec succès !",
+            'message' => "Vous avez supprimé la vente #$miningsale->id avec succès !",
         ], 200);
     }
 }

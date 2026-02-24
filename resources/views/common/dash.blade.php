@@ -159,7 +159,6 @@
                             chart4.addSeries(serie, false);
                         });
                         chart4.redraw();
-                        
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -530,6 +529,14 @@
                 }
             });
         @else
+            @php
+                $islog = auth()->user()->user_role == 'logisticien';
+                if ($islog) {
+                    $title = 'Statistiques des ventes par carburant';
+                } else {
+                    $title = 'Statistiques des achats, ventes et livraisons excédentaires';
+                }
+            @endphp
             var chart1 = Highcharts.chart('chart1', {
                 chart: {
                     type: 'column',
@@ -544,7 +551,7 @@
                     }
                 },
                 title: {
-                    text: 'Statistiques des achats, ventes et livraisons excédentaires par carburant'
+                    text: '{{ $title }} par carburant'
                 },
                 credits: {
                     enabled: false
@@ -646,7 +653,7 @@
                     }
                 },
                 title: {
-                    text: 'Statistiques des achats, les ventes et les livraisons excédentaires par zone'
+                    text: '{{ $title }} par zone'
                 },
                 credits: {
                     enabled: false

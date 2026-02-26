@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,15 @@ class AuthController extends Controller
 
         $user->update(['last_activity' => nnow()]);
 
+        AuditLog::create([
+            'user_id'    => $user->id,
+            'username'    => $user->name,
+            'model_type'    => get_class($user),
+            'event'     => 'login',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
         return response([
             'success' => true,
             'message' => "Connexion réussie.",
@@ -48,8 +58,19 @@ class AuthController extends Controller
     public function logout(Request $r)
     {
         if (Auth::check()) {
+            $user = Auth::user();
             Auth::guard('web')->logout();
+            AuditLog::create([
+                'user_id'    => $user->id,
+                'username'    => $user->name,
+                'model_type'    => get_class($user),
+                'event'     => 'logout',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
         }
+
+
         if (request()->wantsJson()) {
             return response(['message' => "logged out"]);
         }

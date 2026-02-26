@@ -1037,20 +1037,22 @@ class DataController extends Controller
                     $ids = User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id');
                     $entities = Entity::whereIn('users_id', $ids)->get();
 
-                    $categories_achat = $categories_vente = $categories_livr = [];
-                    $da = $dv = $dl = [];
+                    $categories_achat = $categories_vente = $categories_livr = $cate_vente_min = [];
+                    $da = $dv = $dl = $dvm = [];
                     foreach ($entities as $entity) {
                         if ($entity->user->user_role == 'logisticien') {
-                            $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
-                            $categories_vente[] = $entity->shortname;
                         } else {
                             $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum('qtym3'), 3);
-                            $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
                             $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
                             $categories_achat[] = $entity->shortname;
                             $categories_livr[] = $entity->shortname;
-                            $categories_vente[] = $entity->shortname;
                         }
+
+                        $categories_vente[] = $entity->shortname;
+                        $cate_vente_min[] = $entity->shortname;
+
+                        $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
+                        $dvm[] = round($entity->mining_sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
                     }
 
                     $vente_zone = [];
@@ -1066,6 +1068,7 @@ class DataController extends Controller
                         ];
                     }
 
+                    // tri
                     $tab = [];
                     foreach ($dv as $i => $val) {
                         $tab[] = ['label' => $categories_vente[$i], 'value' => $val];
@@ -1074,6 +1077,13 @@ class DataController extends Controller
                     $dv = array_column($tab, 'value');
                     $categories_vente = array_column($tab, 'label');
 
+                    $tab = [];
+                    foreach ($dvm as $i => $val) {
+                        $tab[] = ['label' => $cate_vente_min[$i], 'value' => $val];
+                    }
+                    usort($tab, fn($a, $b) => $b['value'] <=> $a['value']);
+                    $dvm = array_column($tab, 'value');
+                    $cate_vente_min = array_column($tab, 'label');
 
                     $tab = [];
                     foreach ($da as $i => $val) {
@@ -1099,12 +1109,18 @@ class DataController extends Controller
                                 'data' => $da,
                             ]
                         ],
-
                         'vente' => [
                             'categories' => $categories_vente,
                             'series' => [
                                 'name' => 'Ventes',
                                 'data' => $dv,
+                            ]
+                        ],
+                        'vente_miniere' => [
+                            'categories' => $cate_vente_min,
+                            'series' => [
+                                'name' => 'Vente liées aux sociétés minières',
+                                'data' => $dvm,
                             ]
                         ],
                         'livraison' =>  [
@@ -1215,7 +1231,6 @@ class DataController extends Controller
                     ];
 
                     $chart4 = compact('series', 'categories');
-
 
                     return compact('chart1', 'chart2', 'chart3', 'chart4');
                 }

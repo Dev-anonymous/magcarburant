@@ -74,6 +74,11 @@
                                             <div id="chart3"></div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart5"></div>
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="col-md-6">
                                         <div class="">
@@ -138,6 +143,7 @@
                         var achat = data.data.achat;
                         var vente = data.data.vente;
                         var livraison = data.data.livraison;
+                        var vente_miniere = data.data.vente_miniere;
 
                         chart1.xAxis[0].setCategories(vente.categories, false);
                         while (chart1.series.length > 0) {
@@ -169,6 +175,13 @@
                             chart4.addSeries(serie, false);
                         });
                         chart4.redraw();
+
+                        chart5.xAxis[0].setCategories(vente_miniere.categories, false);
+                        while (chart5.series.length > 0) {
+                            chart5.series[0].remove(false);
+                        }
+                        chart5.addSeries(vente_miniere.series, false);
+                        chart5.redraw();
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -544,6 +557,84 @@
                         data: [60, 70, 55, 40]
                     }
                 ],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart5 = Highcharts.chart('chart5', {
+                chart: {
+                    type: 'bar',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des ventes liées aux sociétés minières'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [],
                 responsive: {
                     rules: [{
                         condition: {

@@ -127,7 +127,7 @@ class DataController extends Controller
                 return compact('totalLata', 'totalL15', 'chart1', 'chart2');
             }
 
-             if ($type === 'mining-sale') {
+            if ($type === 'mining-sale') {
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
@@ -1123,7 +1123,6 @@ class DataController extends Controller
 
                     $categories = [];
                     $da = $dv = $dl = [];
-
                     foreach (mainfuels() as $fuel) {
                         $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum('qtym3'), 3);
                         $dv[] = round($entity->sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
@@ -1182,7 +1181,43 @@ class DataController extends Controller
                     }
 
                     $chart2 = compact('series', 'categories');
-                    return compact('chart1', 'chart2');
+
+                    //
+                    $categories = [];
+                    $dv = [];
+                    foreach (mainfuels() as $fuel) {
+                        $dv[] = round($entity->mining_sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $fuel])->sum(DB::raw('lata/1000')), 3);
+                        $categories[] = $fuel;
+                    }
+
+                    $series = [
+                        (object)[
+                            'name' => 'Ventes liées aux Ste Minières',
+                            'data' => $dv,
+                        ],
+                    ];
+
+                    $chart3 = compact('series', 'categories');
+
+                    //
+                    $categories = [];
+                    $dv = [];
+                    foreach (mainWays() as $way) {
+                        $dv[] = round($entity->mining_sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'way' => $way])->sum(DB::raw('lata/1000')), 3);
+                        $categories[] = $way;
+                    }
+
+                    $series = [
+                        (object) [
+                            'name' => 'Ventes liées aux Sociétés Minières',
+                            'data' => $dv,
+                        ],
+                    ];
+
+                    $chart4 = compact('series', 'categories');
+
+
+                    return compact('chart1', 'chart2', 'chart3', 'chart4');
                 }
             }
         }

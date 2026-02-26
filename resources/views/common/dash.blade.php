@@ -75,14 +75,24 @@
                                         </div>
                                     </div>
                                 @else
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="">
                                             <div id="chart1"></div>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="">
                                             <div id="chart2"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart3"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart4"></div>
                                         </div>
                                     </div>
                                 @endif
@@ -182,8 +192,32 @@
                             }, false);
                         });
 
+                        chart3.xAxis[0].setCategories(data.chart3.categories, false);
+                        while (chart3.series.length > 0) {
+                            chart3.series[0].remove(false);
+                        }
+                        data.chart3.series.forEach(function(serie) {
+                            chart3.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
+
+                        chart4.xAxis[0].setCategories(data.chart4.categories, false);
+                        while (chart4.series.length > 0) {
+                            chart4.series[0].remove(false);
+                        }
+                        data.chart4.series.forEach(function(serie) {
+                            chart4.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
+
                         chart1.redraw();
                         chart2.redraw();
+                        chart3.redraw();
+                        chart4.redraw();
                     @endif
                     ldr.hide();
                 },
@@ -204,7 +238,7 @@
             var chart1 = Highcharts.chart('chart1', {
                 chart: {
                     type: 'bar',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                 },
                 title: {
@@ -282,7 +316,7 @@
             var chart2 = Highcharts.chart('chart2', {
                 chart: {
                     type: 'bar',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                 },
                 title: {
@@ -360,7 +394,7 @@
             var chart3 = Highcharts.chart('chart3', {
                 chart: {
                     type: 'bar',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                 },
                 title: {
@@ -438,7 +472,7 @@
             var chart4 = Highcharts.chart('chart4', {
                 chart: {
                     type: 'column',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                 },
                 title: {
@@ -531,8 +565,9 @@
         @else
             @php
                 $islog = auth()->user()->user_role == 'logisticien';
+                $title2 = 'Statistiques des ventes liées aux Sociétés Minières';
                 if ($islog) {
-                    $title = 'Statistiques des ventes par carburant';
+                    $title = 'Statistiques des ventes';
                 } else {
                     $title = 'Statistiques des achats, ventes et livraisons excédentaires';
                 }
@@ -540,11 +575,11 @@
             var chart1 = Highcharts.chart('chart1', {
                 chart: {
                     type: 'column',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                     options3d: {
                         enabled: true,
-                        alpha: 35,
+                        alpha: 20,
                         beta: 0,
                         depth: 50,
                         viewDistance: 25
@@ -642,11 +677,11 @@
             var chart2 = Highcharts.chart('chart2', {
                 chart: {
                     type: 'column',
-                    height: 600,
+                    height: 400,
                     backgroundColor: 'transparent',
                     options3d: {
                         enabled: true,
-                        alpha: 35,
+                        alpha: 20,
                         beta: 0,
                         depth: 50,
                         viewDistance: 25
@@ -654,6 +689,179 @@
                 },
                 title: {
                     text: '{{ $title }} par zone'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25,
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    },
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart3 = Highcharts.chart('chart3', {
+                chart: {
+                    type: 'column',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                    options3d: {
+                        enabled: true,
+                        alpha: 20,
+                        beta: 0,
+                        depth: 50,
+                        viewDistance: 25
+                    }
+                },
+                title: {
+                    text: '{{ $title2 }} par carburant'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        depth: 25,
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    },
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart4 = Highcharts.chart('chart4', {
+                chart: {
+                    type: 'column',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                    options3d: {
+                        enabled: true,
+                        alpha: 20,
+                        beta: 0,
+                        depth: 50,
+                        viewDistance: 25
+                    }
+                },
+                title: {
+                    text: '{{ $title2 }} par zone'
                 },
                 credits: {
                     enabled: false

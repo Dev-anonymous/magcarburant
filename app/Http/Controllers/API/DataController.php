@@ -816,8 +816,6 @@ class DataController extends Controller
                     'TVA à la vente (TVAV)',
                     'Droits de douane (10% PMF Commercial)',
                     'Droits de consommation (25%, 15%, 0% du PMFF)',
-                    "Droits de consommation (25%, 15%, 0% du PMFF)",
-                    "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
                     "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
                     "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"
                 ];

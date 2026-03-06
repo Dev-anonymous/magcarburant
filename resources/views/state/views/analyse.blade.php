@@ -2,7 +2,7 @@
 @section('title', 'Analyse')
 @section('bg-class', 'bg-img-3')
 @section('body')
-    <div class="container">
+    <div class="container-wide">
         <div class="d-flex justify-content-between">
             <div class="">
                 @if ($entity->user->user_role == 'petrolier')

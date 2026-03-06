@@ -2,7 +2,7 @@
 @section('title', 'Analyse')
 @section('bg-class', 'bg-img-3')
 @section('body')
-    <div class="container">
+    <div class="container-wide">
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Manque à Gagner des Sociétés Commerciales</h2>

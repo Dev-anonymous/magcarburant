@@ -41,6 +41,7 @@ class AuthController extends Controller
 
         AuditLog::create([
             'user_id'    => $user->id,
+            'entity_id'    => $user->entities()->first()?->id,
             'username'    => $user->name,
             'model_type'    => get_class($user),
             'event'     => 'login',
@@ -58,10 +59,11 @@ class AuthController extends Controller
     public function logout(Request $r)
     {
         if (Auth::check()) {
-            $user = Auth::user();
+            $user = request()->user();
             Auth::guard('web')->logout();
             AuditLog::create([
                 'user_id'    => $user->id,
+                'entity_id'    => $user->entities()->first()?->id,
                 'username'    => $user->name,
                 'model_type'    => get_class($user),
                 'event'     => 'logout',

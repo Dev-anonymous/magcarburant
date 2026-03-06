@@ -5,6 +5,7 @@ use App\Http\Controllers\LogisticsWebController;
 use App\Http\Controllers\ProviderWebController;
 use App\Http\Controllers\StateWebController;
 use App\Http\Controllers\SudoWebController;
+use App\Http\Controllers\WebController;
 use App\Http\Middleware\APP\LogisticsMiddleware;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\StateMiddleware;
@@ -52,6 +53,8 @@ Route::get('', function () {
 
 
 Route::middleware('auth')->group(function () {
+    Route::get('app-logs', [WebController::class, 'applogs'] )->name('applogs');
+
     Route::prefix('super-admin')->middleware(SudoMiddleware::class)->group(function () {
         Route::controller(SudoWebController::class)->group(function () {
             Route::get('', 'home')->name('sudo.home');

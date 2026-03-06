@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AccountingClosureController;
+use App\Http\Controllers\API\AuditController;
 use App\Http\Controllers\API\AVGPriceController;
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\DeliveryController;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
     Route::get('reconciliation', [ReconciliationController::class, 'reconciliation'])->name('reconciliation');
+    Route::resource('audit', AuditController::class)->only(['index']);
     Route::resource('entity', EntityController::class);
     Route::resource('rate', RateController::class);
     Route::resource('staterate', StateRateController::class);

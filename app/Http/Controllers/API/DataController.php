@@ -826,12 +826,10 @@ class DataController extends Controller
                     $tabv["tot_fisc_$z"] = 0;
                 }
 
-                foreach ($items1 as $ti) {
+                foreach ($items1 as $idx => $ti) {
                     $line0 = [];
                     $line0[] = [
                         'label' => $ti,
-                        // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
-                        // 'title' => "Afficher les détails de tous les produits.",
                     ];
 
                     $tot = 0;
@@ -852,7 +850,10 @@ class DataController extends Controller
                             }
                         }
 
-                        incr($tabv, "tot_fisc_$fuel", $t);
+                        if ($idx != 0) {
+                            //  pas  de tva a la vente dans fiscalite
+                            incr($tabv, "tot_fisc_$fuel", $t);
+                        }
 
                         $tot += $t;
                         $line0[] = [

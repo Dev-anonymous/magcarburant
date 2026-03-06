@@ -375,7 +375,7 @@ function initfuelprice(Structureprice|StateStructureprice $structure)
 function userimg(?User $user = null)
 {
     if (Auth::check()) {
-        $user = $user ?? auth()->user();
+        $user = $user ?? request()->user();
         $role = $user->user_role;
         $i = 'assets/images/avatar.png';
         if ($role === 'sudo') {
@@ -442,7 +442,7 @@ function itemsPara()
 
 function itemslog()
 {
-    $user = auth()->user();
+    $user = request()->user();
     if ($user->user_role === 'logisticien') {
         $name = $user->entities()->first()?->shortname;
         if ($name == 'SEP CONGO') {
@@ -501,7 +501,7 @@ function incr(&$tab, $key,  $val)
 
 function gb_href($params, $route = null)
 {
-    $user = auth()->user();
+    $user = request()->user();
     if ($user->user_role === 'petrolier') {
         $href = route($route ? "provider.$route" : 'provider.accounting', $params);
     } elseif ($user->user_role === 'logisticien') {

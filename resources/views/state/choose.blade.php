@@ -97,7 +97,7 @@
                 <div class="modal-body text-center">
                     <h4 class="my-3">Sélectionnez une société </h4>
                     <input type="hidden" id="navmode">
-                    <div class="my-3">
+                    <div class="my-3" style="max-height: 70vh;overflow-y: auto; overflow-x: hidden;">
                         <div class="row">
                             @foreach ($entities as $el)
                                 <div class="col-md-6">

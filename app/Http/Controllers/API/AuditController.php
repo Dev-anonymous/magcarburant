@@ -69,8 +69,8 @@ class AuditController extends Controller
                 $d['date'] = Carbon::parse($row->created_at)->format('d-m-Y H:i:s');
                 $d['event'] = ucfirst($d['event']);
                 $entity = Entity::find($d['entity_id']);
-                $d['entity'] = $entity ? $entity->shortname : null;
-                if ($row->username == $d['entity']) {
+                $d['entity'] =  $ent = @$entity->shortname;
+                if ($row->username == $ent) {
                     $d['entity'] = null;
                 }
                 return json_encode($d);

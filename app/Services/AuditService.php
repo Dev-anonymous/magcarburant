@@ -11,6 +11,7 @@ class AuditService
     public static function log($event, $model = null, $old = null, $new = null, $title = null)
     {
         $user = Auth::user();
+
         AuditLog::create([
             'event'      => $event,
             'title' => $title,
@@ -22,7 +23,7 @@ class AuditService
             'old_values' => is_array($old) && count($old) ? json_encode($old) : null,
             'new_values' => is_array($new) && count($new) ?  json_encode($new) : null,
             'ip_address' => Request::ip(),
-            'user_agent' => Request::userAgent(),
+            'user_agent' => ua(),
             'created_at' => nnow(),
         ]);
     }

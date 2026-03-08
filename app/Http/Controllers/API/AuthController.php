@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Jenssegers\Agent\Agent;
 
 class AuthController extends Controller
 {
@@ -37,6 +38,8 @@ class AuthController extends Controller
 
         $user->update(['last_activity' => nnow()]);
 
+
+
         AuditLog::create([
             'user_id'    => $user->id,
             'entity_id'    => $user->entities()->first()?->id,
@@ -44,7 +47,7 @@ class AuthController extends Controller
             'model_type'    => get_class($user),
             'event'     => 'connexion',
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'user_agent' => ua(),
             'title' => sprintf("%s s'est connecté (ID:%d)", $user->name ?? 'Système', $user->id)
         ]);
 
@@ -60,6 +63,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             $user = request()->user();
             Auth::guard('web')->logout();
+
             AuditLog::create([
                 'user_id'    => $user->id,
                 'entity_id'    => $user->entities()->first()?->id,
@@ -67,7 +71,7 @@ class AuthController extends Controller
                 'model_type'    => get_class($user),
                 'event'     => 'déconnexion',
                 'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
+                'user_agent' => ua(),
                 'title' => sprintf("%s s'est déconnecté (ID:%d)", $user->name ?? 'Système', $user->id)
             ]);
         }

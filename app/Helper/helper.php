@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 function nnow()
 {
@@ -604,4 +605,16 @@ function middleTruncate(string $value): string
     $finish = Str::substr($value, -$keep);
 
     return $start . $end . $finish;
+}
+
+function ua()
+{
+    $agent = new Agent();
+    $userAgentInfo = sprintf(
+        "%s %s sur %s",
+        $agent->browser(),
+        $agent->version($agent->browser()),
+        $agent->platform()
+    );
+    return $userAgentInfo;
 }

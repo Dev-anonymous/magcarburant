@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $event
+ * @property string|null $title
  * @property string|null $model_type
  * @property int|null $model_id
  * @property int|null $user_id
@@ -40,6 +41,7 @@ class AuditLog extends Model
 
 	protected $fillable = [
 		'event',
+		'title',
 		'model_type',
 		'model_id',
 		'user_id',

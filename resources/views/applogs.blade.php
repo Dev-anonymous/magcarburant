@@ -53,12 +53,13 @@
                     </div>
                     <div class="card-body" style="min-height: 300px">
                         <div class="table-responsive">
-                            <table id="table" class="table table-striped table-hover" style="width:100%">
+                            <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">Date</th>
                                         <th class="text-nowrap">Utilisateur</th>
                                         <th class="text-nowrap">Evènement</th>
+                                        <th class="text-nowrap">Description</th>
                                         <th class="text-nowrap">Anciennes données</th>
                                         <th class="text-nowrap">Nouvelles données</th>
                                         <th class="text-nowrap">Adresse IP</th>
@@ -160,7 +161,6 @@
             columns: [{
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'text-nowrap',
                 },
                 {
                     data: 'username',
@@ -170,27 +170,26 @@
                 {
                     data: 'event',
                     name: 'event',
-                    className: '',
+                },
+                {
+                    data: 'title',
+                    name: 'title',
                 },
                 {
                     data: 'old_values',
                     name: 'old_values',
-                    className: '',
                 },
                 {
                     data: 'new_values',
                     name: 'new_values',
-                    className: '',
                 },
                 {
                     data: 'ip_address',
                     name: 'ip_address',
-                    className: '',
                 },
                 {
                     data: 'user_agent',
                     name: 'user_agent',
-                    className: 'text-nowrap',
                 },
             ],
             dom: 'Blfrtip',

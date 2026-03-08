@@ -6,13 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class MiningSale
- * 
+ *
  * @property int $id
  * @property int $entity_id
  * @property string|null $terminal
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $from_state
  * @property bool $from_mutuality
  * @property int|null $parent_id
- * 
+ *
  * @property Entity $entity
  * @property MiningSale|null $mining_sale
  * @property Collection|MiningSale[] $mining_sales
@@ -39,6 +40,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MiningSale extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'mining_sale';
 	public $timestamps = false;
 

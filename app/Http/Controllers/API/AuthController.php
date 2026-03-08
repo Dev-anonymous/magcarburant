@@ -45,6 +45,7 @@ class AuthController extends Controller
             'event'     => 'connexion',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
+            'title' => sprintf("%s s'est connecté (ID:%d)", $user->name ?? 'Système', $user->id)
         ]);
 
         return response([
@@ -64,9 +65,10 @@ class AuthController extends Controller
                 'entity_id'    => $user->entities()->first()?->id,
                 'username'    => $user->name,
                 'model_type'    => get_class($user),
-                'event'     => 'Déconnexion',
+                'event'     => 'déconnexion',
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
+                'title' => sprintf("%s s'est déconnecté (ID:%d)", $user->name ?? 'Système', $user->id)
             ]);
         }
 

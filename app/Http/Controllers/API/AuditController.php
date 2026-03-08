@@ -67,6 +67,9 @@ class AuditController extends Controller
                 $d['event'] = ucfirst($d['event']);
                 $entity = Entity::find($d['entity_id']);
                 $d['entity'] = $entity ? $entity->shortname : '';
+                if ($row->username == $d['entity']) {
+                    $d['entity'] = '';
+                }
                 return json_encode($d);
             })
             ->rawColumns(['raw_data'])

@@ -65,6 +65,8 @@ class AuditController extends Controller
                 $d = $row->toArray();
                 $d['date'] = Carbon::parse($row->created_at)->format('d-m-Y H:i:s');
                 $d['event'] = ucfirst($d['event']);
+                $entity = Entity::find($d['entity_id']);
+                $d['entity'] = $entity ? $entity->shortname : '';
                 return json_encode($d);
             })
             ->rawColumns(['raw_data'])

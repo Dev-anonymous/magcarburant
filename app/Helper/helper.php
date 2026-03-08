@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 function nnow()
 {
@@ -585,4 +586,22 @@ function logEvents()
         (object)  ['name' => 'Connexion', 'value' => 'connexion'],
         (object)  ['name' => 'Déconnexion', 'value' => 'déconnexion'],
     ];
+}
+
+function middleTruncate(string $value): string
+{
+    $end = ' ... ';
+    $limit = 20;
+    $length = Str::length($value);
+
+    if ($length <= $limit) {
+        return $value;
+    }
+
+    $keep = (int) (($limit - Str::length($end)) / 2);
+
+    $start = Str::substr($value, 0, $keep);
+    $finish = Str::substr($value, -$keep);
+
+    return $start . $end . $finish;
 }

@@ -53,13 +53,13 @@ class AuditController extends Controller
                 if (!($row->old_values)) {
                     return '-';
                 }
-                return Str::limit($row->old_values, 50, '...');
+                return middleTruncate($row->old_values);
             })
             ->editColumn('new_values', function ($row) {
                 if (!$row->new_values) {
                     return '-';
                 }
-                return Str::limit($row->new_values, 50, '...');
+                return middleTruncate($row->new_values);
             })
             ->addColumn('raw_data', function ($row) {
                 $d = $row->toArray();

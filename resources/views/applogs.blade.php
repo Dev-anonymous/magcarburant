@@ -76,6 +76,22 @@
     </div>
 @endsection
 @section('modals')
+    <div class="modal fade" id="logModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Détails de l'audit #<span logid></span></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- contenu injecté par JS -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -83,6 +99,11 @@
     <x-flatpickr />
     <x-select />
     <x-datatable />
+    <style>
+        #table tr {
+            cursor: pointer;
+        }
+    </style>
 
     <script>
         flatpickr(".flatpickr", {
@@ -188,6 +209,47 @@
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
+
+        });
+
+        $('#table tbody').on('click', 'tr', function() {
+            let log = dtObj.row(this).data();
+
+            console.log(log);
+
+            // Parse JSON si présent
+            let oldValues = {};
+            let newValues = {};
+            try {
+                oldValues = JSON.parse(log.old_values);
+            } catch (e) {}
+            try {
+                newValues = JSON.parse(log.new_values);
+            } catch (e) {}
+
+            $('[logid]').html(log.id);
+            // Construire HTML
+            let html = `
+            <p class='m-0'><strong>Événement :</strong> ${log.event}</p>
+            <p class='m-0'><strong>Utilisateur :</strong> ${log.username ?? ''}</p>
+            <p class='m-0'><strong>Utilisateur :</strong> ${log.username ?? ''}</p>
+            <p class='m-0'><strong>Date :</strong> ${log.created_at}</p>
+            <hr/>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-danger">Anciennes valeurs</h6>
+                    <pre class="bg-light p-2 rounded">${JSON.stringify(oldValues, null, 2)}</pre>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-success">Nouvelles valeurs</h6>
+                    <pre class="bg-light p-2 rounded">${JSON.stringify(newValues, null, 2)}</pre>
+                </div>
+            </div>
+        `;
+
+            $('#logModal .modal-body').html(html);
+            $('#logModal').modal('show');
+
 
         });
     </script>

@@ -60,7 +60,7 @@ class AuditController extends Controller
                 }
                 return $row->new_values;
             })
-            ->rawColumns([])
+            ->rawColumns(['old_values', 'new_values'])
             ->make(true);
     }
 

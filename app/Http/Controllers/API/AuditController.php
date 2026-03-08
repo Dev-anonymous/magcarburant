@@ -61,6 +61,9 @@ class AuditController extends Controller
                 }
                 return middleTruncate($row->new_values);
             })
+            ->editColumn('user_agent', function ($row) {
+                return Str::limit($row->user_agent, 50);
+            })
             ->addColumn('raw_data', function ($row) {
                 $d = $row->toArray();
                 $d['date'] = Carbon::parse($row->created_at)->format('d-m-Y H:i:s');
@@ -68,7 +71,7 @@ class AuditController extends Controller
                 $entity = Entity::find($d['entity_id']);
                 $d['entity'] = $entity ? $entity->shortname : '';
                 if ($row->username == $d['entity']) {
-                    $d['entity'] = '';
+                    $d['entity'] = null;
                 }
                 return json_encode($d);
             })

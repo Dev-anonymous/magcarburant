@@ -256,6 +256,10 @@
                         <pre class="bg-light p-2 rounded">${newHtml}</pre>
                     </div>
                 </div>
+                <div>
+                <p class='m-0 mt-5'><strong>Navigateur :</strong> ${raw.user_agent}</p>
+                <p class='m-0'><strong>IP :</strong> ${raw.ip_address}</p>
+                </div>
             `;
             $('#logModal .modal-body').html(html);
             $('#logModal').modal('show');

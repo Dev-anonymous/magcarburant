@@ -10,7 +10,7 @@ trait HasAuditLogs
     {
         static::created(function ($model) {
             AuditService::log(
-                'create',
+                'ajout',
                 $model,
                 null,
                 $model->getAttributes()
@@ -27,13 +27,13 @@ trait HasAuditLogs
             $new = $model->getChanges();
 
             if (!empty($new)) {
-                AuditService::log('update', $model, $old, $new);
+                AuditService::log('modification', $model, $old, $new);
             }
         });
 
         static::deleted(function ($model) {
             AuditService::log(
-                'delete',
+                'suppresion',
                 $model,
                 $model->getOriginal(),
                 null

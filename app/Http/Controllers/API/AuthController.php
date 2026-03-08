@@ -4,10 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -44,7 +42,7 @@ class AuthController extends Controller
             'entity_id'    => $user->entities()->first()?->id,
             'username'    => $user->name,
             'model_type'    => get_class($user),
-            'event'     => 'login',
+            'event'     => 'connexion',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
@@ -66,7 +64,7 @@ class AuthController extends Controller
                 'entity_id'    => $user->entities()->first()?->id,
                 'username'    => $user->name,
                 'model_type'    => get_class($user),
-                'event'     => 'logout',
+                'event'     => 'Déconnexion',
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);

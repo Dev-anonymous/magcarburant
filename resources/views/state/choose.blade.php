@@ -8,7 +8,7 @@
         <hr />
         <div class="row">
             <div class="col-md-12">
-                <h3 class="text-center font-weight-bold my-3">Sélectionnez le mode d'utilisation</h3>
+                <h3 class="text-center font-weight-bold my-3">Sélectionnez un module</h3>
             </div>
             <div class="col-md-6">
                 <div class="carte" mode="view" style="cursor: pointer;min-height: 145px">
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 120px;"
+                <div class="carte" style="cursor: pointer;min-height: 145px;"
                     onclick="location.assign('{{ route('state.dash') }}')">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
@@ -82,6 +82,20 @@
                         <h4 class="font-weight-bold">Configuration</h4>
                         <p class="m-0">Pour la configuration des taux réels,
                             prix d'achats moyen, structures des prix et autres</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="carte" style="cursor: pointer;min-height: 145px;"
+                    onclick="location.assign('{{ route('applogs') }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#000" style="vertical-align: middle;">
+                        <path
+                            d="M321-296.08q9-8.88 9-21t-9-21.12q-9-9-21-9t-21 9q-9 9-9 21.12 0 12.12 9 21t21 8.88q12 0 21-8.88ZM321-459q9-9 9-21t-9-21q-9-9-21-9t-21 9q-9 9-9 21t9 21q9 9 21 9t21-9Zm0-162.92q9-8.88 9-21t-9-21.12q-9-9-21-9t-21 9q-9 9-9 21.12 0 12.12 9 21t21 8.88q12 0 21-8.88ZM432-287.2h244v-60H432v60Zm0-162.8h244v-60H432v60Zm0-163.04h244v-60H432v60ZM182.15-114.02q-27.6 0-47.86-20.27-20.27-20.26-20.27-47.86v-595.7q0-27.7 20.27-48.03 20.26-20.34 47.86-20.34h595.7q27.7 0 48.03 20.34 20.34 20.33 20.34 48.03v595.7q0 27.6-20.34 47.86-20.33 20.27-48.03 20.27h-595.7Zm0-68.13h595.7v-595.7h-595.7v595.7Zm0-595.7v595.7-595.7Z" />
+                    </svg>
+                    <div class="p-2">
+                        <h4 class="font-weight-bold">Audits</h4>
+                        <p class="m-0">Historique des modifications systèmes</p>
                     </div>
                 </div>
             </div>

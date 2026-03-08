@@ -45,6 +45,9 @@ class AuditController extends Controller
 
         return DataTables::of($logs)
             ->addIndexColumn()
+            ->editColumn('event', function ($row) {
+                return ucfirst($row->event);
+            })
             ->editColumn('old_values', function ($row) {
                 if (!($row->old_values)) {
                     return '-';

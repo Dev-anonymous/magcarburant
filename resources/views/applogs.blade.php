@@ -87,7 +87,10 @@
                     <!-- contenu injecté par JS -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn" data-dismiss="modal">
+                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                        Fermer
+                    </button>
                 </div>
             </div>
         </div>
@@ -215,42 +218,48 @@
         $('#table tbody').on('click', 'tr', function() {
             let log = dtObj.row(this).data();
 
-            console.log(log);
+            let raw = {};
+            try {
+                raw = JSON.parse(log.raw_data);
+            } catch (e) {}
 
-            // Parse JSON si présent
             let oldValues = {};
             let newValues = {};
             try {
-                oldValues = JSON.parse(log.old_values);
+                oldValues = JSON.parse(raw.old_values) || {};
             } catch (e) {}
             try {
-                newValues = JSON.parse(log.new_values);
+                newValues = JSON.parse(raw.new_values) || {};
             } catch (e) {}
 
-            $('[logid]').html(log.id);
-            // Construire HTML
-            let html = `
-            <p class='m-0'><strong>Événement :</strong> ${log.event}</p>
-            <p class='m-0'><strong>Utilisateur :</strong> ${log.username ?? ''}</p>
-            <p class='m-0'><strong>Utilisateur :</strong> ${log.username ?? ''}</p>
-            <p class='m-0'><strong>Date :</strong> ${log.created_at}</p>
-            <hr/>
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="text-danger">Anciennes valeurs</h6>
-                    <pre class="bg-light p-2 rounded">${JSON.stringify(oldValues, null, 2)}</pre>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="text-success">Nouvelles valeurs</h6>
-                    <pre class="bg-light p-2 rounded">${JSON.stringify(newValues, null, 2)}</pre>
-                </div>
-            </div>
-        `;
+            let oldHtml = Object.keys(oldValues).length ?
+                JSON.stringify(oldValues, null, 2) :
+                '<span class="badge badge-secondary">Vide</span>';
 
+            let newHtml = Object.keys(newValues).length ?
+                JSON.stringify(newValues, null, 2) :
+                '<span class="badge badge-secondary">Vide</span>';
+
+            $('[logid]').html(raw.id);
+            let html = `
+                <p class='m-0'><strong>Événement :</strong> <b>${raw.event}</b></p>
+                <p class='m-0'><strong>De :</strong> ${raw.username ?? ''}</p>
+                <p class='m-0'><strong>Sur :</strong> ${raw.entity ?? '-'}</p>
+                <p class='m-0'><strong>Le :</strong> ${raw.created_at}</p>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 style='color:#D70040' class="font-weight-bold">Anciennes valeurs</h6>
+                        <pre class="bg-light p-2 rounded">${oldHtml}</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-success font-weight-bold">Nouvelles valeurs</h6>
+                        <pre class="bg-light p-2 rounded">${newHtml}</pre>
+                    </div>
+                </div>
+            `;
             $('#logModal .modal-body').html(html);
             $('#logModal').modal('show');
-
-
         });
     </script>
 @endsection

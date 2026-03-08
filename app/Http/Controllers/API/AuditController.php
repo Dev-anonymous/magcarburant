@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Entity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 
 class AuditController extends Controller
@@ -52,15 +53,21 @@ class AuditController extends Controller
                 if (!($row->old_values)) {
                     return '-';
                 }
-                return $row->old_values;
+                return Str::limit($row->old_values, 50, '...');
             })
             ->editColumn('new_values', function ($row) {
                 if (!$row->new_values) {
                     return '-';
                 }
-                return $row->new_values;
+                return Str::limit($row->new_values, 50, '...');
             })
-            ->rawColumns(['old_values', 'new_values'])
+            ->addColumn('raw_data', function ($row) {
+                $d = $row->toArray();
+                $d['date'] = Carbon::parse($row->created_at)->format('d-m-Y H:i:s');
+                $d['event'] = ucfirst($d['event']);
+                return json_encode($d);
+            })
+            ->rawColumns(['raw_data'])
             ->make(true);
     }
 

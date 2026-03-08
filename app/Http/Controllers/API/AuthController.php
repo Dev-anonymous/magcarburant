@@ -38,8 +38,6 @@ class AuthController extends Controller
 
         $user->update(['last_activity' => nnow()]);
 
-
-
         AuditLog::create([
             'user_id'    => $user->id,
             'entity_id'    => $user->entities()->first()?->id,

@@ -241,26 +241,49 @@
 
             $('[logid]').html(raw.id);
             let html = `
-                <p class='m-0'><strong>Événement :</strong> <b>${raw.event}</b></p>
-                <p class='m-0'><strong>De :</strong> ${raw.username ?? ''}</p>
-                <p class='m-0'><strong>Sur :</strong> ${raw.entity ?? '-'}</p>
-                <p class='m-0'><strong>Le :</strong> ${raw.created_at}</p>
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">event</i> Événement :</strong>
+                    <b>${raw.event}</b>
+                </p>
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">person</i> De :</strong>
+                    ${raw.username ?? ''}
+                </p>
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">storage</i> Sur :</strong>
+                    ${raw.entity ?? '-'}
+                </p>
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
+                    ${raw.created_at}
+                </p>
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">
-                        <h6 style='color:#D70040' class="font-weight-bold">Anciennes valeurs</h6>
+                        <h6 style='color:#D70040' class="font-weight-bold">
+                            <i class="material-icons align-middle md-18">history</i> Anciennes valeurs
+                        </h6>
                         <pre class="bg-light p-2 rounded">${oldHtml}</pre>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-success font-weight-bold">Nouvelles valeurs</h6>
+                        <h6 class="text-success font-weight-bold">
+                            <i class="material-icons align-middle md-18">update</i> Nouvelles valeurs
+                        </h6>
                         <pre class="bg-light p-2 rounded">${newHtml}</pre>
                     </div>
                 </div>
                 <div>
-                <p class='m-0 mt-5'><strong>Navigateur :</strong> ${raw.user_agent}</p>
-                <p class='m-0'><strong>IP :</strong> ${raw.ip_address}</p>
+                    <p class='m-0 mt-5'>
+                        <strong><i class="material-icons align-middle md-18">language</i> Navigateur :</strong>
+                        ${raw.user_agent}
+                    </p>
+                    <p class='m-0'>
+                        <strong><i class="material-icons align-middle md-18">public</i> IP :</strong>
+                        ${raw.ip_address}
+                    </p>
                 </div>
             `;
+
             $('#logModal .modal-body').html(html);
             $('#logModal').modal('show');
         });

@@ -30,33 +30,33 @@ Route::get('def', function () {
     }
 
 
-    foreach (AuditLog::all() as $el) {
-        // Traduction des events
-        switch ($el->event) {
-            case 'delete':
-                $el->event = 'suppression';
-                break;
-            case 'create':
-                $el->event = 'ajout';
-                break;
-            case 'update':
-                $el->event = 'modification';
-                break;
-            case 'login':
-                $el->event = 'connexion';
-                break;
-            case 'logout':
-                $el->event = 'déconnexion';
-                break;
-        }
+    // foreach (AuditLog::all() as $el) {
+    //     // Traduction des events
+    //     switch ($el->event) {
+    //         case 'delete':
+    //             $el->event = 'suppression';
+    //             break;
+    //         case 'create':
+    //             $el->event = 'ajout';
+    //             break;
+    //         case 'update':
+    //             $el->event = 'modification';
+    //             break;
+    //         case 'login':
+    //             $el->event = 'connexion';
+    //             break;
+    //         case 'logout':
+    //             $el->event = 'déconnexion';
+    //             break;
+    //     }
 
-        // Vérifier old_values
-        if ($el->old_values === 'null') {
-            $el->old_values = null;
-        }
+    //     // Vérifier old_values
+    //     if ($el->old_values === 'null') {
+    //         $el->old_values = null;
+    //     }
 
-        $el->save();
-    }
+    //     $el->save();
+    // }
 
 
     $out = Artisan::output();

@@ -579,10 +579,10 @@ function initAvgPrice()
 function logEvents()
 {
     return [
-        (object)  ['name' => 'Ajout', 'value' => 'create'],
-        (object)  ['name' => 'Modification', 'value' => 'update'],
-        (object)  ['name' => 'Suppression', 'value' => 'delete'],
-        (object)  ['name' => 'Connexion', 'value' => 'login'],
-        (object)  ['name' => 'Déconnexion', 'value' => 'logout'],
+        (object)  ['name' => 'Ajout', 'value' => 'ajout'],
+        (object)  ['name' => 'Modification', 'value' => 'modification'],
+        (object)  ['name' => 'Suppression', 'value' => 'suppression'],
+        (object)  ['name' => 'Connexion', 'value' => 'connexion'],
+        (object)  ['name' => 'Déconnexion', 'value' => 'déconnexion'],
     ];
 }

@@ -131,7 +131,7 @@
             includeSelectAllOption: true,
             nonSelectedText: 'Aucun filtre',
             nSelectedText: 'Evènements sélectionnés',
-            allSelectedText: 'Toutes les zones',
+            allSelectedText: 'Tous les Evènements',
             numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
             selectAllText: 'Tous',
             buttonWidth: '100%',

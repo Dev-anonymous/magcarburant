@@ -255,7 +255,7 @@
                 </p>
                 <p class='m-0'>
                     <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
-                    ${raw.created_at}
+                    ${raw.date}
                 </p>
                 <hr/>
                 <div class="row">

@@ -246,6 +246,11 @@
             }
             var v = unformatFr(vv);
 
+            if (vv === '-') {
+                td.css('background-color', '#fff8c4');
+                return;
+            }
+
             function isNumeric(value) {
                 return value !== null && value !== '' && !isNaN(value);
             }

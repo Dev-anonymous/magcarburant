@@ -244,12 +244,13 @@
                 td.text('');
                 return;
             }
-            var v = unformatFr(vv);
 
             if (vv === '-') {
                 td.css('background-color', '#fff8c4');
                 return;
             }
+
+            var v = unformatFr(vv);
 
             function isNumeric(value) {
                 return value !== null && value !== '' && !isNaN(value);

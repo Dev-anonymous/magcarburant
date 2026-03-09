@@ -227,7 +227,6 @@
                             chart8.addSeries(serie, false);
                         });
                         chart8.redraw();
-
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -299,9 +298,11 @@
                     type: 'bar',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des ventes par société'
+                    text: 'Statistiques des ventes par société',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -377,9 +378,11 @@
                     type: 'bar',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des achats par société'
+                    text: 'Statistiques des achats par société',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -455,9 +458,11 @@
                     type: 'bar',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des livraisons excédentaires par société'
+                    text: 'Statistiques des livraisons excédentaires par société',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -533,9 +538,11 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des ventes par zone'
+                    text: 'Statistiques des ventes par zone',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -576,6 +583,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -611,9 +622,11 @@
                     type: 'bar',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des ventes liées aux sociétés minières'
+                    text: 'Statistiques des ventes liées aux sociétés minières',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -689,9 +702,11 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60,
                 },
                 title: {
-                    text: 'Statistiques des ventes par produit'
+                    text: 'Statistiques des ventes par produit',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -732,6 +747,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -767,9 +786,11 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des livraisons excédentaires par zone'
+                    text: 'Statistiques des livraisons excédentaires par zone',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -810,6 +831,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -845,9 +870,11 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60
                 },
                 title: {
-                    text: 'Statistiques des ventes liées aux sociétés minières par produit'
+                    text: 'Statistiques des ventes liées aux sociétés minières par produit',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -887,7 +914,11 @@
                         pointPadding: 0.1,
                         groupPadding: 0.15,
                         dataLabels: {
-                            enabled: false,
+                            enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -925,13 +956,13 @@
                     $title = 'Statistiques des ventes';
                 } else {
                     $title = 'Statistiques des achats, ventes et livraisons excédentaires';
-                }
-            @endphp
+            } @endphp
             var chart1 = Highcharts.chart('chart1', {
                 chart: {
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60,
                     options3d: {
                         enabled: true,
                         alpha: 20,
@@ -941,7 +972,8 @@
                     }
                 },
                 title: {
-                    text: '{{ $title }} par produit'
+                    text: '{{ $title }} par produit',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -984,6 +1016,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -1034,6 +1070,7 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60,
                     options3d: {
                         enabled: true,
                         alpha: 20,
@@ -1043,7 +1080,8 @@
                     }
                 },
                 title: {
-                    text: '{{ $title }} par zone'
+                    text: '{{ $title }} par zone',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -1086,6 +1124,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -1121,6 +1163,7 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60,
                     options3d: {
                         enabled: true,
                         alpha: 20,
@@ -1130,7 +1173,8 @@
                     }
                 },
                 title: {
-                    text: '{{ $title2 }} par produit'
+                    text: '{{ $title2 }} par produit',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -1172,6 +1216,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
@@ -1207,6 +1255,7 @@
                     type: 'column',
                     height: 400,
                     backgroundColor: 'transparent',
+                    spacingTop: 60,
                     options3d: {
                         enabled: true,
                         alpha: 20,
@@ -1216,7 +1265,8 @@
                     }
                 },
                 title: {
-                    text: '{{ $title2 }} par zone'
+                    text: '{{ $title2 }} par zone',
+                    margin: 40,
                 },
                 credits: {
                     enabled: false
@@ -1259,6 +1309,10 @@
                         groupPadding: 0.15,
                         dataLabels: {
                             enabled: true,
+                            rotation: -45,
+                            overflow: 'allow',
+                            crop: false,
+                            align: 'center',
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },

@@ -62,10 +62,8 @@ Route::get('def', function () {
     //     $el->save();
     // }
 
-    phpinfo();
-
-    // $out = Artisan::output();
-    // dd($out);
+    $out = Artisan::output();
+    dd($out);
 });
 
 Route::get('', function () {

@@ -65,7 +65,7 @@ Route::get('def', function () {
     phpinfo();
 
     // $out = Artisan::output();
-    dd($out);
+    // dd($out);
 });
 
 Route::get('', function () {

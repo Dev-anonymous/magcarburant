@@ -1094,6 +1094,20 @@ class DataController extends Controller
                         ];
                     }
 
+
+                    $vente_min_carburant = [];
+                    $cat_vente_min_carburant = mainfuels();
+                    foreach ($entities as $entity) {
+                        $t = [];
+                        foreach (mainfuels() as $product) {
+                            $t[] = round($entity->mining_sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $product])->sum(DB::raw('lata/1000')), 3);
+                        }
+                        $vente_min_carburant[] = [
+                            'name' =>  $entity->shortname,
+                            'data' =>  $t,
+                        ];
+                    }
+
                     // tri
                     $tab = [];
                     foreach ($dv as $i => $val) {
@@ -1158,6 +1172,7 @@ class DataController extends Controller
                         ],
                         'vente_zone' => ['categories' => $cat_vente_zone, 'series' => $vente_zone],
                         'vente_carburant' => ['categories' => $cat_vente_carburant, 'series' => $vente_carburant],
+                        'vente_miniere_carburant' => ['categories' => $cat_vente_min_carburant, 'series' => $vente_min_carburant],
                         'livraison_zone' => ['categories' => $cat_livraison_zone, 'series' => $livraison_zone],
                     ];
 

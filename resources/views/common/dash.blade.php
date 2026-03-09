@@ -89,6 +89,11 @@
                                             <div id="chart5"></div>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart8"></div>
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="col-md-6">
                                         <div class="">
@@ -212,6 +217,17 @@
                             chart7.addSeries(serie, false);
                         });
                         chart7.redraw();
+
+                        var vente_miniere_carburant = data.data.vente_miniere_carburant;
+                        chart8.xAxis[0].setCategories(vente_miniere_carburant.categories, false);
+                        while (chart8.series.length > 0) {
+                            chart8.series[0].remove(false);
+                        }
+                        vente_miniere_carburant.series.forEach(function(serie) {
+                            chart8.addSeries(serie, false);
+                        });
+                        chart8.redraw();
+                        
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -675,7 +691,7 @@
                     backgroundColor: 'transparent',
                 },
                 title: {
-                    text: 'Statistiques des ventes par carburant'
+                    text: 'Statistiques des ventes par produit'
                 },
                 credits: {
                     enabled: false
@@ -823,10 +839,88 @@
                     }]
                 }
             });
+
+            var chart8 = Highcharts.chart('chart8', {
+                chart: {
+                    type: 'column',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des ventes liées aux sociétés minières par produit'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
         @else
             @php
                 $islog = auth()->user()->user_role == 'logisticien';
-                $title2 = 'Statistiques des ventes liées aux Sociétés Minières';
+                $title2 = 'Statistiques des ventes liées aux sociétés minières';
                 if ($islog) {
                     $title = 'Statistiques des ventes';
                 } else {
@@ -847,7 +941,7 @@
                     }
                 },
                 title: {
-                    text: '{{ $title }} par carburant'
+                    text: '{{ $title }} par produit'
                 },
                 credits: {
                     enabled: false
@@ -1036,7 +1130,7 @@
                     }
                 },
                 title: {
-                    text: '{{ $title2 }} par carburant'
+                    text: '{{ $title2 }} par produit'
                 },
                 credits: {
                     enabled: false

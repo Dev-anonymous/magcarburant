@@ -227,7 +227,7 @@
                             chart8.addSeries(serie, false);
                         });
                         chart8.redraw();
-                        
+
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -346,7 +346,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -424,7 +424,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -502,7 +502,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -580,7 +580,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -658,7 +658,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -736,7 +736,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -814,7 +814,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -887,12 +887,12 @@
                         pointPadding: 0.1,
                         groupPadding: 0.15,
                         dataLabels: {
-                            enabled: true,
+                            enabled: false,
                             formatter: function() {
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -988,7 +988,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -1090,7 +1090,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -1176,7 +1176,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }
@@ -1263,7 +1263,7 @@
                                 return formatNumber(this.y) + ' M3';
                             },
                             style: {
-                                fontSize: '13px',
+                                fontSize: '10px',
                                 color: '#000'
                             }
                         }

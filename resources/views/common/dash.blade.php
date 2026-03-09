@@ -59,6 +59,11 @@
                                             <div id="chart4"></div>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart6"></div>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6">
                                         <div class="">
                                             <div id="chart1"></div>
@@ -67,6 +72,11 @@
                                     <div class="col-md-6">
                                         <div class="">
                                             <div id="chart2"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="">
+                                            <div id="chart7"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -182,6 +192,26 @@
                         }
                         chart5.addSeries(vente_miniere.series, false);
                         chart5.redraw();
+
+                        var vente_carburant = data.data.vente_carburant;
+                        chart6.xAxis[0].setCategories(vente_carburant.categories, false);
+                        while (chart6.series.length > 0) {
+                            chart6.series[0].remove(false);
+                        }
+                        vente_carburant.series.forEach(function(serie) {
+                            chart6.addSeries(serie, false);
+                        });
+                        chart6.redraw();
+
+                        var livraison_zone = data.data.livraison_zone;
+                        chart7.xAxis[0].setCategories(livraison_zone.categories, false);
+                        while (chart7.series.length > 0) {
+                            chart7.series[0].remove(false);
+                        }
+                        livraison_zone.series.forEach(function(serie) {
+                            chart7.addSeries(serie, false);
+                        });
+                        chart7.redraw();
                     @else
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
@@ -540,23 +570,7 @@
                         }
                     }
                 },
-                series: [{
-                        name: 'TOTAL',
-                        data: [120, 90, 75, 60]
-                    },
-                    {
-                        name: 'ENGEN',
-                        data: [80, 110, 95, 70]
-                    },
-                    {
-                        name: 'SEP CONGO',
-                        data: [150, 130, 100, 85]
-                    },
-                    {
-                        name: 'SOCIR',
-                        data: [60, 70, 55, 40]
-                    }
-                ],
+                series: [],
                 responsive: {
                     rules: [{
                         condition: {
@@ -619,6 +633,162 @@
                 },
                 plotOptions: {
                     bar: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart6 = Highcharts.chart('chart6', {
+                chart: {
+                    type: 'column',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des ventes par carburant'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
+                        borderRadius: 4,
+                        pointPadding: 0.1,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return formatNumber(this.y) + ' M3';
+                            },
+                            style: {
+                                fontSize: '13px',
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                series: [],
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal'
+                            },
+                            chart: {
+                                height: 400
+                            }
+                        }
+                    }]
+                }
+            });
+
+            var chart7 = Highcharts.chart('chart7', {
+                chart: {
+                    type: 'column',
+                    height: 400,
+                    backgroundColor: 'transparent',
+                },
+                title: {
+                    text: 'Statistiques des livraisons excédentaires par zone'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Volume (M3)'
+                    }
+                },
+                legend: {
+                    enabled: true,
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemMarginTop: 8,
+                    itemMarginBottom: 8,
+                    symbolRadius: 6,
+                    symbolHeight: 12,
+                    symbolWidth: 12,
+                    itemStyle: {
+                        fontSize: '14px',
+                        color: '#1a3b5d'
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' M3'
+                },
+                plotOptions: {
+                    column: {
                         borderRadius: 4,
                         pointPadding: 0.1,
                         groupPadding: 0.15,

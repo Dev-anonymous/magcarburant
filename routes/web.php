@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
             Route::get('sale', 'sale')->name('provider.sale');
             Route::get('mining-sale', 'mining_sale')->name('provider.mining-sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
+            Route::get('security-stock', 'security_stock')->name('provider.security-stock');
             Route::prefix('accounting')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
                 Route::get('analyse', 'analyse')->name('provider.analyse');
@@ -144,6 +145,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('', 'apps')->name('state.apps');
                     Route::get('sale', 'sale')->name('state.sale');
                     Route::get('purchase', 'purchase')->name('state.purchase');
+                    Route::get('security-stock', 'security_stock')->name('state.security-stock');
                     Route::prefix('accounting')->group(function () {
                         Route::get('', 'accounting')->name('state.accounting');
                         Route::get('analyse', 'analyse')->name('state.analyse');

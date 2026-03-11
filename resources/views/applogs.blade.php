@@ -242,6 +242,10 @@
             $('[logid]').html(raw.id);
             let html = `
                 <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">event</i> Description :</strong>
+                    <b>${raw.title}</b>
+                </p>
+                <p class='m-0'>
                     <strong><i class="material-icons align-middle md-18">event</i> Événement :</strong>
                     <b>${raw.event}</b>
                 </p>

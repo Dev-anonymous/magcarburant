@@ -5,12 +5,14 @@ use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Fuelprice;
 use App\Models\Label;
+use App\Models\SecurityStock;
 use App\Models\StateFuelprice;
 use App\Models\StateStructureprice;
 use App\Models\Structureprice;
 use App\Models\User;
 use App\Models\Zone;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -567,6 +569,29 @@ function initAvgPrice()
                     ]
                 );
             }
+        }
+    }
+}
+
+function initStockPrice()
+{
+    $year = now()->year;
+    $user = Auth::user();
+    $fromState = from_state();
+    $entities = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id'))->get();
+    $months = CarbonPeriod::create("$year-01-01", '1 month', "$year-12-01");
+    foreach ($entities as $entity) {
+        foreach ($months as $month) {
+            SecurityStock::firstOrCreate(
+                [
+                    'entity_id'  => $entity->id,
+                    'month'      => $month->toDateString(),
+                    'from_state' => $fromState,
+                ],
+                [
+                    'amount' => 0,
+                ]
+            );
         }
     }
 }

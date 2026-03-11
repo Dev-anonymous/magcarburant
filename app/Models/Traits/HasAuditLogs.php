@@ -10,6 +10,7 @@ use App\Models\MiningSale;
 use App\Models\Purchase;
 use App\Models\Rate;
 use App\Models\Sale;
+use App\Models\SecurityStock;
 use App\Models\StateFuelprice;
 use App\Models\StateStructureprice;
 use App\Models\Structureprice;
@@ -109,6 +110,10 @@ trait HasAuditLogs
 
         if ($model instanceof Structureprice) {
             return "Structure de prix";
+        }
+
+        if ($model instanceof SecurityStock) {
+            return "Stock de sécurité collecté reversé";
         }
 
         // autres mappings...

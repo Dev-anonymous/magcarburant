@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
+use App\Models\SecurityStock;
 use App\Models\StateStructureprice;
 use App\Models\Structureprice;
 use App\Models\User;
@@ -192,5 +193,16 @@ class StateWebController extends Controller
             }
         }
         return view('state.edit.str_price');
+    }
+
+    function security_stock($mode, Entity $entity)
+    {
+        initStockPrice();
+        $years = SecurityStock::selectRaw('YEAR(month) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return view('state.views.security_stock', compact('years', 'entity'));
     }
 }

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Collection|Purchase[] $purchases
  * @property Collection|Rate[] $rates
  * @property Collection|Sale[] $sales
+ * @property Collection|SecurityStock[] $security_stocks
  * @property Collection|Structureprice[] $structureprices
  * @property Collection|Workingzone[] $workingzones
  *
@@ -79,6 +80,11 @@ class Entity extends Model
 	public function sales()
 	{
 		return $this->hasMany(Sale::class);
+	}
+
+	public function security_stocks()
+	{
+		return $this->hasMany(SecurityStock::class);
 	}
 
 	public function structureprices()

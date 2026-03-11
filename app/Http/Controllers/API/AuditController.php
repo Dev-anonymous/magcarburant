@@ -43,7 +43,6 @@ class AuditController extends Controller
             // abort(403);
         }
 
-
         return DataTables::of($logs)
             ->addIndexColumn()
             ->editColumn('event', function ($row) {

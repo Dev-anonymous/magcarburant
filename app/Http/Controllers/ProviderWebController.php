@@ -6,6 +6,7 @@ use App\Models\Fuel;
 use App\Models\Fuelprice;
 use App\Models\Label;
 use App\Models\Rate;
+use App\Models\SecurityStock;
 use App\Models\Structureprice;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class ProviderWebController extends Controller
         return view('provider.apps', compact('entity'));
     }
 
-    function dash(){
+    function dash()
+    {
         return view('common.dash');
     }
 
@@ -106,7 +108,8 @@ class ProviderWebController extends Controller
         return view('provider.sale');
     }
 
-    function mining_sale(){
+    function mining_sale()
+    {
         return view('provider.mining_sale');
     }
 
@@ -134,5 +137,19 @@ class ProviderWebController extends Controller
     function taxation()
     {
         return view('provider.taxation');
+    }
+
+    function security_stock()
+    {
+        initStockPrice();
+        $years = SecurityStock::selectRaw('YEAR(month) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+            
+        $user = request()->user();
+        $entity = $user->entities()->first();
+
+        return view('provider.security_stock', compact('years', 'entity'));
     }
 }

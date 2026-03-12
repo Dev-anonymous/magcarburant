@@ -298,37 +298,30 @@ input.form-control:focus {
 }
 
 .container-wide {
-    max-width: 75%;
+    width: 100%;
     margin: 0 auto;
     padding-left: 15px;
     padding-right: 15px;
     padding: 1.25rem;
 }
 
-/* Petits écrans (Bootstrap 3: <768px) */
-@media (max-width: 767px) {
+/* tablette */
+@media (min-width: 768px) {
     .container-wide {
-        max-width: 100%; /* comme .container */
+        max-width: 750px;
     }
 }
 
-/* Écrans moyens (≥768px et <992px) */
-@media (min-width: 768px) and (max-width: 991px) {
+/* desktop */
+@media (min-width: 992px) {
     .container-wide {
-        max-width: 750px; /* valeur Bootstrap 3 pour .container */
+        max-width: 970px;
     }
 }
 
-/* Écrans larges (≥992px et <1200px) */
-@media (min-width: 992px) and (max-width: 1199px) {
-    .container-wide {
-        max-width: 970px; /* valeur Bootstrap 3 */
-    }
-}
-
-/* Très grands écrans (≥1200px) */
+/* large desktop */
 @media (min-width: 1200px) {
     .container-wide {
-        max-width: 95%; /* élargi par rapport à Bootstrap */
+        max-width: 1170px;
     }
 }

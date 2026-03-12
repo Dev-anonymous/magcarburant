@@ -375,7 +375,6 @@
                             'p-1 m-0 alert alert-danger')
                         .show();
                     $('[data]').css('opacity', 0.1);
-
                 },
             }).always(function() {
                 ldr.hide();

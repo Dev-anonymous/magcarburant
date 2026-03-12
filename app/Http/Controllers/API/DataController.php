@@ -13,6 +13,7 @@ use App\Models\Sale;
 use App\Models\Structureprice;
 use App\Models\User;
 use App\Models\Zone;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -381,6 +382,9 @@ class DataController extends Controller
                 $from = request('date1') ?? nnow()->toDateString();
                 $to = request('date2') ?? nnow()->toDateString();
 
+                $fromObj = Carbon::parse($from)->startOfMonth();
+                $toObj   = Carbon::parse($to)->startOfMonth();
+
                 $dhead = $data['head'];
                 $drows = $data['rows'];
 
@@ -419,7 +423,8 @@ class DataController extends Controller
                     $tabVar["pmag_ste_petro_$z"] = 0;
                     $tabVar["tot_pmag_$z"] = 0;
                     $tabVar["livr_excedent_$z"] = 0;
-                    $tabVar["tot_creance_ste_$z"] = 0;
+                    $tabVar["tot_creance_ste_etat_$z"] = 0;
+                    $tabVar["tot_creance_etat_ste_$z"] = 0;
                 }
 
 
@@ -550,6 +555,8 @@ class DataController extends Controller
                         'title' => "TOTAL PMAG + LIVRAISONS EXCÉDENTAIRES du produit $fuel"
                     ];
                     $tg += $t;
+
+                    incr($tabVar, "tot_creance_ste_etat_$fuel", $t);
                 }
 
                 $line0[] = [
@@ -592,6 +599,8 @@ class DataController extends Controller
                 $dhead2 = $data2['head'];
                 $drows2 = $data2['rows'];
 
+                $tabNrev = [];
+
                 $tot = 0;
                 foreach ($fuels as $k => $fuel) {
                     $index = findIndexByLabel($dhead2, 'Montant Stock de Sécurité');
@@ -608,6 +617,7 @@ class DataController extends Controller
                             $t += round($v, 3); //
                         }
                     }
+                    $tabNrev[$fuel] = $t;
                     $tot += $t;
                     $line0[] = [
                         'label' => v($t),
@@ -634,15 +644,27 @@ class DataController extends Controller
                     'label' => "STOCK DE SÉCURITÉ COLLECTÉ REVERSÉ",
                     // 'class' => 'title2',
                 ];
+
+                $sscr = $entity->security_stocks()->where('from_state', from_state())->whereBetween('month', [$fromObj, $toObj])->sum(DB::raw('amount'));
+
+                $dl1 = ucfirst($fromObj->translatedFormat('F')) . ' ' . $fromObj->format('Y');
+                $dl2 = ucfirst($toObj->translatedFormat('F')) . ' ' . $toObj->format('Y');
+
+                if (!$sscr) {
+                    $err = ["Aucun de sécurité collecté reversé n'a été trouvé pour $dl1 - $dl2"];
+                    $data['errors'] = array_merge($err, $data['errors']);
+                }
+
                 foreach ($fuels as $fuel) {
                     $line0[] = [
-                        'label' => "",
+                        'label' => v($sscr),
+                        'title' => "Total Montant Stock sécurité collecté reversé : $dl1 - $dl2",
                         'tag' => 'stock_reverse',
                         'value' => $fuel,
                     ];
                 }
                 $line0[] = [
-                    'label' => "",
+                    'label' => "-",
                     'tag' => 'stock_reverse',
                     'value' => "total",
                 ];
@@ -654,17 +676,22 @@ class DataController extends Controller
                     'label' => "TOTAL CREANCES DE L'ETAT SUR LA SOCIETE",
                     'class' => 'title1',
                 ];
+                $tc = 0;
                 foreach ($fuels as $fuel) {
+                    $v = $tabNrev[$fuel] + $sscr;
+                    $tc += $v;
                     $line0[] = [
-                        'label' => "",
+                        'label' => v($v),
                         'class' => 'title1',
                         'tag' => 'total_creance_etat',
                         'value' => $fuel,
                         'title' => "St. Séc Collecté non versé + St. Séc Collecté versé ($fuel)"
                     ];
+
+                    incr($tabVar, "tot_creance_etat_ste_$fuel", $v);
                 }
                 $line0[] = [
-                    'label' => "",
+                    'label' => v($tc),
                     'class' => 'title1',
                     'tag' => 'total_creance_etat',
                     'value' => 'total',
@@ -678,9 +705,15 @@ class DataController extends Controller
                     'label' => "SOLDE CROISEMENT",
                     'class' => 'title1',
                 ];
+                $tg = 0;
                 foreach ($fuels as $fuel) {
+                    $tcse = $tabVar["tot_creance_ste_etat_$fuel"];
+                    $tces = $tabVar["tot_creance_etat_ste_$fuel"];
+                    $v = $tcse - $tces;
+                    $tg += $v;
+
                     $line0[] = [
-                        'label' => "",
+                        'label' => v($v),
                         'class' => 'title1',
                         'tag' => 'solde_croisement',
                         'value' => $fuel,
@@ -688,7 +721,7 @@ class DataController extends Controller
                     ];
                 }
                 $line0[] = [
-                    'label' => "",
+                    'label' => v($tg),
                     'class' => 'title1',
                     'tag' => 'solde_croisement',
                     'value' => 'total',

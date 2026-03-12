@@ -102,10 +102,6 @@
         td[href] {
             cursor: pointer;
         }
-
-        [contenteditable="true"] {
-            background: #fff8c4;
-        }
     </style>
     <script>
         flatpickr(".flatpickr", {
@@ -149,145 +145,6 @@
             buttonClass: 'btn btn-primary'
         });
 
-        function unformatFr(val) {
-            return val.replace(/\s/g, '').replace(',', '.');
-        }
-
-        function formatFr(val) {
-            if (val === '' || val === null || isNaN(val)) return '';
-            return parseFloat(val).toLocaleString('fr-FR', {
-                minimumFractionDigits: 3,
-                maximumFractionDigits: 3
-            });
-        }
-
-        function calcul() {
-            var stock_non_reverse = $('[stock_non_reverse]');
-            var stock_reverse = $('[stock_reverse]');
-
-            var tot = 0;
-            stock_reverse.each((i, e) => {
-                var v = $(e).attr('stock_reverse');
-                $(e).attr('contenteditable', v != 'total');
-                if (v != 'total') {
-                    var t = parseFloat(unformatFr($(e).text().trim())) || 0;
-                    tot += t;
-                }
-            });
-            $('[stock_reverse="total"]').text(formatFr(tot));
-
-            var total_creance_etat = $('[total_creance_etat]');
-            var total_creance_societe = $('[total_creance_societe]');
-            var solde_croisement = $('[solde_croisement]');
-
-            tot = 0;
-            total_creance_etat.each((i, e) => {
-                e = $(e);
-                var v = e.attr('total_creance_etat');
-                if (v != 'total') {
-                    var ssnv = $(`[stock_non_reverse="${v}"]`).text().trim();
-                    var ssv = $(`[stock_reverse="${v}"]`).text().trim();
-                    ssnv = parseFloat(unformatFr(ssnv)) || 0;
-                    ssv = parseFloat(unformatFr(ssv)) || 0;
-                    var t = ssnv + ssv;
-                    tot += t;
-                    t = formatFr(t);
-                    e.text(t);
-                }
-            });
-            $('[total_creance_etat="total"]').text(formatFr(tot));
-
-            tot = 0;
-            solde_croisement.each((i, e) => {
-                e = $(e);
-                var v = e.attr('solde_croisement');
-                if (v != 'total') {
-                    var ssv = $(`[total_creance_societe="${v}"]`).text().trim();
-                    var ssnv = $(`[total_creance_etat="${v}"]`).text().trim();
-                    ssnv = parseFloat(unformatFr(ssnv)) || 0;
-                    ssv = parseFloat(unformatFr(ssv)) || 0;
-                    var t = ssv - ssnv;
-                    tot += t;
-                    t = formatFr(t);
-                    e.text(t);
-                }
-            });
-            $('[solde_croisement="total"]').text(formatFr(tot));
-        }
-
-
-        function getV() {
-            var d = localStorage.getItem('st_reverse');
-            d = JSON.parse(d) || {};
-            return d;
-        }
-
-        function restoreV() {
-            var d = getV();
-            Object.keys(d).forEach((e) => {
-                var v = d[e];
-                $(`[stock_reverse="${e}"]`).text(formatFr(v));
-            });
-        }
-
-        function setV(k, v) {
-            var d = getV();
-            d[k] = parseFloat(v + '');
-            localStorage.setItem('st_reverse', JSON.stringify(d));
-        }
-
-        $(document).on('input', '[stock_reverse]', function() {
-            calcul();
-            var td = $(this);
-            var vv = $(this).text().trim();
-            if (!vv.length) {
-                td.text('');
-                return;
-            }
-
-            if (vv === '-') {
-                td.css('background-color', '#fff8c4');
-                return;
-            }
-
-            var v = unformatFr(vv);
-
-            function isNumeric(value) {
-                return value !== null && value !== '' && !isNaN(value);
-            }
-
-            if (!v) {
-                td.css('background-color', '#fff8c4');
-                return;
-            }
-
-            if (!isNumeric(v)) {
-                td.css('background-color', '#ffb3b3');
-                alert(`Valeur "${v}" est invalide`);
-                return;
-            }
-            td.css('background-color', '#fff8c4');
-
-            var el = td.attr('stock_reverse');
-            setV(el, v);
-        });
-
-        $(document).on('blur', '[stock_reverse]', function() {
-            $('[stock_reverse]').each((i, e) => {
-                var v = $(e).attr('stock_reverse');
-                $(e).attr('contenteditable', v != 'total');
-                if (v != 'total') {
-                    var d = unformatFr($(e).text().trim());
-                    $(e).text(formatFr(d));
-                }
-            });
-        });
-        $(document).on('focus', '[stock_reverse]', function() {
-            let td = $(this);
-            td.text(unformatFr(td.text()));
-        });
-
-
         function getData() {
             ldr.show();
 
@@ -323,7 +180,6 @@
                     h += '</tbody></table>'
 
                     $('[data]').html(h);
-                    restoreV();
                     $('[data]').css('opacity', 1);
                     rep.hide();
 
@@ -363,8 +219,6 @@
                         });
                     }
                     $('[errdiv]').html(e);
-
-                    calcul();
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;

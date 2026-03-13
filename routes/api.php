@@ -11,6 +11,7 @@ use App\Http\Controllers\API\MiningsaleAPIController;
 use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\RateController;
 use App\Http\Controllers\API\ReconciliationController;
+use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\SaleController;
 use App\Http\Controllers\API\SecurityStockController;
 use App\Http\Controllers\API\StateFuelpriceController;
@@ -39,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('avgprice', AVGPriceController::class);
     Route::resource('accountingclosure', AccountingClosureController::class)->only(['index', 'store', 'update']);
     Route::resource('securitystock', SecurityStockController::class)->only(['index', 'update']);
+    Route::resource('role', RoleController::class);
+
 
     Route::get('products-z', [DataController::class, 'product_z'])->name('extra.product_z');
 });

@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Label;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DefaultDataSeeder extends Seeder
 {
@@ -45,17 +47,26 @@ class DefaultDataSeeder extends Seeder
         DB::beginTransaction();
         foreach ($entities as $el) {
             $e = Entity::firstOrNew(['shortname' => $el[0]]);
-            if (!$e->exists) {
-                $email = strtolower($el[0]) . "@email.com";
-                $u = User::where(['email' => $email])->firstOrNew();
-                if (!$u->exists) {
-                    $u->name = $el[0];
-                    $u->email = $email;
-                    $u->password = Hash::make('mdp@123');
-                    $u->user_role = $el[2];
-                    $u->save();
-                }
+            // if (!$e->exists) {
+            $email = Str::slug(strtolower($el[0]), '_') . "@email.com";
+            $u = User::where(['email' => $email])->firstOrNew();
+            if (!$u->exists) { // eviter de modifier le truc en prod
+                $u->name = $el[0];
+                $u->email = $email;
+                $u->password = Hash::make('mdp@123');
+                $u->user_role = $el[2];
+                $u->save();
+            }
 
+            foreach (['utilisateur', 'manager'] as $ro) {
+                $r = Role::where(['users_id' => $u->id, 'name' => $ro])->firstOrNew();
+                if (!$r->exists) {
+                    $r->users_id = $u->id;
+                    $r->name = $ro;
+                    $r->save();
+                }
+            }
+            if (!$e->exists) { // eviter de modifier le truc en prod
                 $e->longname =  $el[1];
                 $e->users_id = $u->id;
                 $e->save();

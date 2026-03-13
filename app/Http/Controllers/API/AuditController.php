@@ -39,8 +39,12 @@ class AuditController extends Controller
         if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
             $entity  = $user->entities()->first();
             $logs->where('entity_id', $entity->id);
-        } else {
+        } else if ($user->user_role == 'etatique') {
             // abort(403);
+        } elseif ($user->user_role == 'sudo') {
+            //
+        } else {
+            abort(403, "Not permit");
         }
 
         return DataTables::of($logs)

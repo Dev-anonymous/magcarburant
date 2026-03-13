@@ -88,6 +88,8 @@ Route::get('', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('app-logs', [WebController::class, 'applogs'])->name('applogs');
+    Route::get('roles', [WebController::class, 'roles'])->name('roles');
+    Route::get('users', [WebController::class, 'users'])->name('users');
 
     Route::prefix('super-admin')->middleware(SudoMiddleware::class)->group(function () {
         Route::controller(SudoWebController::class)->group(function () {

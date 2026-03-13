@@ -51,7 +51,6 @@
                                         <th>Rôle</th>
                                         <th>Permission</th>
                                         <th>Modules</th>
-                                        <th class="no-export"></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -141,7 +140,7 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 3,
+                targets: 2,
                 width: '1%'
             }],
             columns: [{
@@ -155,10 +154,6 @@
                 {
                     data: 'module',
                     name: 'module',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
                 },
             ],
             dom: 'Blfrtip',

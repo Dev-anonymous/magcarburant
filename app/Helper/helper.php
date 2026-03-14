@@ -552,7 +552,7 @@ function state_route(string $name, $entity)
 
 function initAvgPrice()
 {
-    $year  = 2025;now()->year;
+    $year  = now()->year;
     $zones = Zone::all();
     foreach (mainfuels() as $product) {
         foreach ($zones as $zone) {

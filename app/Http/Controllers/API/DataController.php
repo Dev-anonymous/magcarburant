@@ -678,14 +678,14 @@ class DataController extends Controller
                 ];
                 $tc = 0;
                 foreach ($fuels as $fuel) {
-                    $v = $tabNrev[$fuel] + $sscr;
+                    $v = $tabNrev[$fuel] - $sscr;
                     $tc += $v;
                     $line0[] = [
                         'label' => v($v),
                         'class' => 'title1',
                         'tag' => 'total_creance_etat',
                         'value' => $fuel,
-                        'title' => "St. Séc Collecté non versé + St. Séc Collecté versé ($fuel)"
+                        'title' => "St. Séc Collecté non versé - St. Séc Collecté versé ($fuel)"
                     ];
 
                     incr($tabVar, "tot_creance_etat_ste_$fuel", $v);

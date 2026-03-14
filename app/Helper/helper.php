@@ -552,7 +552,7 @@ function state_route(string $name, $entity)
 
 function initAvgPrice()
 {
-    $year  = now()->year;
+    $year  = 2025;now()->year;
     $zones = Zone::all();
     foreach (mainfuels() as $product) {
         foreach ($zones as $zone) {
@@ -575,7 +575,7 @@ function initAvgPrice()
 
 function initStockPrice()
 {
-    $year = 2025; now()->year;
+    $year = now()->year;
     $user = Auth::user();
     $fromState = from_state();
     $entities = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id'))->get();

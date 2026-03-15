@@ -171,20 +171,19 @@ class DefaultDataSeeder extends Seeder
             $index++;
         }
 
+        //////////////////
 
         $mod_petrolier = [
             'Achat' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Vente' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Livraison excédentaire' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Vente liées aux STEs minières' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
-            'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Stock de sécurité collecté reversé' => ['Lire', 'Modifier'],
             'Tableau de bord' => ['Lire'],
             'Audit' => ['Lire'],
             'Gestion des utilisateurs' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Gestion des rôles' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
 
-            //
             'Comptabilité' => ['Lire'],
             'Bilan manque à gagner' => ['Lire'],
             'Bilan croisement des créances' => ['Lire'],
@@ -192,33 +191,24 @@ class DefaultDataSeeder extends Seeder
             'Grand livre manque à gagner' => ['Lire'],
             'Grand livre croisement des créances' => ['Lire'],
             'Grand livre fiscalité' => ['Lire'],
-            'Structure des prix' => ['Lire'],
-            'Taux réels' => ['Lire'],
+            'Structure des prix' => ['Lire', 'Modifier'],
+            'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux structures' => ['Lire'],
         ];
 
         $mod_log = [
-            'Achat' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Vente' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
-            'Livraison excédentaire' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Vente liées aux STEs minières' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
-            'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
-            'Stock de sécurité collecté reversé' => ['Lire', 'Modifier'],
             'Tableau de bord' => ['Lire'],
             'Audit' => ['Lire'],
             'Gestion des utilisateurs' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Gestion des rôles' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
 
-            //
             'Comptabilité' => ['Lire'],
             'Bilan manque à gagner' => ['Lire'],
-            'Bilan croisement des créances' => ['Lire'],
-            'Bilan fiscalité' => ['Lire'],
             'Grand livre manque à gagner' => ['Lire'],
-            'Grand livre croisement des créances' => ['Lire'],
-            'Grand livre fiscalité' => ['Lire'],
-            'Structure des prix' => ['Lire'],
-            'Taux réels' => ['Lire'],
+            'Structure des prix' => ['Lire', 'Modifier'],
+            'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux structures' => ['Lire'],
         ];
 
@@ -236,10 +226,10 @@ class DefaultDataSeeder extends Seeder
         ];
 
         foreach ($modulesCrud as $role => $perms) {
-
             foreach ($perms as $module => $actions) {
                 foreach ($actions as $action) {
                     Permission::firstOrCreate([
+                        'user_role' => $role,
                         'name' => "{$module} - {$action}",
                     ]);
                 }

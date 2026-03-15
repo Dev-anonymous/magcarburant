@@ -662,7 +662,7 @@ class DataController extends Controller
                         $perc = $tabNrev[$fuel] / $tsscnr;
                     }
                     $lab = v($perc * 100, 0) . "% du montant total du stock sécurité collecté reversé : $dl1 - $dl2";
-                    if (!$perc || $sscr) {
+                    if (!$perc || !$sscr) {
                         $lab = '';
                     }
 

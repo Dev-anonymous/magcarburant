@@ -12,6 +12,7 @@ use App\Models\MiningSaleFile;
 use App\Models\Purchase;
 use App\Models\Purchasefile;
 use App\Models\Rate;
+use App\Models\Role;
 use App\Models\Sale;
 use App\Models\Salefile;
 use App\Models\SecurityStock;
@@ -122,7 +123,7 @@ trait HasAuditLogs
         if ($model instanceof StateFuelprice) {
             return "Prix Carburant";
         }
-        
+
         if ($model instanceof Rate) {
             return "Taux réel";
         }
@@ -141,6 +142,10 @@ trait HasAuditLogs
 
         if ($model instanceof Securitystockfile) {
             return "Pièce jointe du Stock de sécurité collecté reversé";
+        }
+
+        if ($model instanceof Role) {
+            return "Rôle";
         }
 
 

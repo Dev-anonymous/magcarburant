@@ -35,8 +35,7 @@
                         <form id="ffilter" class="filters-form pull-right" role="form">
 
                             <div class="form-group mb-1">
-                                <button type="button" class="btn btn-sm btn-primary mt-3" data-toggle="modal"
-                                    data-target="#mdlChose">
+                                <button type="button" class="btn btn-sm btn-primary mt-3" id="badd">
                                     <i class="material-icons md-18">add_circle_outline</i> Nouveau role
                                 </button>
                             </div>
@@ -44,13 +43,12 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="table" class="table table-striped table-hover text-center text-nowrap"
-                                style="width:100%">
+                            <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>Rôle</th>
-                                        <th>Permission</th>
                                         <th>Modules</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -63,16 +61,17 @@
     </div>
 @endsection
 @section('modals')
-    <div class="modal fade" id="logModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="mdlAdd" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Rôles et permissions</h4>
+                    <h4 class="modal-title" mlabel></h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <form fedit action="#">
+                <form smartform>
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="action">
                     <div class="modal-body">
-                        <input type="hidden" name="id">
                         <div class="mb-3">
                             <label class="form-label">Nom du rôle</label>
                             <input required class="form-control" placeholder="Ex. manager" name="name" maxlength="100">
@@ -83,10 +82,10 @@
                                 <div class="row">
                                     @foreach ($permissions as $permission)
                                         <div class="col-12 col-md-3">
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="checkbox" name="permissions[]"
-                                                    value="{{ $permission->name }}" id="perm2_{{ $permission->id }}">
-                                                <label class="form-check-label small" for="perm2_{{ $permission->id }}">
+                                            <div class="custom-control custom-checkbox mt-1">
+                                                <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
+                                                    id="perm2_{{ $permission->id }}" class="custom-control-input">
+                                                <label class="custom-control-label" for="perm2_{{ $permission->id }}">
                                                     {{ $permission->name }}
                                                 </label>
                                             </div>
@@ -105,26 +104,62 @@
                         </div>
                         <x-alert />
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
+                    </div>
                 </form>
-                <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">
-                        <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
-                        Fermer
-                    </button>
-                </div>
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="mdldel" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="was-validated" fdel>
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="mb-2 text-center">
+                            <h3 class="text-danger">
+                                Voulez-vous supprimer ce rôle ?
+                            </h3>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="w-100 d-flex justify-content-center p-3">
+                        <div class="">
+                            <button type="button" class="btn btn-sm m-2" data-dismiss="modal">
+                                <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                                NON
+                            </button>
+                        </div>
+                        <div class="">
+                            <button type="submit"
+                                class="btn  btn-sm btn-danger d-flex m-2 align-items-center justify-content-center">
+                                <x-loader />
+                                <span text>
+                                    <i class="material-icons md-18 mr-1 m-0 p-0">delete</i>
+                                    OUI JE CONFIRME
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
     <x-datatable />
-    <style>
-        #table tbody tr {
-            cursor: pointer;
-        }
-    </style>
 
     <script>
         $(document).on('click', '.checkAll', function() {
@@ -136,6 +171,15 @@
             var form = $(this).closest('form');
             $('input[name="permissions[]"]', form).prop('checked', false);
         });
+
+        $('#badd').click(function() {
+            var mdl = $('#mdlAdd');
+            $('[name="action"]', mdl).val('');
+            $('[name="id"]', mdl).val('');
+            $('[name="name"]', mdl).val('');
+            $('[mlabel]').html('Nouveau Rôle');
+            mdl.modal('show');
+        })
 
         var dtObj = $('#table').DataTable({
             processing: true,
@@ -159,14 +203,17 @@
             columns: [{
                     data: 'name',
                     name: 'name',
-                },
-                {
-                    data: 'permission',
-                    name: 'permission',
+                    className: 'text-left'
                 },
                 {
                     data: 'module',
                     name: 'module',
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
                 },
             ],
             dom: 'Blfrtip',
@@ -191,26 +238,117 @@
 
         });
 
-        $('#table tbody').on('click', 'tr', function() {
-            let log = dtObj.row(this).data();
-
+        $('#table tbody').on('click', '[bedit]', function() {
+            let log = $(this).attr('data');
             let raw = {};
             try {
-                raw = JSON.parse(log.raw_data);
+                raw = JSON.parse(log);
             } catch (e) {}
 
-            var mdl = $('#logModal');
-
+            var mdl = $('#mdlAdd');
             $('[name="name"]', mdl).val(raw.name);
             $('[name="id"]', mdl).val(raw.id);
+            $('[name="action"]', mdl).val('update');
             $('input[name="permissions[]"]', mdl).val(raw.perms);
+            $('[mlabel]').html('Modification du Rôle');
 
             $('input[name="permissions[]"]', mdl).prop('checked', false);
             raw.perms.forEach(function(permId) {
                 $('#perm2_' + permId, mdl).prop('checked', true);
             });
-
             mdl.modal('show');
+        });
+
+        $('#table tbody').on('click', '[bdel]', function() {
+            var data = JSON.parse($(this).attr('data'));
+            var mdl = $('#mdldel');
+            var form = $('[fdel]', mdl);
+            $('[name="id"]', form).val(data.id);
+            mdl.modal('show');
+        });
+
+        $('[smartform]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var data = new FormData(this);
+            rep.hide();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('role.store') }}',
+                method: 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    form[0].reset();
+                    setTimeout(() => {
+                        rep.hide();
+                        $('.modal.show').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            });
+        });
+
+        $('[fdel]').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var btn = $(':submit', form);
+            var rep = $('#rep', form);
+            var id = $('[name="id"]', form).val();
+            rep.hide();
+            var data = form.serialize();
+            $(':input', form).attr('disabled', true);
+            $('[loader]', btn).show();
+            $('[text]', btn).hide();
+
+            $.ajax({
+                url: '{{ route('role.index') }}/' + id,
+                method: 'delete',
+                data: data,
+                success: function(resp) {
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-success')
+                        .show();
+                    dtObj.ajax.reload(null, false);
+                    setTimeout(() => {
+                        rep.hide();
+                        $('.modal.show').modal('hide');
+                    }, 2000);
+                },
+                error: function(xhr, a, b) {
+                    var resp = xhr.responseJSON;
+                    var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                    rep.html(mess).stop().removeClass().addClass(
+                            'p-1 m-0 text-center alert alert-danger')
+                        .show();
+                },
+            }).always(function() {
+                $(':input', form).attr('disabled', false);
+                $('[loader]', btn).hide();
+                $('[text]', btn).show();
+            })
         });
     </script>
 @endsection

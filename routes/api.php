@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('avgprice', AVGPriceController::class);
     Route::resource('accountingclosure', AccountingClosureController::class)->only(['index', 'store', 'update']);
     Route::resource('securitystock', SecurityStockController::class)->only(['index', 'store']);
-    Route::resource('role', RoleController::class);
+    Route::resource('role', RoleController::class)->only(['index', 'store', 'destroy']);
 
 
     Route::get('products-z', [DataController::class, 'product_z'])->name('extra.product_z');

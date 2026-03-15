@@ -14,12 +14,11 @@ use Illuminate\Database\Eloquent\Model;
  * Class Permission
  * 
  * @property int $id
- * @property int|null $users_id
+ * @property string $user_role
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property User|null $user
  * @property Collection|Role[] $roles
  *
  * @package App\Models
@@ -28,19 +27,10 @@ class Permission extends Model
 {
 	protected $table = 'permissions';
 
-	protected $casts = [
-		'users_id' => 'int'
-	];
-
 	protected $fillable = [
-		'users_id',
+		'user_role',
 		'name'
 	];
-
-	public function user()
-	{
-		return $this->belongsTo(User::class, 'users_id');
-	}
 
 	public function roles()
 	{

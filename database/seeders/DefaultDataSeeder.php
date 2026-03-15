@@ -59,7 +59,7 @@ class DefaultDataSeeder extends Seeder
                 $u->save();
             }
 
-            foreach (['utilisateur', 'manager'] as $ro) {
+            foreach (['utilisateur', 'manager', 'comptable'] as $ro) {
                 $r = Role::where(['users_id' => $u->id, 'name' => $ro])->firstOrNew();
                 if (!$r->exists) {
                     $r->users_id = $u->id;

@@ -67,7 +67,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Détails de l'audit #<span logid></span></h4>
+                    <h4 class="modal-title">Rôles et permissions</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <form fedit action="#">
@@ -78,7 +78,7 @@
                             <input required class="form-control" placeholder="Ex. manager" name="name" maxlength="100">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Modules utilisables pour ce rôle</label>
+                            <label class="form-label fw-semibold">Modules utilisables et permissions pour ce rôle</label>
                             <div class="border rounded p-3 mb-2" style="max-height: 300px; overflow-y: auto;">
                                 <div class="row">
                                     @foreach ($permissions as $permission)
@@ -127,6 +127,16 @@
     </style>
 
     <script>
+        $(document).on('click', '.checkAll', function() {
+            var form = $(this).closest('form');
+            $('input[name="permissions[]"]', form).prop('checked', true);
+        });
+
+        $(document).on('click', '.uncheckAll', function() {
+            var form = $(this).closest('form');
+            $('input[name="permissions[]"]', form).prop('checked', false);
+        });
+
         var dtObj = $('#table').DataTable({
             processing: true,
             serverSide: true,

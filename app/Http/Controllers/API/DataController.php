@@ -652,7 +652,7 @@ class DataController extends Controller
                 $dl2 = ucfirst($toObj->translatedFormat('F')) . ' ' . $toObj->format('Y');
 
                 if (!$sscr) {
-                    $err = ["Aucun valeur stock sécurité collecté reversé n'a été trouvé pour $dl1 - $dl2"];
+                    $err = ["Aucun valeur stock de sécurité collecté reversé n'a été trouvé : $dl1 - $dl2"];
                     $data['errors'] = array_merge($err, $data['errors']);
                 }
 

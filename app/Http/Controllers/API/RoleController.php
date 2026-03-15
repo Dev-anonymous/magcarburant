@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RoleHasPermission;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -190,8 +191,12 @@ class RoleController extends Controller
         $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
+        $i = childrenlist($user, false);
+        $n = User::whereIn('id', $i)->where('role_id', $role->id)->count();
+
+        abort_if($n, 422, "Vous ne pouvez pas supprimer ce rôle pour le moment, car il contient $n utilisateur(s)");
+
         $role->delete();
         return response()->json(['success' => true, 'message' => 'Rôle supprimé']);
-        
     }
 }

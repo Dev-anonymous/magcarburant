@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * Class Permission
  * 
  * @property int $id
- * @property int $users_id
+ * @property int|null $users_id
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property User $user
+ * @property User|null $user
  * @property Collection|Role[] $roles
  *
  * @package App\Models

@@ -26,50 +26,14 @@ class RoleController extends Controller
             })
             ->addColumn('permission', function ($row) {})
             ->addColumn('module', function ($row) {})
-            ->addColumn('action', function ($row) use ($user) {
-                // $eb = "";
-                // $d = $row->toArray();
-                // $d['date'] = $row->date?->format('Y-m-d');
-                // $data = e(json_encode($d));
-                // $eb = "
-                //     <a class='dropdown-item' href='#' bedit data='$data'>
-                //         <i class='material-icons md-14 align-middle'>edit</i>
-                //         <span class='align-middle'>Modifier</span>
-                //     </a>
-                // ";
-                // $t = <<<DATA
-                //     <div class="dropdown">
-                //         <a
-                //             class="btn btn-primary2 btn-sm"
-                //             href="#"
-                //             role="button"
-                //             data-toggle="dropdown"
-                //             aria-haspopup="true"
-                //             aria-expanded="false"
-                //         >
-                //             <i class="material-icons md-18 align-middle"
-                //             >more_vert</i
-                //             >
-                //         </a>
-                //         <div class="dropdown-menu dropdown-menu-right">
-                //             $eb
-                //             <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                //                 <i class="material-icons md-14 align-middle">delete</i>
-                //                 <span class="align-middle">Supprimer</span>
-                //             </a>
-                //         </div>
-                //     </div>
-                // DATA;
-
-                // if ($row->from_mutuality) {
-                //     $t = '';
-                // }
-
-                // if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-                //     return $t;
-                // }
+            ->addColumn('raw_data', function ($row) use ($user) {
+                return json_encode([
+                    'id' => $row->id,
+                    'name' => $row->name,
+                    'perms' => $row->permissions->pluck('id')->all(),
+                ]);
             })
-            ->rawColumns(['action', 'salefile', 'selall'])
+            ->rawColumns(['raw_data'])
             ->make(true);
     }
 

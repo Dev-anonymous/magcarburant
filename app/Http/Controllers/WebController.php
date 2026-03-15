@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
 use Illuminate\Http\Request;
 
 class WebController extends Controller
@@ -17,6 +18,7 @@ class WebController extends Controller
     {
         $user = request()->user();
         abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'logisticien']), 403, "No permission");
-        return view('roles');
+        $permissions = Permission::orderBy('name')->get();
+        return view('roles', compact('permissions'));
     }
 }

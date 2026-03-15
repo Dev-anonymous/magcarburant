@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Label;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Zone;
@@ -170,6 +171,47 @@ class DefaultDataSeeder extends Seeder
             $index++;
         }
 
+        $modulesCrud = [
+            'Achat' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Vente' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Livraison excédentaire' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Vente liées aux STEs minières' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Stock de sécurité collecté reversé' => ['Lire', 'Modifier'],
+            'Tableau de bord' => ['Lire'],
+            'Audit' => ['Lire'],
+            'Gestion des utilisateurs' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Gestion des rôles' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+
+            //
+            'Comptabilité' => ['Lire'],
+            'Bilan manque à gagner' => ['Lire'],
+            'Bilan croisement des créances' => ['Lire'],
+            'Bilan fiscalité' => ['Lire'],
+            'Grand livre manque à gagner' => ['Lire'],
+            'Grand livre croisement des créances' => ['Lire'],
+            'Grand livre fiscalité' => ['Lire'],
+            'Structure des prix' => ['Lire'],
+            'Taux réels' => ['Lire'],
+            'Taux structures' => ['Lire'],
+
+
+            'Mode lecture' => ['Lire'],
+            'Mode écriture' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Réconciliation' => ['Lire',],
+            'Configuration' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+        ];
+
+        $mod_petrolier = [];
+
+
+        foreach ($modulesCrud as $module => $actions) {
+            foreach ($actions as $action) {
+                Permission::firstOrCreate([
+                    'name' => "{$module} - {$action}",
+                ]);
+            }
+        }
 
         DB::commit();
     }

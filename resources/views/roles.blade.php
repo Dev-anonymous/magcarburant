@@ -70,9 +70,42 @@
                     <h4 class="modal-title">Détails de l'audit #<span logid></span></h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <!-- contenu injecté par JS -->
-                </div>
+                <form fedit action="#">
+                    <div class="modal-body">
+                        <input type="hidden" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">Nom du rôle</label>
+                            <input required class="form-control" placeholder="Ex. manager" name="name" maxlength="100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Modules utilisables pour ce rôle</label>
+                            <div class="border rounded p-3 mb-2" style="max-height: 300px; overflow-y: auto;">
+                                <div class="row">
+                                    @foreach ($permissions as $permission)
+                                        <div class="col-12 col-md-3">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" name="permissions[]"
+                                                    value="{{ $permission->name }}" id="perm2_{{ $permission->id }}">
+                                                <label class="form-check-label small" for="perm2_{{ $permission->id }}">
+                                                    {{ $permission->name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary checkAll">
+                                    Tout cocher
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary uncheckAll">
+                                    Tout décocher
+                                </button>
+                            </div>
+                        </div>
+                        <x-alert />
+                    </div>
+                </form>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-dismiss="modal">
                         <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
@@ -86,44 +119,14 @@
 @endsection
 
 @section('script')
-    <x-flatpickr />
-    <x-select />
     <x-datatable />
     <style>
-        #table tr {
+        #table tbody tr {
             cursor: pointer;
         }
     </style>
 
     <script>
-        flatpickr(".flatpickr", {
-            maxDate: "today",
-            locale: {
-                firstDayOfWeek: 1
-            }
-        });
-        var ff = $('#ffilter');
-
-        let timer;
-        ff.change(function(e) {
-            clearTimeout(timer);
-            var e = $(e.target);
-            timer = setTimeout(() => {
-                dtObj.ajax.reload(null, false);
-            }, 100);
-        });
-
-        $('[name="event[]"]').multiselect({
-            includeSelectAllOption: true,
-            nonSelectedText: 'Aucun filtre',
-            nSelectedText: 'Evènements sélectionnés',
-            allSelectedText: 'Tous les Evènements',
-            numberDisplayed: 1, // affiche 1 élément puis "n zones sélectionnées"
-            selectAllText: 'Tous',
-            buttonWidth: '100%',
-            buttonClass: 'btn btn-primary'
-        });
-
         var dtObj = $('#table').DataTable({
             processing: true,
             serverSide: true,
@@ -186,74 +189,18 @@
                 raw = JSON.parse(log.raw_data);
             } catch (e) {}
 
-            let oldValues = {};
-            let newValues = {};
-            try {
-                oldValues = JSON.parse(raw.old_values) || {};
-            } catch (e) {}
-            try {
-                newValues = JSON.parse(raw.new_values) || {};
-            } catch (e) {}
+            var mdl = $('#logModal');
 
-            let oldHtml = Object.keys(oldValues).length ?
-                JSON.stringify(oldValues, null, 2) :
-                '<span class="badge badge-secondary">Vide</span>';
+            $('[name="name"]', mdl).val(raw.name);
+            $('[name="id"]', mdl).val(raw.id);
+            $('input[name="permissions[]"]', mdl).val(raw.perms);
 
-            let newHtml = Object.keys(newValues).length ?
-                JSON.stringify(newValues, null, 2) :
-                '<span class="badge badge-secondary">Vide</span>';
+            $('input[name="permissions[]"]', mdl).prop('checked', false);
+            raw.perms.forEach(function(permId) {
+                $('#perm2_' + permId, mdl).prop('checked', true);
+            });
 
-            $('[logid]').html(raw.id);
-            let html = `
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">event</i> Description :</strong>
-                    <b>${raw.title}</b>
-                </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">event</i> Événement :</strong>
-                    <b>${raw.event}</b>
-                </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">person</i> De :</strong>
-                    ${raw.username ?? ''}
-                </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">storage</i> Sur :</strong>
-                    ${raw.entity ?? '-'}
-                </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
-                    ${raw.date}
-                </p>
-                <hr/>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6 style='color:#D70040' class="font-weight-bold">
-                            <i class="material-icons align-middle md-18">history</i> Anciennes valeurs
-                        </h6>
-                        <pre class="bg-light p-2 rounded">${oldHtml}</pre>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-success font-weight-bold">
-                            <i class="material-icons align-middle md-18">update</i> Nouvelles valeurs
-                        </h6>
-                        <pre class="bg-light p-2 rounded">${newHtml}</pre>
-                    </div>
-                </div>
-                <div>
-                    <p class='m-0 mt-5'>
-                        <strong><i class="material-icons align-middle md-18">language</i> Navigateur :</strong>
-                        ${raw.user_agent}
-                    </p>
-                    <p class='m-0'>
-                        <strong><i class="material-icons align-middle md-18">public</i> IP :</strong>
-                        ${raw.ip_address}
-                    </p>
-                </div>
-            `;
-
-            $('#logModal .modal-body').html(html);
-            $('#logModal').modal('show');
+            mdl.modal('show');
         });
     </script>
 @endsection

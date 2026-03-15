@@ -161,7 +161,9 @@ class PurchaseController extends Controller
                     File::delete("storage/" . $f->file);
                     $f->delete();
                 }
-                Purchasefile::insert($newFiles);
+                foreach ($newFiles as $i) {
+                    Purchasefile::create($i);
+                }
             }
 
             DB::commit();
@@ -344,7 +346,9 @@ class PurchaseController extends Controller
                     $f[] = ['purchase_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
-            Purchasefile::insert($f);
+            foreach ($f as $i) {
+                Purchasefile::create($i);
+            }
 
             DB::commit();
 

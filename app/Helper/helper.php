@@ -596,13 +596,6 @@ function initStockPrice()
     }
 }
 
-
-// function canViewLog()
-// {
-//     return in_array(request()->user()->user_role, ['sudo', 'etatique']);
-// }
-
-
 function logEvents()
 {
     return [
@@ -642,4 +635,16 @@ function ua()
         $agent->platform()
     );
     return $userAgentInfo;
+}
+
+function childrenlist(User $user, $withme = true)
+{
+    $t = [];
+    if (in_array($user->user_role, ['logisticien', 'etatique', 'petrolier'], true)) {
+        $t = $user->users()->pluck('id')->all();
+        if ($withme) {
+            $t = [$user->id, ...$user->users()->pluck('id')->all()];
+        }
+    }
+    return $t;
 }

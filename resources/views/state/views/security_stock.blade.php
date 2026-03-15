@@ -45,6 +45,7 @@
                                             <tr>
                                                 <th>Mois</th>
                                                 <th class="text-center">Stock de sécurité collecté reversé (USD)</th>
+                                                <th class="no-export">Preuves de paiement</th>
                                                 <th class="no-export"></th>
                                             </tr>
                                         </thead>
@@ -73,14 +74,20 @@
                 </div>
                 <form class="was-validated" fedit>
                     <input type="hidden" name="id">
+                    <input type="hidden" name="action" value="update">
                     <div class="modal-body">
                         <div class="py-3">
                             <h4 month></h4>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="mb-0">Montant Stock de sécurité collecté reversé</label>
                             <input type="number" min="0" step="0.001" class="form-control" required
                                 name="amount">
+                        </div>
+                        <p class="mt-2">Pièces jointes : factures ou documents (.pdf)</p>
+                        <div class="mb-2">
+                            <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
+                            <input type="file" multiple class="form-control" name="securitystockfile[]">
                         </div>
                         <x-alert />
                     </div>
@@ -133,7 +140,7 @@
             var form = $(this);
             var btn = $(':submit', form);
             var rep = $('#rep', form);
-            var data = form.serialize();
+            var data = new FormData(this);
             rep.hide();
             $(':input', form).attr('disabled', true);
             $('[loader]', btn).show();
@@ -141,9 +148,11 @@
             var id = $('[name=id]', form).val();
 
             $.ajax({
-                url: '{{ route('securitystock.index') }}/' + id,
-                method: 'put',
+                url: '{{ route('securitystock.store') }}',
+                method: 'post',
                 data: data,
+                contentType: false,
+                processData: false,
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(
@@ -187,7 +196,7 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 2,
+                targets: 3,
                 width: '1%'
             }],
             columns: [{
@@ -198,6 +207,12 @@
                     data: 'amount',
                     name: 'amount',
                     className: 'text-center'
+                },
+                {
+                    data: 'files',
+                    name: 'files',
+                    orderable: false,
+                    searchable: false,
                 },
                 {
                     data: 'action',

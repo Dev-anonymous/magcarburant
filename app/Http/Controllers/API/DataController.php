@@ -601,7 +601,7 @@ class DataController extends Controller
 
                 $tabNrev = [];
 
-                $tot = 0;
+                $tsscnr = 0;
                 foreach ($fuels as $k => $fuel) {
                     $index = findIndexByLabel($dhead2, 'Montant Stock de Sécurité');
                     abort_if(is_null($index), 422, "Can't process: label \"Montant Stock de Sécurité\" not found in greatebook for fuel -> $fuel");
@@ -618,7 +618,7 @@ class DataController extends Controller
                         }
                     }
                     $tabNrev[$fuel] = $t;
-                    $tot += $t;
+                    $tsscnr += $t;
                     $line0[] = [
                         'label' => v($t),
                         'title' => "Montant Stock de Sécurité du produit $fuel",
@@ -629,13 +629,14 @@ class DataController extends Controller
                     ];
                 }
                 $line0[] = [
-                    'label' => v($tot),
+                    'label' => v($tsscnr),
                     'title' => "Total Montant Stock de Sécurité des produits.",
                     'tag' => 'stock_non_reverse',
                     'value' => "total",
                     'href' => gb_href(['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
                 ];
                 $rows[] = $line0;
+
 
                 //////////////////////
 
@@ -651,20 +652,29 @@ class DataController extends Controller
                 $dl2 = ucfirst($toObj->translatedFormat('F')) . ' ' . $toObj->format('Y');
 
                 if (!$sscr) {
-                    $err = ["Aucun de sécurité collecté reversé n'a été trouvé pour $dl1 - $dl2"];
+                    $err = ["Aucun valeur stock sécurité collecté reversé n'a été trouvé pour $dl1 - $dl2"];
                     $data['errors'] = array_merge($err, $data['errors']);
                 }
 
                 foreach ($fuels as $fuel) {
+                    $perc = 0;
+                    if ($tsscnr) {
+                        $perc = $tabNrev[$fuel] / $tsscnr;
+                    }
+                    $lab = v($perc * 100, 0) . "% du montant total du stock sécurité collecté reversé : $dl1 - $dl2";
+                    if (!$perc) {
+                        $lab = '';
+                    }
+
                     $line0[] = [
-                        'label' => v($sscr),
-                        'title' => "Total Montant Stock sécurité collecté reversé : $dl1 - $dl2",
+                        'label' => v($perc * $sscr),
+                        'title' => $lab,
                         'tag' => 'stock_reverse',
                         'value' => $fuel,
                     ];
                 }
                 $line0[] = [
-                    'label' => "-",
+                    'label' => v($sscr),
                     'tag' => 'stock_reverse',
                     'value' => "total",
                 ];

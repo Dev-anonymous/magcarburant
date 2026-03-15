@@ -177,7 +177,9 @@ class MiningsaleAPIController extends Controller
                         File::delete("storage/" . $f->file);
                         $f->delete();
                     }
-                    MiningSaleFile::insert($insertFiles);
+                    foreach ($insertFiles as $f) {
+                        MiningSaleFile::create($f);
+                    }
                 }
             }
 
@@ -440,7 +442,10 @@ class MiningsaleAPIController extends Controller
                     $f[] = ['mining_sale_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
-            MiningSaleFile::insert($f);
+
+            foreach ($f as $i) {
+                MiningSaleFile::create($i);
+            }
 
             DB::commit();
 

@@ -8,6 +8,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditLogs;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $from_state
  *
  * @property Entity $entity
+ * @property Collection|Securitystockfile[] $securitystockfiles
  *
  * @package App\Models
  */
@@ -47,5 +49,10 @@ class SecurityStock extends Model
     public function entity()
     {
         return $this->belongsTo(Entity::class);
+    }
+
+    public function securitystockfiles()
+    {
+        return $this->hasMany(Securitystockfile::class);
     }
 }

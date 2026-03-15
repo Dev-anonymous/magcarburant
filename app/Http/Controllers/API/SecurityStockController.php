@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Entity;
 use App\Models\SecurityStock;
+use App\Models\Securitystockfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Yajra\DataTables\DataTables;
 
 class SecurityStockController extends Controller
@@ -43,6 +46,14 @@ class SecurityStockController extends Controller
             ->addColumn('amount', function ($row) {
                 return v($row->amount);
             })
+            ->addColumn('files', function ($row) {
+                $f = '';
+                foreach ($row->securitystockfiles as $i => $e) {
+                    $u = asset('storage/' . $e->file);
+                    $f .= "<a href='$u' class='text-nowrap mr-2' target='_blank'><i class='material-icons md-18 align-middle mb-1 text-primary'>attach_file</i> Fichier " . ($i + 1) . "</a>";
+                }
+                return "<div class=''>$f</div>";
+            })
             ->addColumn('action', function ($row) use ($user) {
                 $date = $row->month;
                 $m = ucfirst($date->translatedFormat('F')) . ' ' . $date->format('Y');
@@ -60,7 +71,7 @@ class SecurityStockController extends Controller
                     return $t;
                 }
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'files'])
             ->make(true);
     }
 
@@ -69,7 +80,48 @@ class SecurityStockController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (request('action') == 'update') {
+            $user = request()->user();
+            abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'etatique']), 403, "No permission");
+            $validated = $request->validate([
+                'id' => 'required|exists:security_stock',
+                'amount' => 'required|numeric|min:0',
+                'securitystockfile' => 'nullable|array',
+                'securitystockfile.*' => 'mimes:pdf|max:10240'
+            ]);
+
+            $securitystock = SecurityStock::findOrFail(request('id'));
+
+            DB::beginTransaction();
+            if ($request->hasFile('securitystockfile')) {
+                $insertFiles = [];
+                foreach ($request->file('securitystockfile') as $file) {
+                    $insertFiles[] = [
+                        'security_stock_id' => $securitystock->id,
+                        'file' => $file->store('bills', 'public')
+                    ];
+                }
+                if (!empty($insertFiles)) {
+                    foreach ($securitystock->securitystockfiles as $f) {
+                        File::delete("storage/" . $f->file);
+                        $f->delete();
+                    }
+                    foreach ($insertFiles as $f) {
+                        Securitystockfile::create($f);
+                    }
+                }
+            }
+
+            $securitystock->amount = request('amount');
+            $securitystock->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Le montant a été mis à jour avec succès !",
+            ], 200);
+        }
     }
 
     /**
@@ -83,22 +135,7 @@ class SecurityStockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SecurityStock $securitystock)
-    {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'etatique']), 403, "No permission");
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0',
-        ]);
-
-        $securitystock->amount = request('amount');
-        $securitystock->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => "Le montant a été mis à jour avec succès !",
-        ], 200);
-    }
+    public function update(Request $request, SecurityStock $securitystock) {}
 
     /**
      * Remove the specified resource from storage.

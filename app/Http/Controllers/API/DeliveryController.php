@@ -163,7 +163,9 @@ class DeliveryController extends Controller
                         File::delete("storage/" . $f->file);
                         $f->delete();
                     }
-                    Deliveryfile::insert($insertFiles);
+                    foreach ($insertFiles as $f) {
+                        Deliveryfile::create($f);
+                    }
                 }
             }
 
@@ -351,8 +353,6 @@ class DeliveryController extends Controller
                 ], 422);
             }
 
-            // Delivery::insertOrIgnore($insert);
-
             foreach ($insert as $data) {
                 Delivery::firstOrCreate(
                     [
@@ -407,7 +407,10 @@ class DeliveryController extends Controller
                     $f[] = ['delivery_id' => $delivery->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
-            Deliveryfile::insert($f);
+
+            foreach ($f as $fi) {
+                Deliveryfile::create($fi);
+            }
 
             DB::commit();
 

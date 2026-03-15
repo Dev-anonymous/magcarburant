@@ -5,12 +5,17 @@ namespace App\Models\Traits;
 use App\Models\AccountingClosure;
 use App\Models\AverageFuelPrice;
 use App\Models\Delivery;
+use App\Models\Deliveryfile;
 use App\Models\Fuelprice;
 use App\Models\MiningSale;
+use App\Models\MiningSaleFile;
 use App\Models\Purchase;
+use App\Models\Purchasefile;
 use App\Models\Rate;
 use App\Models\Sale;
+use App\Models\Salefile;
 use App\Models\SecurityStock;
+use App\Models\Securitystockfile;
 use App\Models\StateFuelprice;
 use App\Models\StateStructureprice;
 use App\Models\Structureprice;
@@ -68,7 +73,7 @@ trait HasAuditLogs
     private static function mapTableName(Model $model): string
     {
         if ($model instanceof User) {
-            return "Utilisatuer";
+            return "Utilisateur";
         }
 
         if ($model instanceof AccountingClosure) {
@@ -81,18 +86,35 @@ trait HasAuditLogs
         if ($model instanceof Delivery) {
             return "Livraison excédentaire";
         }
+        if ($model instanceof Deliveryfile) {
+            return "Pièce jointe de la livraison excédentaire";
+        }
+
         if ($model instanceof Fuelprice) {
             return "Prix Carburant";
         }
+
         if ($model instanceof MiningSale) {
-            return "Ventes liées aux Stes Minières";
+            return "Ventes liées aux Stes. Minières";
         }
+        if ($model instanceof MiningSaleFile) {
+            return "Pièce jointe de la vente liée aux Stes. Minières";
+        }
+
         if ($model instanceof Purchase) {
             return "Achat";
         }
+        if ($model instanceof Purchasefile) {
+            return "Pièce jointe de l'achat ";
+        }
+
         if ($model instanceof Sale) {
             return "Vente";
         }
+        if ($model instanceof Salefile) {
+            return "Pièce jointe de la vente ";
+        }
+
         if ($model instanceof Rate) {
             return "Taux réel";
         }
@@ -100,6 +122,7 @@ trait HasAuditLogs
         if ($model instanceof StateFuelprice) {
             return "Prix Carburant";
         }
+        
         if ($model instanceof Rate) {
             return "Taux réel";
         }
@@ -116,7 +139,11 @@ trait HasAuditLogs
             return "Stock de sécurité collecté reversé";
         }
 
-        // autres mappings...
+        if ($model instanceof Securitystockfile) {
+            return "Pièce jointe du Stock de sécurité collecté reversé";
+        }
+
+
         return strtolower(class_basename($model));
     }
 }

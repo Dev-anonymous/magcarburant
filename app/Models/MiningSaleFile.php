@@ -6,21 +6,24 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class MiningSaleFile
- * 
+ *
  * @property int $id
  * @property int $mining_sale_id
  * @property string|null $file
- * 
+ *
  * @property MiningSale $mining_sale
  *
  * @package App\Models
  */
 class MiningSaleFile extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'mining_sale_files';
 	public $timestamps = false;
 

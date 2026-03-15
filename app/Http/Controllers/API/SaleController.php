@@ -176,7 +176,9 @@ class SaleController extends Controller
                         File::delete("storage/" . $f->file);
                         $f->delete();
                     }
-                    Salefile::insert($insertFiles);
+                    foreach ($insertFiles as $i) {
+                        Salefile::create($i);
+                    }
                 }
             }
 
@@ -439,7 +441,9 @@ class SaleController extends Controller
                     $f[] = ['sale_id' => $sale->id, 'file' =>  $file->store('bills', 'public')];
                 }
             }
-            Salefile::insert($f);
+            foreach ($f as $i) {
+                Salefile::create($i);
+            }
 
             DB::commit();
 

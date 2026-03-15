@@ -18,7 +18,6 @@ class AuditController extends Controller
     public function index()
     {
         $user = request()->user();
-        // abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
 
         $date = request('date');
         $date = explode(' to ', $date);
@@ -36,11 +35,8 @@ class AuditController extends Controller
             $logs->whereIn('event', $event);
         }
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity  = $user->entities()->first();
-            $logs->where('entity_id', $entity->id);
-        } else if ($user->user_role == 'etatique') {
-            // abort(403);
+        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+            $logs->whereIn('user_id', childrenlist($user));
         } elseif ($user->user_role == 'sudo') {
             //
         } else {

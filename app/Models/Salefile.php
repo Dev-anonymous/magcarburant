@@ -6,21 +6,24 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Salefile
- * 
+ *
  * @property int $id
  * @property int $sale_id
  * @property string|null $file
- * 
+ *
  * @property Sale $sale
  *
  * @package App\Models
  */
 class Salefile extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'salefile';
 	public $timestamps = false;
 

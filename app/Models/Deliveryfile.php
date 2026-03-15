@@ -6,21 +6,24 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLogs;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Deliveryfile
- * 
+ *
  * @property int $id
  * @property int $delivery_id
  * @property string $file
- * 
+ *
  * @property Delivery $delivery
  *
  * @package App\Models
  */
 class Deliveryfile extends Model
 {
+    use HasAuditLogs;
+    
 	protected $table = 'deliveryfile';
 	public $timestamps = false;
 

@@ -21,4 +21,13 @@ class WebController extends Controller
         $permissions = Permission::where('user_role', $user->user_role)->orderBy('name')->get();
         return view('roles', compact('permissions'));
     }
+
+    function users()
+    {
+        $user = request()->user();
+        abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'logisticien']), 403, "No permission");
+        $permissions = Permission::where('user_role', $user->user_role)->orderBy('name')->get();
+        return '...';
+        return view('roles', compact('permissions'));
+    }
 }

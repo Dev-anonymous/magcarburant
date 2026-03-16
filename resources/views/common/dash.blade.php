@@ -3,7 +3,10 @@
 @section('bg-class', 'bg-img-3')
 @section('body')
     @php
-        $isState = !in_array(Auth::user()->user_role, ['petrolier', 'logisticien']);
+        $isState = in_array(Auth::user()->user_role, ['etatique']);
+        $isPetrol = in_array(Auth::user()->user_role, ['petrolier']);
+        $isLog = in_array(Auth::user()->user_role, ['logisticien']);
+
     @endphp
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
@@ -94,7 +97,7 @@
                                             <div id="chart8"></div>
                                         </div>
                                     </div>
-                                @else
+                                @elseif ($isPetrol)
                                     <div class="col-md-6">
                                         <div class="">
                                             <div id="chart1"></div>
@@ -113,6 +116,17 @@
                                     <div class="col-md-6">
                                         <div class="">
                                             <div id="chart4"></div>
+                                        </div>
+                                    </div>
+                                @elseif ($isLog)
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <div id="chart2"></div>
                                         </div>
                                     </div>
                                 @endif
@@ -227,7 +241,7 @@
                             chart8.addSeries(serie, false);
                         });
                         chart8.redraw();
-                    @else
+                    @elseif ($isPetrol)
                         chart1.xAxis[0].setCategories(data.chart1.categories, false);
                         while (chart1.series.length > 0) {
                             chart1.series[0].remove(false);
@@ -276,6 +290,31 @@
                         chart2.redraw();
                         chart3.redraw();
                         chart4.redraw();
+                    @elseif ($isLog)
+                        chart1.xAxis[0].setCategories(data.chart1.categories, false);
+                        while (chart1.series.length > 0) {
+                            chart1.series[0].remove(false);
+                        }
+                        data.chart1.series.forEach(function(serie) {
+                            chart1.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
+                        chart1.redraw();
+
+                        chart2.xAxis[0].setCategories(data.chart2.categories, false);
+                        while (chart2.series.length > 0) {
+                            chart2.series[0].remove(false);
+                        }
+                        data.chart2.series.forEach(function(serie) {
+                            chart2.addSeries({
+                                name: serie.name,
+                                data: serie.data
+                            }, false);
+                        });
+                        chart2.redraw();
+ 
                     @endif
                     ldr.hide();
                 },
@@ -950,398 +989,600 @@
             });
         @else
             @php
-                $islog = auth()->user()->user_role == 'logisticien';
                 $title2 = 'Statistiques des ventes liées aux sociétés minières';
-                if ($islog) {
+                if ($isLog) {
                     $title = 'Statistiques des ventes';
                 } else {
                     $title = 'Statistiques des achats, ventes et livraisons excédentaires';
             } @endphp
-            var chart1 = Highcharts.chart('chart1', {
-                chart: {
-                    type: 'column',
-                    height: 400,
-                    backgroundColor: 'transparent',
-                    spacingTop: 60,
-                    options3d: {
-                        enabled: true,
-                        alpha: 20,
-                        beta: 0,
-                        depth: 50,
-                        viewDistance: 25
-                    }
-                },
-                title: {
-                    text: '{{ $title }} par produit',
-                    margin: 40,
-                },
-                credits: {
-                    enabled: false
-                },
-                xAxis: {
-                    categories: [],
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Volume (M3)'
-                    }
-                },
-                legend: {
-                    enabled: true,
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemMarginTop: 8,
-                    itemMarginBottom: 8,
-                    symbolRadius: 6,
-                    symbolHeight: 12,
-                    symbolWidth: 12,
-                    itemStyle: {
-                        fontSize: '14px',
-                        color: '#1a3b5d'
-                    }
-                },
-
-                tooltip: {
-                    shared: true,
-                    valueSuffix: ' M3'
-                },
-                plotOptions: {
-                    column: {
-                        depth: 25,
-                        borderRadius: 4,
-                        pointPadding: 0.1,
-                        groupPadding: 0.15,
-                        dataLabels: {
+            @if ($isPetrol)
+                var chart1 = Highcharts.chart('chart1', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
                             enabled: true,
-                            rotation: -45,
-                            overflow: 'allow',
-                            crop: false,
-                            align: 'center',
-                            formatter: function() {
-                                return formatNumber(this.y) + ' M3';
-                            },
-                            style: {
-                                fontSize: '10px',
-                                color: '#000'
-                            }
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
                         }
                     },
-                },
-
-                series: [
-                    // {
-                    //     name: "Achats",
-                    //     data: []
-                    // },
-                    // {
-                    //     name: "Ventes",
-                    //     data: []
-                    // },
-                    // {
-                    //     name: "Livraisons excédentaires",
-                    //     data: []
-                    // }
-                ],
-
-                responsive: {
-                    rules: [{
-                        condition: {
-                            maxWidth: 500
-                        },
-                        chartOptions: {
-                            legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                layout: 'horizontal'
-                            },
-                            chart: {
-                                height: 400
-                            }
-                        }
-                    }]
-                }
-            });
-
-            var chart2 = Highcharts.chart('chart2', {
-                chart: {
-                    type: 'column',
-                    height: 400,
-                    backgroundColor: 'transparent',
-                    spacingTop: 60,
-                    options3d: {
-                        enabled: true,
-                        alpha: 20,
-                        beta: 0,
-                        depth: 50,
-                        viewDistance: 25
-                    }
-                },
-                title: {
-                    text: '{{ $title }} par zone',
-                    margin: 40,
-                },
-                credits: {
-                    enabled: false
-                },
-                xAxis: {
-                    categories: [],
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
                     title: {
-                        text: 'Volume (M3)'
-                    }
-                },
-                legend: {
-                    enabled: true,
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemMarginTop: 8,
-                    itemMarginBottom: 8,
-                    symbolRadius: 6,
-                    symbolHeight: 12,
-                    symbolWidth: 12,
-                    itemStyle: {
-                        fontSize: '14px',
-                        color: '#1a3b5d'
-                    }
-                },
-
-                tooltip: {
-                    shared: true,
-                    valueSuffix: ' M3'
-                },
-                plotOptions: {
-                    column: {
-                        depth: 25,
-                        borderRadius: 4,
-                        pointPadding: 0.1,
-                        groupPadding: 0.15,
-                        dataLabels: {
-                            enabled: true,
-                            rotation: -45,
-                            overflow: 'allow',
-                            crop: false,
-                            align: 'center',
-                            formatter: function() {
-                                return formatNumber(this.y) + ' M3';
-                            },
-                            style: {
-                                fontSize: '10px',
-                                color: '#000'
-                            }
+                        text: '{{ $title }} par produit',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
                         }
                     },
-                },
-                series: [],
-                responsive: {
-                    rules: [{
-                        condition: {
-                            maxWidth: 500
-                        },
-                        chartOptions: {
-                            legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                layout: 'horizontal'
-                            },
-                            chart: {
-                                height: 400
-                            }
-                        }
-                    }]
-                }
-            });
-
-            var chart3 = Highcharts.chart('chart3', {
-                chart: {
-                    type: 'column',
-                    height: 400,
-                    backgroundColor: 'transparent',
-                    spacingTop: 60,
-                    options3d: {
+                    legend: {
                         enabled: true,
-                        alpha: 20,
-                        beta: 0,
-                        depth: 50,
-                        viewDistance: 25
-                    }
-                },
-                title: {
-                    text: '{{ $title2 }} par produit',
-                    margin: 40,
-                },
-                credits: {
-                    enabled: false
-                },
-                xAxis: {
-                    categories: [],
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Volume (M3)'
-                    }
-                },
-                legend: {
-                    enabled: true,
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemMarginTop: 8,
-                    itemMarginBottom: 8,
-                    symbolRadius: 6,
-                    symbolHeight: 12,
-                    symbolWidth: 12,
-                    itemStyle: {
-                        fontSize: '14px',
-                        color: '#1a3b5d'
-                    }
-                },
-                tooltip: {
-                    shared: true,
-                    valueSuffix: ' M3'
-                },
-                plotOptions: {
-                    column: {
-                        depth: 25,
-                        borderRadius: 4,
-                        pointPadding: 0.1,
-                        groupPadding: 0.15,
-                        dataLabels: {
-                            enabled: true,
-                            rotation: -45,
-                            overflow: 'allow',
-                            crop: false,
-                            align: 'center',
-                            formatter: function() {
-                                return formatNumber(this.y) + ' M3';
-                            },
-                            style: {
-                                fontSize: '10px',
-                                color: '#000'
-                            }
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
                         }
                     },
-                },
-                series: [],
-                responsive: {
-                    rules: [{
-                        condition: {
-                            maxWidth: 500
-                        },
-                        chartOptions: {
-                            legend: {
+
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
                                 align: 'center',
-                                verticalAlign: 'bottom',
-                                layout: 'horizontal'
-                            },
-                            chart: {
-                                height: 400
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
                             }
-                        }
-                    }]
-                }
-            });
+                        },
+                    },
 
-            var chart4 = Highcharts.chart('chart4', {
-                chart: {
-                    type: 'column',
-                    height: 400,
-                    backgroundColor: 'transparent',
-                    spacingTop: 60,
-                    options3d: {
-                        enabled: true,
-                        alpha: 20,
-                        beta: 0,
-                        depth: 50,
-                        viewDistance: 25
-                    }
-                },
-                title: {
-                    text: '{{ $title2 }} par zone',
-                    margin: 40,
-                },
-                credits: {
-                    enabled: false
-                },
-                xAxis: {
-                    categories: [],
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Volume (M3)'
-                    }
-                },
-                legend: {
-                    enabled: true,
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemMarginTop: 8,
-                    itemMarginBottom: 8,
-                    symbolRadius: 6,
-                    symbolHeight: 12,
-                    symbolWidth: 12,
-                    itemStyle: {
-                        fontSize: '14px',
-                        color: '#1a3b5d'
-                    }
-                },
+                    series: [
+                        // {
+                        //     name: "Achats",
+                        //     data: []
+                        // },
+                        // {
+                        //     name: "Ventes",
+                        //     data: []
+                        // },
+                        // {
+                        //     name: "Livraisons excédentaires",
+                        //     data: []
+                        // }
+                    ],
 
-                tooltip: {
-                    shared: true,
-                    valueSuffix: ' M3'
-                },
-                plotOptions: {
-                    column: {
-                        depth: 25,
-                        borderRadius: 4,
-                        pointPadding: 0.1,
-                        groupPadding: 0.15,
-                        dataLabels: {
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+
+                var chart2 = Highcharts.chart('chart2', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
                             enabled: true,
-                            rotation: -45,
-                            overflow: 'allow',
-                            crop: false,
-                            align: 'center',
-                            formatter: function() {
-                                return formatNumber(this.y) + ' M3';
-                            },
-                            style: {
-                                fontSize: '10px',
-                                color: '#000'
-                            }
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
                         }
                     },
-                },
-                series: [],
-                responsive: {
-                    rules: [{
-                        condition: {
-                            maxWidth: 500
-                        },
-                        chartOptions: {
-                            legend: {
-                                align: 'center',
-                                verticalAlign: 'bottom',
-                                layout: 'horizontal'
-                            },
-                            chart: {
-                                height: 400
-                            }
+                    title: {
+                        text: '{{ $title }} par zone',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
                         }
-                    }]
-                }
-            });
+                    },
+                    legend: {
+                        enabled: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
+                        }
+                    },
+
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
+                                align: 'center',
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
+                            }
+                        },
+                    },
+                    series: [],
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+
+                var chart3 = Highcharts.chart('chart3', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
+                            enabled: true,
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    title: {
+                        text: '{{ $title2 }} par produit',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
+                        }
+                    },
+                    legend: {
+                        enabled: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
+                        }
+                    },
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
+                                align: 'center',
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
+                            }
+                        },
+                    },
+                    series: [],
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+
+                var chart4 = Highcharts.chart('chart4', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
+                            enabled: true,
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    title: {
+                        text: '{{ $title2 }} par zone',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
+                        }
+                    },
+                    legend: {
+                        enabled: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
+                        }
+                    },
+
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
+                                align: 'center',
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
+                            }
+                        },
+                    },
+                    series: [],
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+            @elseif ($isLog)
+                var chart1 = Highcharts.chart('chart1', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
+                            enabled: true,
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    title: {
+                        text: '{{ $title }} par produit',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
+                        }
+                    },
+                    legend: {
+                        enabled: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
+                        }
+                    },
+
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
+                                align: 'center',
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
+                            }
+                        },
+                    },
+
+                    series: [
+                        // {
+                        //     name: "Achats",
+                        //     data: []
+                        // },
+                        // {
+                        //     name: "Ventes",
+                        //     data: []
+                        // },
+                        // {
+                        //     name: "Livraisons excédentaires",
+                        //     data: []
+                        // }
+                    ],
+
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+
+                var chart2 = Highcharts.chart('chart2', {
+                    chart: {
+                        type: 'column',
+                        height: 400,
+                        backgroundColor: 'transparent',
+                        spacingTop: 60,
+                        options3d: {
+                            enabled: true,
+                            alpha: 20,
+                            beta: 0,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    title: {
+                        text: '{{ $title }} par zone',
+                        margin: 40,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: [],
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Volume (M3)'
+                        }
+                    },
+                    legend: {
+                        enabled: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemMarginTop: 8,
+                        itemMarginBottom: 8,
+                        symbolRadius: 6,
+                        symbolHeight: 12,
+                        symbolWidth: 12,
+                        itemStyle: {
+                            fontSize: '14px',
+                            color: '#1a3b5d'
+                        }
+                    },
+
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' M3'
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25,
+                            borderRadius: 4,
+                            pointPadding: 0.1,
+                            groupPadding: 0.15,
+                            dataLabels: {
+                                enabled: true,
+                                rotation: -45,
+                                overflow: 'allow',
+                                crop: false,
+                                align: 'center',
+                                formatter: function() {
+                                    return formatNumber(this.y) + ' M3';
+                                },
+                                style: {
+                                    fontSize: '10px',
+                                    color: '#000'
+                                }
+                            }
+                        },
+                    },
+                    series: [],
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            chartOptions: {
+                                legend: {
+                                    align: 'center',
+                                    verticalAlign: 'bottom',
+                                    layout: 'horizontal'
+                                },
+                                chart: {
+                                    height: 400
+                                }
+                            }
+                        }]
+                    }
+                });
+            @endif
         @endif
 
         dashboard();

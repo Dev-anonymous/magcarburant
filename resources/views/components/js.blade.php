@@ -10,6 +10,24 @@
 
 <script src="{{ asset('assets/vendor/dom-factory.js') }}"></script>
 <script src="{{ asset('assets/vendor/material-design-kit.js') }}"></script>
+@auth
+    <div class="modal fade" id="mdlautoout" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="mb-2 text-center">
+                        <h2 class="text-danger bold">
+                            Cher {{ auth()->user()->name }}, vous allez être déconnecté ! Merci de vous reconnecter à
+                            nouveau.
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endauth
+
 <script>
     (function() {
         "use strict";
@@ -50,12 +68,7 @@
         });
 
 
-        $('[logout]').on('click', function(e) {
-            e.preventDefault();
-            var btn = $(this);
-            btn.children().hide();
-            $('[loader]', btn).show();
-
+        function logout() {
             $.ajax({
                 url: '{{ route('api.logout') }}',
                 method: 'POST',
@@ -66,6 +79,36 @@
             }).always(function() {
                 location.reload();
             })
+        }
+        $('[logout]').on('click', function(e) {
+            e.preventDefault();
+            var btn = $(this);
+            btn.children().hide();
+            $('[loader]', btn).show();
+            logout();
         });
+
+        function ping() {
+            $.ajax({
+                url: '{{ route('ping') }}',
+                headers: {
+                    'accept': 'application/json'
+                },
+                error: function(x) {
+                    if (401 == x.status) {
+                        $('#mdlautoout').modal('show');
+                        setTimeout(() => {
+                            logout();
+                        }, 5000);
+                    } else {
+                        setTimeout(() => {
+                            ping();
+                        }, 1000);
+                    }
+                }
+            });
+        }
+
+        ping();
     })();
 </script>

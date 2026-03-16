@@ -38,7 +38,7 @@ class RoleController extends Controller
                 $n = count($modules);
                 if ($n) {
                     $l = "($n) " . implode(', ', $modules);
-                    return Str::limit($l, 60,);
+                    return Str::limit($l, 100,);
                 }
                 return '-';
             })

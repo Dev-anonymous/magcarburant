@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Rôles et permissions')
+@section('title', 'Gestions des utilisateurs')
 @section('bg-class', 'bg-img-3')
 @section('body')
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Rôles et permissions</h2>
-                <p class="lead small m-0">Gestions des rôles et permissions sur les modules</p>
+                <h2 class="font-weight-bold">Gestions des utilisateurs</h2>
+                <p class="lead small m-0">Gestions des sessions utilisateurs</p>
             </div>
             <div class="m-2">
                 <button onclick="history.back()" class="btn btn-sm btn-primary d-flex align-items-center">
@@ -20,34 +20,29 @@
         </div>
         <hr />
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card transparent">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-                                <h4 class="card-title font-weight-bold">
-
-                                </h4>
-                            </div>
-
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title font-weight-bold">
+                            Liste des utilisateurs
+                        </h4>
+                        <div class="">
+                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
+                                <i class="material-icons md-24">add_circle_outline</i>
+                                Nouvel utilisateur
+                            </button>
                         </div>
-                        <form id="ffilter" class="filters-form pull-right" role="form">
-
-                            <div class="form-group mb-1">
-                                <button type="button" class="btn btn-sm btn-primary mt-3" id="badd">
-                                    <i class="material-icons md-18">add_circle_outline</i> Nouveau role
-                                </button>
-                            </div>
-                        </form>
                     </div>
-                    <div class="card-body">
+                    <div class="py-4">
                         <div class="table-responsive">
                             <table id="table" class="table table-striped table-hover text-nowrap" style="width:100%">
                                 <thead>
                                     <tr>
+                                        <th>Nom</th>
+                                        <th>Email</th>
                                         <th>Rôle</th>
-                                        <th>Modules</th>
-                                        <th></th>
+                                        <th>Date création</th>
+                                        <th class="no-export"></th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -58,48 +53,42 @@
             </div>
         </div>
     </div>
+    </div>
 @endsection
 @section('modals')
-    <div class="modal fade" id="mdlAdd" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="mdladd" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" mlabel></h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" id="defaultModalLabel">Nouvel utilisateur</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <form smartform>
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="action">
+                <form class="was-validated" fadd>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Nom du rôle</label>
-                            <input required class="form-control" placeholder="Ex. manager" name="name" maxlength="100">
+                        <div class="mb-2">
+                            <label for="">Rôle de l'utilisateur</label>
+                            <select name="role_id" class="form-control" required>
+                                <option value="">Sélectionnez le rôle</option>
+                                @foreach ($roles as $e)
+                                    <option value="{{ $e->id }}">{{ $e->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Modules utilisables et permissions pour ce rôle</label>
-                            <div class="border rounded p-3 mb-2" style="max-height: 300px; overflow-y: auto;">
-                                <div class="row">
-                                    @foreach ($permissions as $permission)
-                                        <div class="col-12 col-md-3">
-                                            <div class="custom-control custom-checkbox mt-1">
-                                                <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
-                                                    id="perm2_{{ $permission->id }}" class="custom-control-input">
-                                                <label class="custom-control-label" for="perm2_{{ $permission->id }}">
-                                                    {{ $permission->name }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary checkAll">
-                                    Tout cocher
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary uncheckAll">
-                                    Tout décocher
-                                </button>
-                            </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Nom de l'utilisateur</label>
+                            <input type="text" class="form-control" id="validationCustom01" placeholder="Ex: John Doe"
+                                name="name" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Email de l'utilisateur </label>
+                            <input type="email" class="form-control" id="validationCustom01"
+                                placeholder="Ex: exemple@email.com" name="email" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Mot de passe de connexion</label>
+                            <input type="text" class="form-control" id="validationCustom01" name="password">
                         </div>
                         <x-alert />
                     </div>
@@ -120,7 +109,58 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="mdldel" role="dialog">
+    <div class="modal fade" id="mdledit" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="defaultModalLabel">Modification infos de l'utilisateur</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="was-validated" fedit>
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="action" value="update">
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <label for="">Rôle de l'utilisateur</label>
+                            <select name="role_id" class="form-control" required>
+                                <option value="">Sélectionnez le rôle</option>
+                                @foreach ($roles as $e)
+                                    <option value="{{ $e->id }}">{{ $e->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Nom de l'utilisateur</label>
+                            <input type="text" class="form-control" id="validationCustom01"
+                                placeholder="Ex: John Doe" name="name" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="mb-0" for="validationCustom01">Email de l'utilisateur </label>
+                            <input type="email" class="form-control" id="validationCustom01"
+                                placeholder="Ex: exemple@email.com" name="email" required>
+                        </div>
+                        <x-alert />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal">
+                            <i class="material-icons md-18 mr-1 m-0 p-0">highlight_off</i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <x-loader />
+                            <span text>
+                                <i class="material-icons md-18 mr-1 m-0 p-0">save</i>
+                                Valider
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdldel" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form class="was-validated" fdel>
@@ -128,7 +168,7 @@
                     <div class="modal-body">
                         <div class="mb-2 text-center">
                             <h3 class="text-danger">
-                                Voulez-vous supprimer ce rôle ?
+                                Voulez-vous supprimer cet utilisateur <span shortname></span> et toutes ses informations ?
                             </h3>
                         </div>
                         <x-alert />
@@ -161,30 +201,11 @@
     <x-datatable />
 
     <script>
-        $(document).on('click', '.checkAll', function() {
-            var form = $(this).closest('form');
-            $('input[name="permissions[]"]', form).prop('checked', true);
-        });
-
-        $(document).on('click', '.uncheckAll', function() {
-            var form = $(this).closest('form');
-            $('input[name="permissions[]"]', form).prop('checked', false);
-        });
-
-        $('#badd').click(function() {
-            var mdl = $('#mdlAdd');
-            $('[name="action"]', mdl).val('');
-            $('[name="id"]', mdl).val('');
-            $('[name="name"]', mdl).val('');
-            $('[mlabel]').html('Nouveau Rôle');
-            mdl.modal('show');
-        })
-
         var dtObj = $('#table').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('role.index') }}',
+                url: '{{ route('user.index') }}',
                 data: function(d) {
 
                 }
@@ -196,17 +217,26 @@
                 targets: 0,
                 width: '1%'
             }, {
-                targets: 2,
+                targets: 4,
                 width: '1%'
             }],
             columns: [{
                     data: 'name',
                     name: 'name',
-                    className: 'text-left'
                 },
                 {
-                    data: 'module',
-                    name: 'module',
+                    data: 'email',
+                    name: 'email',
+                },
+                {
+                    data: 'role_id',
+                    name: 'role_id',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
                 },
                 {
                     data: 'action',
@@ -234,39 +264,27 @@
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
-
-        });
-
-        $('#table tbody').on('click', '[bedit]', function() {
-            let log = $(this).attr('data');
-            let raw = {};
-            try {
-                raw = JSON.parse(log);
-            } catch (e) {}
-
-            var mdl = $('#mdlAdd');
-            $('[name="name"]', mdl).val(raw.name);
-            $('[name="id"]', mdl).val(raw.id);
-            $('[name="action"]', mdl).val('update');
-            $('input[name="permissions[]"]', mdl).val(raw.perms);
-            $('[mlabel]').html('Modification du Rôle');
-
-            $('input[name="permissions[]"]', mdl).prop('checked', false);
-            raw.perms.forEach(function(permId) {
-                $('#perm2_' + permId, mdl).prop('checked', true);
+            $('[bedit]').off('click').click(function() {
+                var data = JSON.parse($(this).attr('data'));
+                var mdl = $('#mdledit');
+                var form = $('[fedit]', mdl);
+                $('[name="id"]', form).val(data.id);
+                $('[name="role_id"]', form).val(data.role_id);
+                $('[name="name"]', form).val(data.name);
+                $('[name="email"]', form).val(data.email);
+                mdl.modal('show');
             });
-            mdl.modal('show');
+            $('[bdel]').off('click').click(function() {
+                var data = JSON.parse($(this).attr('data'));
+                var mdl = $('#mdldel');
+                var form = $('[fdel]', mdl);
+                $('[name="id"]', form).val(data.id);
+                $('[shortname]', form).html(data.name);
+                mdl.modal('show');
+            });
         });
 
-        $('#table tbody').on('click', '[bdel]', function() {
-            var data = JSON.parse($(this).attr('data'));
-            var mdl = $('#mdldel');
-            var form = $('[fdel]', mdl);
-            $('[name="id"]', form).val(data.id);
-            mdl.modal('show');
-        });
-
-        $('[smartform]').on('submit', function(e) {
+        $('[fadd],[fedit]').on('submit', function(e) {
             e.preventDefault();
             var form = $(this);
             var btn = $(':submit', form);
@@ -278,7 +296,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('role.store') }}',
+                url: '{{ route('user.store') }}',
                 method: 'POST',
                 data: data,
                 contentType: false,
@@ -286,27 +304,27 @@
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(
-                            'p-1 m-0 alert alert-success')
+                            'p-1 m-0 text-center alert alert-success')
                         .show();
                     dtObj.ajax.reload(null, false);
                     form[0].reset();
                     setTimeout(() => {
                         rep.hide();
-                        $('.modal.show').modal('hide');
+                        $('#mdladd,#mdledit').modal('hide');
                     }, 2000);
                 },
                 error: function(xhr, a, b) {
                     var resp = xhr.responseJSON;
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(
-                            'p-1 m-0 alert alert-danger')
+                            'p-1 m-0 text-center alert alert-danger')
                         .show();
                 },
             }).always(function() {
                 $(':input', form).attr('disabled', false);
                 $('[loader]', btn).hide();
                 $('[text]', btn).show();
-            });
+            })
         });
 
         $('[fdel]').on('submit', function(e) {
@@ -316,15 +334,13 @@
             var rep = $('#rep', form);
             var id = $('[name="id"]', form).val();
             rep.hide();
-            var data = form.serialize();
             $(':input', form).attr('disabled', true);
             $('[loader]', btn).show();
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('role.index') }}/' + id,
+                url: '{{ route('user.index') }}/' + id,
                 method: 'delete',
-                data: data,
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";
                     rep.html(mess).stop().removeClass().addClass(

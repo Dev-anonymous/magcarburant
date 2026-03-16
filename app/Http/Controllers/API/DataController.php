@@ -1076,13 +1076,14 @@ class DataController extends Controller
                 $to = @$date[1] ?? $from;
 
                 if ($user->user_role == 'etatique') {
-                    $ids = User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id');
-                    $entities = Entity::whereIn('users_id', $ids)->get();
+                    $entities = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id'))->get();
+                    $entities1 = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier'])->pluck('id'))->get();
 
                     $categories_achat = $categories_vente = $categories_livr = $cate_vente_min = [];
                     $da = $dv = $dl = $dvm = [];
                     foreach ($entities as $entity) {
                         if ($entity->user->user_role == 'logisticien') {
+                            continue;
                         } else {
                             $da[] = round($entity->purchases()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum('qtym3'), 3);
                             $dl[] = round($entity->deliveries()->whereBetween('date', [$from, $to])->where(['from_state' => 0])->sum(DB::raw('lata/1000')), 3);
@@ -1140,7 +1141,7 @@ class DataController extends Controller
 
                     $vente_min_carburant = [];
                     $cat_vente_min_carburant = mainfuels();
-                    foreach ($entities as $entity) {
+                    foreach ($entities1 as $entity) {
                         $t = [];
                         foreach (mainfuels() as $product) {
                             $t[] = round($entity->mining_sales()->whereBetween('date', [$from, $to])->where(['from_state' => 0, 'product' => $product])->sum(DB::raw('lata/1000')), 3);

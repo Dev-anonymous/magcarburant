@@ -19,9 +19,13 @@ use App\Http\Controllers\API\StateRateController;
 use App\Http\Controllers\API\StateStructurepriceController;
 use App\Http\Controllers\API\StructurepriceController;
 use App\Http\Controllers\API\TxStructure;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/ping', function () {
+        return response()->json(['success' => true, 'message'=> "Hello ". request()->user()->name, 'time' => nnow()->format('Y-m-d H:i:s')]);
+    })->name('ping');
     Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
     Route::get('reconciliation', [ReconciliationController::class, 'reconciliation'])->name('reconciliation');
     Route::resource('audit', AuditController::class)->only(['index']);
@@ -41,7 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('accountingclosure', AccountingClosureController::class)->only(['index', 'store', 'update']);
     Route::resource('securitystock', SecurityStockController::class)->only(['index', 'store']);
     Route::resource('role', RoleController::class)->only(['index', 'store', 'destroy']);
-
-
+    Route::resource('user', UserController::class);
     Route::get('products-z', [DataController::class, 'product_z'])->name('extra.product_z');
 });

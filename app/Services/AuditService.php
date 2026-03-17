@@ -11,6 +11,7 @@ class AuditService
     public static function log($event, $model = null, $old = null, $new = null, $title = null)
     {
         $user = Auth::user();
+        if (!$user) return;
 
         AuditLog::create([
             'event'      => $event,

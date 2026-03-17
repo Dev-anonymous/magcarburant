@@ -39,52 +39,116 @@
                 <div class="row w-100 justify-content-center">
                     <div class="col-12 col-md-6">
                         <div class="card mb-3 transparent" style="border-radius: 20px;">
-                            <div class="card-body">
-                                <form action="#" flog>
-                                    <div class="py-3">
-                                        <h3 class="text-center">Réinitialisation du mot de passe</h3>
-                                        <p class="text-center text-dark mb-0">Entrez votre adresse email pour recevoir
-                                            les instructions de réinitialisation de votre mot de passe.</p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Email</label>
-                                        <div class="input-group input-group--inline">
-                                            <div class="input-group-addon">
-                                                <i class="material-icons">account_circle</i>
-                                            </div>
-                                            <input type="text" class="form-control" name="email"
-                                                placeholder="Votre email" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="d-flex">
-                                            <span class="ml-auto">
+                            <div class="card-body w-100">
+                                @if ($message)
+                                    <div class="text-center">
+                                        <h3 class="text-danger">{{ $message }}</h3>
+                                        <div class="mt-5">
+                                            <div class="">
                                                 <a href="{{ route('login') }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="12px"
+                                                        viewBox="0 -960 960 960" width="12px" fill="#000">
+                                                        <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
+                                                    </svg>
                                                     Retourner à la page de connexion
                                                 </a>
-                                            </span>
+                                            </div>
                                         </div>
-
                                     </div>
-                                    <x-alert />
-                                    <button type="submit"
-                                        class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
-                                        <x-loader />
-                                        <span text>
-                                            <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
-                                            Vérifier
-                                        </span>
-                                    </button>
-                                </form>
+                                @elseif ($canreset)
+                                    <h3 class="text-center mb-4">Réinitialisation du mot de passe</h3>
+                                    <p class="text-center text-dark my-3">
+                                        Entrez votre nouveau mot de passe pour
+                                        réinitialiser votre compte.
+                                    </p>
+                                    <form freset>
+                                        <input type="hidden" name="token" value="{{ $token }}">
+                                        <div class="form-group">
+                                            <label>Nouveau mot de passe</label>
+                                            <div class="input-group input-group--inline">
+                                                <div class="input-group-addon">
+                                                    <i class="material-icons">lock</i>
+                                                </div>
+                                                <input type="password" class="form-control" name="password"
+                                                    placeholder="Nouveau mot de passe" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirmer le mot de passe</label>
+                                            <div class="input-group input-group--inline">
+                                                <div class="input-group-addon">
+                                                    <i class="material-icons">lock</i>
+                                                </div>
+                                                <input type="password" class="form-control" name="password_confirmation"
+                                                    placeholder="Confirmer le mot de passe" required>
+                                            </div>
+                                        </div>
+                                        <x-alert />
+                                        <button type="submit"
+                                            class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
+                                            <x-loader />
+                                            <span text>
+                                                <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
+                                                Valider
+                                            </span>
+                                        </button>
+                                        <div class="mt-3">
+                                            <div class="">
+                                                <a href="{{ route('login') }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="12px"
+                                                        viewBox="0 -960 960 960" width="12px" fill="#000">
+                                                        <path d="M423-59 2-480l421-421 78 79-342 342 342 342-78 79Z" />
+                                                    </svg>
+                                                    Retourner à la page de connexion
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                @else
+                                    <form action="#" flog>
+                                        <div class="py-3">
+                                            <h3 class="text-center">Réinitialisation du mot de passe
+                                            </h3>
+                                            <p class="text-center text-dark mb-0">Entrez votre adresse email pour
+                                                recevoir
+                                                les instructions de réinitialisation de votre mot de passe.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <div class="input-group input-group--inline">
+                                                <div class="input-group-addon">
+                                                    <i class="material-icons">account_circle</i>
+                                                </div>
+                                                <input type="text" class="form-control" name="email"
+                                                    placeholder="Votre email" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="d-flex">
+                                                <span class="ml-auto">
+                                                    <a href="{{ route('login') }}">
+                                                        Retourner à la page de connexion
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <x-alert />
+                                        <button type="submit"
+                                            class="btn btn-primary btn-block d-flex align-items-center justify-content-center">
+                                            <x-loader />
+                                            <span text>
+                                                <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
+                                                Vérifier
+                                            </span>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <div class="d-flex justify-content-center">
-                    <span class="mr-2">Don't have an account?</span>
-                    <a href="signup.html">Sign Up</a>
-                </div> --}}
+
         </div>
     </div>
     </div>
@@ -118,11 +182,11 @@
                                 'p-1 text-center alert alert-success')
                             .show();
                         setTimeout(() => {
-                            // $(':input', form).attr('disabled', true);
+                            $(':input', form).attr('disabled', true);
                         }, 800);
-                        // setTimeout(() => {
-                        //     location.reload();
-                        // }, 1000);
+                        setTimeout(() => {
+                            location.assign('{{ route('login') }}');
+                        }, 3000);
                     },
                     error: function(xhr, a, b) {
                         var resp = xhr.responseJSON;
@@ -140,6 +204,56 @@
                     $('[text]', btn).show();
                 })
             });
+
+            @if ($canreset)
+                $('[freset]').on('submit', function(e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    var btn = $(':submit', form);
+                    var rep = $('#rep', form);
+                    var data = form.serialize();
+                    rep.hide();
+                    $(':input', form).attr('disabled', true);
+                    $('[loader]', btn).show();
+                    $('[text]', btn).hide();
+
+                    $.ajax({
+                        url: '{{ route('recovery.reset') }}',
+                        method: 'POST',
+                        data: data,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(resp) {
+                            var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                            rep.html(mess).stop().removeClass().addClass(
+                                    'p-1 text-center alert alert-success')
+                                .show();
+                            localStorage.setItem('_token', resp.token);
+                            setTimeout(() => {
+                                $(':input', form).attr('disabled', true);
+                            }, 800);
+                            setTimeout(() => {
+                                location.assign('{{ route('login') }}');
+                            }, 3000);
+                        },
+                        error: function(xhr, a, b) {
+                            var resp = xhr.responseJSON;
+                            var mess = resp?.message ?? "Erreur, veuillez réessayer !";
+                            rep.html(mess).stop().removeClass().addClass(
+                                    'p-1 text-center alert alert-danger')
+                                .show();
+                            if (419 == xhr.status) {
+                                location.reload();
+                            }
+                        },
+                    }).always(function() {
+                        $(':input', form).attr('disabled', false);
+                        $('[loader]', btn).hide();
+                        $('[text]', btn).show();
+                    })
+                });
+            @endif
         });
     </script>
 </body>

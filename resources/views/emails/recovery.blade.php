@@ -7,13 +7,14 @@
 </head>
 
 <body>
-    <h2>Bonjour,</h2>
+    <h2>Bonjour cher {{ $user->name }},</h2>
 
-    <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
+    <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour définir un nouveau mot
+        de passe :</p>
 
     <p>
-        <a href="{{ route('recovery.verify', ['token' => $token]) }}"
-            style="display:inline-block;padding:10px 20px;background:#3490dc;color:#fff;text-decoration:none;border-radius:5px;">
+        <a href="{{ route('recovery', ['token' => $token]) }}"
+            style="display:inline-block;padding:10px 20px;background:#5a90cc;color:#fff;text-decoration:none;border-radius:5px;">
             Réinitialiser mon mot de passe
         </a>
     </p>

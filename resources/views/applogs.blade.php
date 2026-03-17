@@ -262,7 +262,7 @@
                 </p>
                 ${sur}
                 <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
+                    <strong><i class="material-icons align-middle md-18">schedule</i> Date :</strong>
                     ${raw.date}
                 </p>
                 <hr/>

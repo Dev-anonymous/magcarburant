@@ -122,15 +122,6 @@ class WebController extends Controller
         try {
             DB::beginTransaction();
 
-            $user->password = Hash::make($request->input('password'));
-            $user->save();
-
-            $recovery->used = true;
-            $recovery->save();
-
-            $user->tokens()->delete();
-            Auth::login($user);
-
             Mail::send('emails.template', [
                 'subject' => 'Mot de passe réinitialisé',
                 'content' => '<h2>Bonjour ' . $user->name . ',</h2>
@@ -140,6 +131,15 @@ class WebController extends Controller
                 $message->to($user->email)
                     ->subject('Mot de passe réinitialisé');
             });
+
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            $recovery->used = true;
+            $recovery->save();
+            $user->tokens()->delete();
+            Auth::login($user);
+
             DB::commit();
 
             return response()->json([

@@ -105,28 +105,52 @@ class WebController extends Controller
         ], ['token.exists' => "Lien de réinitialisation invalide."]);
 
         $token = $request->input('token');
-        $recovery = Recovery::where('token', $token)->where('used', false)->where('date', '>=', Carbon::now()->subMinutes(15))->first();
+        $recovery = Recovery::where('token', $token)
+            ->where('used', false)
+            ->where('date', '>=', Carbon::now()->subMinutes(15))
+            ->first();
+
         if (!$recovery) {
             return response()->json(['success' => false, 'message' => "Lien de réinitialisation invalide ou expiré."]);
         }
+
         $user = User::where('email', $recovery->email)->first();
         if (!$user) {
             return response()->json(['success' => false, 'message' => "Aucun compte trouvé pour ce lien de réinitialisation."]);
         }
-        DB::beginTransaction();
-        $user->password = Hash::make($request->input('password'));
-        $user->save();
-        $recovery->used = true;
-        $recovery->save();
-        $user->tokens()->delete();
-        Auth::login($user);
 
-        DB::commit();
+        try {
+            DB::beginTransaction();
 
-        return response()->json([
-            'success' => true,
-            'token' => $user->createToken('token_' . time())->plainTextToken,
-            'message' => "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe."
-        ]);
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+
+            $recovery->used = true;
+            $recovery->save();
+
+            $user->tokens()->delete();
+            Auth::login($user);
+
+            Mail::send('emails.template', [
+                'subject' => 'Mot de passe réinitialisé',
+                'content' => '<h2>Bonjour ' . $user->name . ',</h2>
+                          <p>Votre mot de passe a été réinitialisé avec succès le ' . nnow()->format('d-m-Y H:i') . '.</p>
+                          <p>Si vous n’êtes pas à l’origine de cette action, contactez immédiatement le support.</p>'
+            ], function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('Mot de passe réinitialisé');
+            });
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'token' => $user->createToken('token_' . time())->plainTextToken,
+                'message' => "Votre mot de passe a été réinitialisé avec succès. Un email de confirmation vous a été envoyé."
+            ]);
+        } catch (\Exception $e) {
+            Auth::logout($user);
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => "Une erreur est survenue, veuillez réessayer SVP."]);
+        }
     }
 }

@@ -243,9 +243,10 @@
             var sur = raw.entity ? `
                 <p class='m-0'>
                     <strong><i class="material-icons align-middle md-18">storage</i> Sur :</strong>
-                    ${raw.entity ?? '-'}
+                    ${raw.entity}
                 </p>
             ` : ``;
+
             let html = `
                 <p class='m-0'>
                     <strong><i class="material-icons align-middle md-18">event</i> Description :</strong>
@@ -260,6 +261,10 @@
                     ${raw.username ?? ''}
                 </p>
                 ${sur}
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
+                    ${raw.date}
+                </p>
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">

@@ -66,7 +66,7 @@ class AuditController extends Controller
             ->addColumn('raw_data', function ($row) {
                 $d = $row->toArray();
                 $date = Carbon::parse($row->created_at);
-                $d['date'] = ucfirst($date->dayName) . " le {$date->format('d-m-Y H:i:s')}";
+                $d['date'] = ucfirst($date->dayName) . " le {$date->format('d-m-Y H:i:s P')}";
                 $d['event'] = ucfirst($d['event']);
                 $entity = Entity::find($d['entity_id']);
                 $d['entity'] =  $ent = @$entity->shortname;

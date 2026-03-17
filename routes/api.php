@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ping', function () {
-        return response()->json(['success' => true, 'message'=> "Hello ". request()->user()->name, 'time' => nnow()->format('Y-m-d H:i:s')]);
+        return response()->json(['success' => true, 'message' => "Hello " . request()->user()->name, 'time' => nnow()->format('Y-m-d H:i:s')]);
     })->name('ping');
     Route::get('dashboard', [DataController::class, 'dashboard'])->name('dashboard');
     Route::get('reconciliation', [ReconciliationController::class, 'reconciliation'])->name('reconciliation');

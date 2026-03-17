@@ -109,7 +109,7 @@
                 success: function(r) {
                     setTimeout(() => {
                         ping();
-                    }, 1000);
+                    }, 5000);
                 }
             });
         }

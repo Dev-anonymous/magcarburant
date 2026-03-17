@@ -22,46 +22,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::get('def', function () {
     $action = request('action');
-    // if ('reset' == $action) {
-    //     Artisan::call('migrate:refresh', ['--seed' => true]);
-    // }
     if ('migrate' == $action) {
         Artisan::call('migrate', ['--seed' => true]);
     }
-
-
-    // foreach (AuditLog::all() as $el) {
-    //     // Traduction des events
-    //     switch ($el->event) {
-    //         case 'delete':
-    //             $el->event = 'suppression';
-    //             break;
-    //         case 'create':
-    //             $el->event = 'ajout';
-    //             break;
-    //         case 'update':
-    //             $el->event = 'modification';
-    //             break;
-    //         case 'login':
-    //             $el->event = 'connexion';
-    //             break;
-    //         case 'logout':
-    //             $el->event = 'déconnexion';
-    //             break;
-    //     }
-
-    //     // Vérifier old_values
-    //     if ($el->old_values === 'null') {
-    //         $el->old_values = null;
-    //     }
-
-    //     if ($el->new_values === 'null') {
-    //         $el->new_values = null;
-    //     }
-
-    //     $el->save();
-    // }
-
     $out = Artisan::output();
     dd($out);
 });
@@ -85,6 +48,11 @@ Route::get('', function () {
     return view('login');
 })->name('login');
 
+Route::prefix('recovery')->group(function () {
+    Route::get('', [WebController::class, 'recovery'])->name('recovery');
+    Route::post('verify', [WebController::class, 'recovery_verify'])->name('recovery.verify');
+    Route::post('reset', [WebController::class, 'recovery_reset'])->name('recovery.reset');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('app-logs', [WebController::class, 'applogs'])->name('applogs');

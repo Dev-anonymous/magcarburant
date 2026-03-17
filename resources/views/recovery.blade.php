@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Connexion | {{ config('app.name') }}</title>
+    <title>Réinitialisation du mot de passe | {{ config('app.name') }}</title>
     <link type="text/css" href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
     <link type="text/css" href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
     <style>
@@ -41,6 +41,11 @@
                         <div class="card mb-3 transparent" style="border-radius: 20px;">
                             <div class="card-body">
                                 <form action="#" flog>
+                                    <div class="py-3">
+                                        <h3 class="text-center">Réinitialisation du mot de passe</h3>
+                                        <p class="text-center text-dark mb-0">Entrez votre adresse email pour recevoir
+                                            les instructions de réinitialisation de votre mot de passe.</p>
+                                    </div>
                                     <div class="form-group">
                                         <label>Email</label>
                                         <div class="input-group input-group--inline">
@@ -53,27 +58,13 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="d-flex">
-                                            <label>Mot de passe</label>
                                             <span class="ml-auto">
-                                                <a href="{{ route('recovery') }}">
-                                                    J'ai oublié mon mot de passe
+                                                <a href="{{ route('login') }}">
+                                                    Retourner à la page de connexion
                                                 </a>
                                             </span>
                                         </div>
-                                        <div class="input-group input-group--inline">
-                                            <div class="input-group-addon">
-                                                <i class="material-icons">lock_outline</i>
-                                            </div>
-                                            <input type="password" class="form-control" name="password"
-                                                placeholder="Votre mot de passe" required>
-                                        </div>
-                                        <div class="custom-control custom-checkbox mt-3">
-                                            <input type="checkbox" name="remember" class="custom-control-input"
-                                                id="customCheck1">
-                                            <label class="custom-control-label" for="customCheck1">
-                                                Rester connecté
-                                            </label>
-                                        </div>
+
                                     </div>
                                     <x-alert />
                                     <button type="submit"
@@ -81,7 +72,7 @@
                                         <x-loader />
                                         <span text>
                                             <i class="material-icons md-18 mr-1 m-0 p-0">lock_open</i>
-                                            Connexion
+                                            Vérifier
                                         </span>
                                     </button>
                                 </form>
@@ -115,7 +106,7 @@
                 $('[text]', btn).hide();
 
                 $.ajax({
-                    url: '{{ route('api.login') }}',
+                    url: '{{ route('recovery.verify') }}',
                     method: 'POST',
                     data: data,
                     headers: {
@@ -126,13 +117,12 @@
                         rep.html(mess).stop().removeClass().addClass(
                                 'p-1 text-center alert alert-success')
                             .show();
-                        localStorage.setItem('_token', resp.token);
                         setTimeout(() => {
-                            $(':input', form).attr('disabled', true);
+                            // $(':input', form).attr('disabled', true);
                         }, 800);
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+                        // setTimeout(() => {
+                        //     location.reload();
+                        // }, 1000);
                     },
                     error: function(xhr, a, b) {
                         var resp = xhr.responseJSON;

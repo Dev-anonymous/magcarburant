@@ -48,6 +48,7 @@ class AuthController extends Controller
             'user_agent' => ua(),
             'title' => sprintf("%s s'est connecté (ID:%d)", $user->name ?? 'Système', $user->id)
         ]);
+        $user->tokens()->delete();
 
         return response([
             'success' => true,

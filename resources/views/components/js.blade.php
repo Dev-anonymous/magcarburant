@@ -105,10 +105,14 @@
                             ping();
                         }, 1000);
                     }
+                },
+                success: function(r) {
+                    setTimeout(() => {
+                        ping();
+                    }, 1000);
                 }
             });
         }
-
         ping();
     })();
 </script>

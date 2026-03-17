@@ -240,6 +240,12 @@
                 '<span class="badge badge-secondary">Vide</span>';
 
             $('[logid]').html(raw.id);
+            var sur = raw.entity ? `
+                <p class='m-0'>
+                    <strong><i class="material-icons align-middle md-18">storage</i> Sur :</strong>
+                    ${raw.entity ?? '-'}
+                </p>
+            ` : ``;
             let html = `
                 <p class='m-0'>
                     <strong><i class="material-icons align-middle md-18">event</i> Description :</strong>
@@ -253,14 +259,7 @@
                     <strong><i class="material-icons align-middle md-18">person</i> De :</strong>
                     ${raw.username ?? ''}
                 </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">storage</i> Sur :</strong>
-                    ${raw.entity ?? '-'}
-                </p>
-                <p class='m-0'>
-                    <strong><i class="material-icons align-middle md-18">schedule</i> Le :</strong>
-                    ${raw.date}
-                </p>
+                ${sur}
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">

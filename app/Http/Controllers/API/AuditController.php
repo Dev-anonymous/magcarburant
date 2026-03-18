@@ -31,9 +31,7 @@ class AuditController extends Controller
         $event = (array) request('event');
 
         $logs = AuditLog::whereBetween('created_at', [$from, $to]);
-        if (count($event)) {
-            $logs->whereIn('event', $event);
-        }
+        $logs->whereIn('event', $event);
 
         if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
             $logs->whereIn('user_id', childrenlist($user));

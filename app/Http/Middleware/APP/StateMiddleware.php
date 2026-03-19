@@ -16,7 +16,15 @@ class StateMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (@request()->user()->user_role !== 'etatique') {
+        $ok = false;
+        $user = $request->user();
+        if ($user) {
+            $parent = $user->user;
+            if ($user->user_role === 'etatique' || $parent && $parent->user_role === 'etatique' && $user->user_role === 'utilisateur') {
+                $ok = true;
+            }
+        }
+        if (!$ok) {
             Auth::guard('web')->logout();
             return redirect(route('login'));
         }

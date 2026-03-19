@@ -31,18 +31,26 @@ Route::get('def', function () {
 
 Route::get('', function () {
     if (Auth::check()) {
-        $role = request()->user()->user_role;
+        $user = request()->user();
+        $role = $user->user_role;
+        $route = null;
+        $parent = $user->user;
+
         if ($role === 'sudo') {
-            return redirect(route('sudo.home'));
+            $route = 'sudo.home';
         }
-        if ($role === 'petrolier') {
-            return redirect(route('provider.home'));
+        if ($role === 'petrolier' || $parent && $parent->user_role === 'petrolier' && $role === 'utilisateur') {
+            $route = 'provider.home';
         }
-        if ($role === 'logisticien') {
-            return redirect(route('logistics.home'));
+        if ($role === 'logisticien' || $parent && $parent->user_role === 'logisticien' && $role === 'utilisateur') {
+            $route = 'logistics.home';
         }
-        if ($role === 'etatique') {
-            return redirect(route('state.home'));
+        if ($role === 'etatique' || $parent && $parent->user_role === 'etatique' && $role === 'utilisateur') {
+            $route = 'state.home';
+        }
+
+        if ($route) {
+            return redirect()->route($route);
         }
     }
     return view('login');

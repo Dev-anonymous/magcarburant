@@ -392,6 +392,15 @@ function userimg(?User $user = null)
             }
             return asset($i);
         }
+        if ($role === 'utilisateur') {
+            $parent = $user->user;
+            $e = $parent?->entities()->first()?->logo;
+            if ($e) {
+                $i  = "storage/$e";
+            }
+            return asset($i);
+        }
+        return asset($i);
     }
 }
 
@@ -647,4 +656,17 @@ function childrenlist(User $user, $withme = true)
         }
     }
     return $t;
+}
+
+function gentity(): Entity
+{
+    $user = request()->user();
+    if (in_array($user->user_role, ['logisticien', 'etatique', 'petrolier'], true)) {
+        return $user->entities()->first();
+    }
+    if ($user->user_role === 'utilisateur') {
+        return $user->user?->entities()->first();
+    }
+
+    throw new Exception("User role not supported for getting entity");
 }

@@ -13,7 +13,7 @@ class StateWebController extends Controller
 {
     function home()
     {
-        $entity = request()->user()->entities()->first();
+        $entity = gentity();
         $entities = Entity::whereIn('users_id', User::whereIn('user_role', ['logisticien', 'petrolier'])->pluck('id'))->orderBy('shortname', 'asc')->get();
         return view('state.choose', compact('entity', 'entities'));
     }
@@ -136,7 +136,7 @@ class StateWebController extends Controller
 
     function reconciliation(Entity $entity)
     {
-        $me = request()->user()->entities()->first();
+        $me = gentity();
         return view('state.views.reconciliation', compact('entity', 'me'));
     }
 

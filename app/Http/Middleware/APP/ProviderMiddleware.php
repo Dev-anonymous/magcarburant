@@ -16,7 +16,15 @@ class ProviderMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (@auth()->user()->user_role !== 'petrolier') {
+        $ok = false;
+        $user = $request->user();
+        if ($user) {
+            $parent = $user->user;
+            if ($user->user_role === 'petrolier' || $parent && $parent->user_role === 'petrolier' && $user->user_role === 'utilisateur') {
+                $ok = true;
+            }
+        }
+        if (!$ok) {
             Auth::guard('web')->logout();
             return redirect(route('login'));
         }

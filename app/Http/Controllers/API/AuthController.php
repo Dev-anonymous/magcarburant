@@ -57,11 +57,12 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $r)
+    public function logout()
     {
         if (Auth::check()) {
             $user = request()->user();
             Auth::guard('web')->logout();
+            $user->tokens()->delete();
 
             AuditLog::create([
                 'user_id'    => $user->id,

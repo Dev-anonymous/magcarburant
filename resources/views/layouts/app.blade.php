@@ -11,6 +11,17 @@
 
 <body class="@yield('bg-class', 'bg-img-1')">
     <x-preloader />
+    @php
+        $user = request()->user();
+        $role = $user->user_role;
+        $parent = $user->user;
+        $isLogisticien =
+            $role === 'logisticien' || ($parent && $parent->user_role === 'logisticien' && $role === 'utilisateur');
+        $isPetrolier =
+            $role === 'petrolier' || ($parent && $parent->user_role === 'petrolier' && $role === 'utilisateur');
+        $isEtatique = $role === 'etatique' || ($parent && $parent->user_role === 'etatique' && $role === 'utilisateur');
+
+    @endphp
 
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
@@ -37,13 +48,12 @@
                                             Route::is('logistics.analyse') ||
                                             Route::is('state.accounting', 'state.analyse'))
                                         @php
-                                            $role = auth()->user()->user_role;
                                             $param = [];
-                                            if ($role == 'logisticien') {
+                                            if ($isLogisticien) {
                                                 $lab = 'logistics';
-                                            } elseif ($role == 'petrolier') {
+                                            } elseif ($isPetrolier) {
                                                 $lab = 'provider';
-                                            } elseif ($role == 'etatique') {
+                                            } elseif ($isEtatique) {
                                                 $lab = 'state';
                                                 $entity = request()->route('entity');
                                                 $mode = request()->route('mode');
@@ -107,10 +117,11 @@
                                         <a href="#"
                                             class="nav-link dropdown-toggle dropdown-clear-caret appcol font-weight-bold"
                                             data-toggle="sidebar" data-target="#user-drawer">
-                                            {{ auth()->user()->name }}
-                                            <img src="{{ userimg() }}" style="border: 2px solid #ccc"
-                                                class="img-fluid rounded-circle ml-1" width="35" />
-                                            <br> <small>{{ ucfirst(auth()->user()->user_role) }}</small>
+                                            {{ $user->name }}
+                                            <img src="{{ userimg() }}"
+                                                style="border: 2px solid #ccc; object-fit: contain; width: 35px!important; height: 35px!important"
+                                                class="img-fluid rounded-circle ml-1" />
+                                            <br> <small>{{ ucfirst($parent->user_role ?? $user->user_role) }}</small>
                                         </a>
                                     </li>
                                 </ul>
@@ -139,9 +150,6 @@
                             </div>
                         </div>
                         <ul class="drawer-menu" id="mainMenu" data-children=".drawer-submenu">
-                            @php
-                                $role = auth()->user()->user_role;
-                            @endphp
                             @if ($role === 'sudo')
                                 <li class="drawer-menu-item @if (Route::is('sudo.home')) active @endif">
                                     <a href="{{ route('sudo.home') }}">
@@ -163,25 +171,12 @@
                                     </ul>
                                 </li>
                             @endif
-                            @if ($role === 'petrolier')
-                                {{-- <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
-                                    <a href="{{ route('provider.home') }}">
-                                        <i class="material-icons">dashboard</i>
-                                        <span class="drawer-menu-text"> Dashboard</span>
-                                    </a>
-                                </li>
-                                <li class="drawer-menu-item @if (Route::is('provider.home')) active @endif">
-                                    <a href="{{ route('provider.apps') }}">
-                                        <i class="material-icons">apps</i>
-                                        <span class="drawer-menu-text"> Applications</span>
-                                    </a>
-                                </li> --}}
-                            @endif
                             <li class="drawer-menu-item drawer-fixed-bottom">
                                 <a href="#" class="nav-link dropdown-toggle dropdown-clear-caret appcol"
                                     data-toggle="sidebar" data-target="#user-drawer">
-                                    <img src="{{ userimg() }}" class="img-fluid rounded-circle ml-1"
-                                        width="35" />
+                                    <img src="{{ userimg() }}"
+                                        style="border: 2px solid #ccc; object-fit: contain; width: 35px!important; height: 35px!important"
+                                        class="img-fluid rounded-circle ml-1" width="35" />
                                     Profil
                                 </a>
                             </li>
@@ -197,11 +192,12 @@
                     <nav class="drawer drawer--light">
                         <div class="drawer-spacer drawer-spacer-border">
                             <div class="media align-items-center">
-                                <img src="{{ userimg() }}" class="img-fluid rounded-circle mr-2" width="35"
-                                    alt="" />
+                                <img src="{{ userimg() }}"
+                                    style="border: 2px solid #ccc; object-fit: contain; width: 35px!important; height: 35px!important"
+                                    class="img-fluid rounded-circle mr-2" alt="" />
                                 <div class="media-body">
-                                    <a class="h5 m-0">{{ auth()->user()->name }}</a>
-                                    <div>{{ ucfirst(auth()->user()->user_role) }}</div>
+                                    <a class="h5 m-0">{{ $user->name }}</a>
+                                    <div>{{ ucfirst($parent->user_role ?? $user->user_role) }}</div>
                                 </div>
                             </div>
                         </div>

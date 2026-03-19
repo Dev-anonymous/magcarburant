@@ -16,7 +16,15 @@ class LogisticsMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (@auth()->user()->user_role !== 'logisticien') {
+        $ok = false;
+        $user = $request->user();
+        if ($user) {
+            $parent = $user->user;
+            if ($user->user_role === 'logisticien' || $parent && $parent->user_role === 'logisticien' && $user->user_role === 'utilisateur') {
+                $ok = true;
+            }
+        }
+        if (!$ok) {
             Auth::guard('web')->logout();
             return redirect(route('login'));
         }

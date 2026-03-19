@@ -17,7 +17,7 @@ class ProviderWebController extends Controller
 {
     function home()
     {
-        $entity = request()->user()->entities()->first();
+        $entity = gentity();
         return view('provider.apps', compact('entity'));
     }
 
@@ -31,19 +31,19 @@ class ProviderWebController extends Controller
         $item = request('item');
         if ($item == 'rtx') {
             $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
             $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('provider.structrates', compact('entity'));
         }
 
         if ($item == 'pricestr') {
             $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('common.structprices', compact('entity'));
         }
 
@@ -61,7 +61,7 @@ class ProviderWebController extends Controller
 
         $stx = request('stx');
         if ($stx) {
-            $entity = request()->user()->entities()->first();
+            $entity = gentity();
             $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
                 initfuelprice($structure);
@@ -115,16 +115,14 @@ class ProviderWebController extends Controller
 
     function analyse()
     {
-        $user = request()->user();
-        $entity = $user->entities()->first();
+        $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.analyse', compact('ps'));
     }
 
     function claim()
     {
-        $user = request()->user();
-        $entity = $user->entities()->first();
+        $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.claim', compact('ps'));
     }
@@ -146,9 +144,8 @@ class ProviderWebController extends Controller
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year');
-            
-        $user = request()->user();
-        $entity = $user->entities()->first();
+
+        $entity = gentity();
 
         return view('provider.security_stock', compact('years', 'entity'));
     }

@@ -128,7 +128,7 @@
                             </div>
                         </div>
                         <div class="text-center">
-                            <a class="text-primary" href="{{ route('users') }}">Gestion des utilisateurs </a>
+                            <a class="text-primary" href="{{ route('users') }}">Gestion des utilisateurs</a>
                             <span>|</span>
                             <a class="text-primary" href="{{ route('roles') }}">Gestion des rôles</a>
                         </div>

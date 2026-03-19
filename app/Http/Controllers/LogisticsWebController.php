@@ -16,7 +16,7 @@ class LogisticsWebController extends Controller
 {
     function home()
     {
-        $entity = request()->user()->entities()->first();
+        $entity = gentity();
         return view('logistics.apps', compact('entity'));
     }
 
@@ -39,20 +39,17 @@ class LogisticsWebController extends Controller
     {
         $item = request('item');
         if ($item == 'rtx') {
-            $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
-            $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('provider.structrates', compact('entity'));
         }
 
         if ($item == 'pricestr') {
-            $user = request()->user();
-            $entity = $user->entities()->first();
+            $entity = gentity();
             return view('common.structprices', compact('entity'));
         }
 
@@ -70,7 +67,7 @@ class LogisticsWebController extends Controller
 
         $stx = request('stx');
         if ($stx) {
-            $entity = request()->user()->entities()->first();
+            $entity = gentity();
             $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
                 initfuelprice($structure);
@@ -109,8 +106,7 @@ class LogisticsWebController extends Controller
 
     function analyse()
     {
-        $user = request()->user();
-        $entity = $user->entities()->first();
+        $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('logistics.analyse', compact('ps'));
     }

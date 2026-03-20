@@ -27,16 +27,29 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasAuditLogs
 {
+    protected static array $ignore = [
+        'remember_token',
+        'updated_at',
+        'created_at',
+    ];
+
+    private static function filterIgnored(array $attributes): array
+    {
+        return array_diff_key($attributes, array_flip(self::$ignore));
+    }
+
     protected static function bootHasAuditLogs()
     {
         static::created(function ($model) {
             $user = Auth::user();
             $tableName = self::mapTableName($model);
+            $new = self::filterIgnored($model->getAttributes());
+
             AuditService::log(
                 'ajout',
                 $model,
                 null,
-                $model->getAttributes(),
+                $new,
                 sprintf("%s a ajouté une donnée (%s [ID:%d])", $user->name ?? 'Système', $tableName, $model->id)
             );
         });
@@ -45,6 +58,9 @@ trait HasAuditLogs
             $user = Auth::user();
             $old = array_intersect_key($model->getOriginal(), $model->getChanges());
             $new = $model->getChanges();
+
+            $old = self::filterIgnored($old);
+            $new = self::filterIgnored($new);
 
             if (!empty($new)) {
                 $tableName = self::mapTableName($model);
@@ -61,10 +77,13 @@ trait HasAuditLogs
         static::deleted(function ($model) {
             $user = Auth::user();
             $tableName = self::mapTableName($model);
+
+            $old = self::filterIgnored($model->getOriginal());
+
             AuditService::log(
                 'suppression',
                 $model,
-                $model->getOriginal(),
+                $old,
                 null,
                 sprintf("%s a supprimé une donnée (%s [ID:%d])", $user->name ?? 'Système', $tableName, $model->id)
             );
@@ -147,7 +166,6 @@ trait HasAuditLogs
         if ($model instanceof Role) {
             return "Rôle";
         }
-
 
         return strtolower(class_basename($model));
     }

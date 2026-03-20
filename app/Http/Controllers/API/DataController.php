@@ -1331,6 +1331,7 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
         $isState = false;
+        $mode = rmode();
         $user = request()->user();
         if ($user->user_role == 'petrolier') {
             $entity = $user->entities()->first();
@@ -1409,7 +1410,7 @@ class DataController extends Controller
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            if ($isState) {
+            if ($isState && $mode === 'edit') {
                 $pmfc_reel = (float) AverageFuelPrice::whereYear('month', $saledate->year)
                     ->whereMonth('month', $saledate->month)
                     ->where('product', $fuel)

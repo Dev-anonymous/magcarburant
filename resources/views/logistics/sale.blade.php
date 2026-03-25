@@ -184,7 +184,12 @@
                             <div class="col-md-12">
                                 <div class="mb-2">
                                     <label class="mb-0">Terminal</label>
-                                    <input class="form-control" required name="terminal">
+                                    <select name="terminal" id="" class="form-control" required>
+                                        <option value="">Sélectionnez un terminal</option>
+                                        @foreach (terminal() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -311,7 +316,11 @@
                             <div class="col-md-12">
                                 <div class="mb-2">
                                     <label class="mb-0">Terminal</label>
-                                    <input class="form-control" required name="terminal">
+                                    <select name="terminal" id="" class="form-control" required>
+                                        @foreach (terminal() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -662,7 +671,7 @@
                 exportOptions: {
                     columns: ':not(.no-export)',
                     format: {
-                       body: function(data, row, column, node) {
+                        body: function(data, row, column, node) {
                             if (!data) return data;
                             let text = $('<div>').html(data).text().trim();
                             if ($(node).find('input[type="checkbox"]').length > 0) {

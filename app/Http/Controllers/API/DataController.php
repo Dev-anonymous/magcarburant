@@ -652,7 +652,7 @@ class DataController extends Controller
                 $dl2 = ucfirst($toObj->translatedFormat('F')) . ' ' . $toObj->format('Y');
 
                 if (!$sscr) {
-                    $err = ["Aucun valeur stock de sécurité collecté reversé n'a été trouvé : $dl1 - $dl2"];
+                    $err = ["Aucune valeur stock de sécurité collecté reversé n'a été trouvé : $dl1 - $dl2"];
                     $data['errors'] = array_merge($err, $data['errors']);
                 }
 
@@ -949,6 +949,8 @@ class DataController extends Controller
                 $data = $this->greatBookLogData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
+                $terminal = (array) request('terminal');
+                $termTab = terminal();
 
                 $dhead = $data['head'];
                 $drows = $data['rows'];
@@ -986,6 +988,12 @@ class DataController extends Controller
                             abort_if(is_null($index), 422, "Can't process: label \"$ti->label\" not found in greatebook");
 
                             foreach ($drows as $r) {
+                                $term = $r[0]['v'];
+                                abort_if(!in_array($term, $termTab), 422, "Can't process: Invalid terminal : $term");
+                                if (!in_array($term, $terminal)) {
+                                    continue;
+                                }
+
                                 $v = (float) $r[$index]['vv'];
                                 $zo = $r[3]['v'];
                                 $pro = $r[4]['v'];
@@ -1008,7 +1016,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => $ti->label,
                         'class' => 'title1',
-                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $t0 = 0;
@@ -1018,7 +1026,7 @@ class DataController extends Controller
                         $line0[] = [
                             'label' => v($v),
                             'class' => 'title1',
-                            'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
+                            'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val, 'z' => $z]),
                             'title' => "Afficher les valeurs $ti->label de la zone $z",
                         ];
                         $t0 += $v;
@@ -1031,7 +1039,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($t0),
                         'class' => 'title1',
-                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
+                        'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2'), 'el' => $ti->val]),
                         'title' => "Afficher les valeurs $ti->label de toutes les zones",
                     ];
                     $rows[] = $line0;
@@ -1041,7 +1049,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => "TOTAL GENERAL",
                     'class' => 'title1',
-                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $t0 = 0;
@@ -1050,7 +1058,7 @@ class DataController extends Controller
                     $line0[] = [
                         'label' => v($v),
                         'class' => 'title1',
-                        'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
+                        'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2'), 'z' => $z]),
                         'title' => "Afficher le Total de la zone $z",
                     ];
                     $t0 += $v;
@@ -1059,7 +1067,7 @@ class DataController extends Controller
                 $line0[] = [
                     'label' => v($t0),
                     'class' => 'title1',
-                    'href' => gb_href(['item' => 'gb', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'href' => gb_href(['item' => 'gb', 'terminal' => request('terminal'), 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => 'Afficher les détails pour toutes les zones'
                 ];
                 $rows[] = $line0;
@@ -1963,6 +1971,7 @@ class DataController extends Controller
     {
         $reqzone = (array) request('zone');
         $reqfuel = (array) request('fuel');
+        $terminal = (array) request('terminal');
         $items = request('items');
 
         $user = request()->user();
@@ -2011,7 +2020,7 @@ class DataController extends Controller
 
         $head = [...$head, ...$labels];
 
-        $sales = $entity->sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
+        $sales = $entity->sales()->whereIn('terminal', $terminal)->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
             $q->whereIn('product', $reqfuel);
             $q->whereIn('way', $reqzone);
         })->whereBetween('date', [$from, $to])->orderBy('date')->get();

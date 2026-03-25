@@ -57,7 +57,7 @@
                             </select>
                         </div>
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname) </label>
+                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname|Terminal) </label>
                             <input type="text" class="form-control" id="validationCustom01" placeholder="Ex: ENGEN"
                                 name="shortname" required>
                         </div>
@@ -116,9 +116,9 @@
                     <input type="hidden" name="action" value="update">
                     <div class="modal-body">
                         <div class="mb-2">
-                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname) </label>
+                            <label class="mb-0" for="validationCustom01">Sigle de l'utilisateur (Shortname|Terminal) </label>
                             <input type="text" class="form-control" id="validationCustom01" placeholder="Ex: ENGEN"
-                                name="shortname" required>
+                                name="shortname" disabled>
                         </div>
                         <div class="mb-2">
                             <label class="mb-0" for="validationCustom01">Nom complet de l'utilisateur </label>

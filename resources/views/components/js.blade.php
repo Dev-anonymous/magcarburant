@@ -85,6 +85,7 @@
             var btn = $(this);
             btn.children().hide();
             $('[loader]', btn).show();
+            Window.donotshowmodal = true
             logout();
         });
 
@@ -96,7 +97,10 @@
                 },
                 error: function(x) {
                     if (401 == x.status) {
-                        $('#mdlautoout').modal('show');
+                        if (!Window.donotshowmodal) {
+                            $('#mdlautoout').modal('show');
+                        }
+
                         setTimeout(() => {
                             logout();
                         }, 5000);

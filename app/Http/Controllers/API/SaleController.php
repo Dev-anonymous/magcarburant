@@ -137,21 +137,28 @@ class SaleController extends Controller
             $id = request('id');
             $sale = Sale::findOrFail($id);
 
-            $validated = $request->validate([
-                'date' => 'required|string|date|before_or_equal:today',
-                'terminal'  => 'required|string|max:255',
-                'product' => 'required|string|in:' . implode(',', mainfuels()),
-                'way' => 'required|string|in:' . implode(',', mainWays()),
-                'client'  => 'required|string|max:128',
-                'locality'  => 'required|string',
-                'delivery_note'  => 'required|string',
-                'delivery_program'  => 'required|string',
-                'lata'  => 'required|numeric|min:0',
-                'l15'  => 'required|numeric|min:0',
-                'density'  => 'required|numeric|min:0.001',
-                'salefile' => 'nullable|array',
-                'salefile.*' => 'mimes:pdf|max:10240'
-            ]);
+            $validated = $request->validate(
+                [
+                    'date' => 'required|string|date|before_or_equal:today',
+                    'terminal'  => 'required|string|in:' . implode(',', terminal()),
+                    'product' => 'required|string|in:' . implode(',', mainfuels()),
+                    'way' => 'required|string|in:' . implode(',', mainWays()),
+                    'client'  => 'required|string|max:128',
+                    'locality'  => 'required|string',
+                    'delivery_note'  => 'required|string',
+                    'delivery_program'  => 'required|string',
+                    'lata'  => 'required|numeric|min:0',
+                    'l15'  => 'required|numeric|min:0',
+                    'density'  => 'required|numeric|min:0.001',
+                    'salefile' => 'nullable|array',
+                    'salefile.*' => 'mimes:pdf|max:10240'
+                ],
+                [
+                    'terminal.in' => "Le terminal doit être l'un de ces éléments : " . implode(', ', terminal()),
+                    'product.in' => "Le produit doit être l'un de ces éléments : " . implode(', ', mainfuels()),
+                    'way.in' => "La voie doit être l'un de ces éléments : " . implode(', ', mainWays()),
+                ]
+            );
 
             abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
 
@@ -252,6 +259,11 @@ class SaleController extends Controller
                 // === B : Terminal ===
                 if (empty($colB)) {
                     $lineErrors[] = "Cellule B$rowNumber : veuillez renseigner le terminal";
+                } else {
+                    $colB = strtoupper($colB);
+                    if (!in_array($colB, terminal(), true)) {
+                        $lineErrors[] = "Cellule B$rowNumber : le terminal \"$colB\" n'est pas valide, les terminaux valides sont : " . implode(', ', terminal());
+                    }
                 }
 
                 // === C : Localité ===
@@ -260,8 +272,10 @@ class SaleController extends Controller
                 }
 
                 // === D : Voie ===
-                if (!in_array($colD, mainWays(), true)) {
-                    $lineErrors[] = "Cellule D$rowNumber : la voie \"$colD\" n'est pas valide";
+                if (empty($colD)) {
+                    $lineErrors[] = "Cellule D$rowNumber : veuillez renseigner la voie";
+                } elseif (!in_array($colD, mainWays(), true)) {
+                    $lineErrors[] = "Cellule D$rowNumber : la voie \"$colD\" n'est pas valide, les voies valides sont : " . implode(', ', mainWays());
                 }
 
                 // === E : Produit ===
@@ -392,21 +406,28 @@ class SaleController extends Controller
             }
             abort_if(!$entity, 422, "No entity");
 
-            $validated = $request->validate([
-                'date' => 'required|string|date|before_or_equal:today',
-                'terminal'  => 'required|string|max:255',
-                'product' => 'required|string|in:' . implode(',', mainfuels()),
-                'way' => 'required|string|in:' . implode(',', mainWays()),
-                'client'  => 'required|string|max:128',
-                'locality'  => 'required|string',
-                'delivery_note'  => 'required|string',
-                'delivery_program'  => 'required|string',
-                'lata'  => 'required|numeric|min:0',
-                'l15'  => 'required|numeric|min:0',
-                'density'  => 'required|numeric|min:0.001',
-                'salefile' => 'nullable|array',
-                'salefile.*' => 'mimes:pdf|max:10240'
-            ]);
+            $validated = $request->validate(
+                [
+                    'date' => 'required|string|date|before_or_equal:today',
+                    'terminal'  => 'required|string|in:' . implode(',', terminal()),
+                    'product' => 'required|string|in:' . implode(',', mainfuels()),
+                    'way' => 'required|string|in:' . implode(',', mainWays()),
+                    'client'  => 'required|string|max:128',
+                    'locality'  => 'required|string',
+                    'delivery_note'  => 'required|string',
+                    'delivery_program'  => 'required|string',
+                    'lata'  => 'required|numeric|min:0',
+                    'l15'  => 'required|numeric|min:0',
+                    'density'  => 'required|numeric|min:0.001',
+                    'salefile' => 'nullable|array',
+                    'salefile.*' => 'mimes:pdf|max:10240'
+                ],
+                [
+                    'terminal.in' => "Le terminal doit être l'un de ces éléments : " . implode(', ', terminal()),
+                    'product.in' => "Le produit doit être l'un de ces éléments : " . implode(', ', mainfuels()),
+                    'way.in' => "La voie doit être l'un de ces éléments : " . implode(', ', mainWays()),
+                ]
+            );
 
             abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
 

@@ -670,3 +670,11 @@ function gentity(): Entity
 
     throw new Exception("User role not supported for getting entity");
 }
+
+
+function terminal()
+{
+    return Entity::whereIn('id', User::where('user_role', 'logisticien')->pluck('id'))->pluck('shortname')->map(function ($item) {
+        return strtoupper($item);
+    })->all();
+}

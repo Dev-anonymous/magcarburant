@@ -57,6 +57,15 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="form-group mb-1">
+                                <label for="fuel" class="control-label d-block mb-0">Terminal</label>
+                                <select name="terminal[]" id="fuel" class="form-control" multiple
+                                    style="min-width:150px;">
+                                    @foreach (terminal() as $e)
+                                        <option >{{ $e }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </form>
                     </div>
                     <x-dataloader />
@@ -242,6 +251,17 @@
             buttonClass: 'btn btn-primary'
         });
 
+        $('[name="terminal[]"]').multiselect({
+            includeSelectAllOption: true,
+            nonSelectedText: 'Aucun filtre',
+            nSelectedText: 'terminaux sélectionnés',
+            allSelectedText: 'Tous les terminaux',
+            numberDisplayed: 1,
+            selectAllText: 'Tous',
+            buttonWidth: '100%',
+            buttonClass: 'btn btn-primary'
+        });
+
 
         var ff = $('#ffilter');
 
@@ -259,6 +279,7 @@
         var item = '{{ request('el') }}';
         var zone = '{{ request('z') }}';
         var fuel = '{{ request('fuel') }}';
+        var terminal = @json(request('terminal'));
         if (date1.length) {
             $('[name="date1"]')[0]._flatpickr.setDate(date1, true);
         }
@@ -275,6 +296,10 @@
         if (fuel.length) {
             $('[name="fuel[]"]').val([fuel]).change();
             $('[name="fuel[]"]').multiselect('refresh');
+        }
+        if (terminal && terminal.length) {
+            $('[name="terminal[]"]').val(terminal).change();
+            $('[name="terminal[]"]').multiselect('refresh');
         }
 
         getData();

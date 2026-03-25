@@ -1,4 +1,4 @@
-name: 🚀 Déploiement automatique sur LWS
+name: 🚀 Déploiement automatique sur Serveur
 
 on:
   push:
@@ -52,22 +52,3 @@ jobs:
           local-dir: ./_tmp_data_public/
           security: loose
 
-      # ============================
-      # 🔥 COMMANDES SERVEUR (SSH)
-      # ============================
-
-      # - name: 🔑 Exécuter composer install & migrate via SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USER }}
-      #     password: ${{ secrets.SSH_PASSWORD }}
-      #     port: ${{ secrets.SSH_PORT }}
-      #     script: |
-      #       cd ${{ secrets.SSH_PATH }}
-
-      #       php -v
-      #       composer install --no-dev --optimize-autoloader
-
-      #       php artisan migrate --force
-      #       php artisan optimize:clear

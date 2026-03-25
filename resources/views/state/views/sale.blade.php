@@ -204,6 +204,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <p id="termlabel" class="text-danger"></p>
                             </div>
                         </div>
                         <div class="row">
@@ -405,6 +406,9 @@
                             <label class="mb-0">Vous pouvez sélectionner plusieurs fichiers à la fois</label>
                             <input type="file" multiple class="form-control" name="salefile[]">
                         </div>
+                        <p class="text-danger">Si vous modifiez cette vente, pensez à faire de même dans le module « Mode
+                            Ecriture -> Ventes »
+                        </p>
                         <x-alert />
                     </div>
                     <div class="modal-footer">
@@ -597,6 +601,22 @@
             var t = $(this).data('target');
             $(`${t}`).modal('show');
         });
+
+        var selterm = $('[name="terminal"]', $('#mdladd'));
+
+        function slab() {
+            var v = selterm.val();
+            var h = '';
+            if (v.length) {
+                h =
+                    `Si vous enregistrez cette vente de {{ $entity->shortname }}, elle sera automatiment enregistrée dans le  module « Mode Ecriture -> Ventes » pour le compte de ${v}.`;
+            }
+            $('#termlabel').html(h);
+        }
+        slab();
+        selterm.change(function() {
+            slab();
+        })
 
         function formatFr(val) {
             if (val === '' || val === null || isNaN(val)) return '';

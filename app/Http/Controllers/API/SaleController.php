@@ -353,7 +353,7 @@ class SaleController extends Controller
                 $sale = Sale::create($ins);
                 $insert[] = $ins;
 
-                if ($user->user_role == 'etatique') {
+                if ($user->user_role === 'etatique') {
                     $logTerm = Entity::where('shortname', $colB)->first();
                     abort_if(!$logTerm, 422, "Le terminal spécifié ($colB) n'existe pas dans la base de données."); // uhm
                     $ins2 = $ins;
@@ -445,7 +445,7 @@ class SaleController extends Controller
 
             $sale = Sale::create($validated);
 
-            if ($user->user_role == 'etatique') {
+            if ($user->user_role === 'etatique') {
                 $logTerm = Entity::where('shortname', $validated['terminal'])->first();
                 abort_if(!$logTerm, 422, "Le terminal spécifié (" . $validated['terminal'] . ") n'existe pas dans la base de données."); // uhm
                 $validated2 = $validated;

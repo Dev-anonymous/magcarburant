@@ -5,6 +5,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+        /* background: rgb(182, 212, 238); */
         background: var(--appcolor);
         display: flex;
         align-items: center;
@@ -12,32 +13,13 @@
         z-index: 999999;
     }
 
-    /* .spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid #e0e0e0;
-        border-top-color: var(--appcolor) !important;
-        ;
-        border-radius: 50%;
-        animation: spin 0.5s linear infinite;
-    }
-
-    @keyframes spin {
-        100% {
-            transform: rotate(360deg);
-        }
-    } */
-
-
-
-
     /* ///  */
     .loader {
         transform: rotateZ(45deg);
         perspective: 1000px;
         border-radius: 50%;
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         color: #fff;
     }
 
@@ -120,7 +102,6 @@
 
 <div>
     <div id="preloader">
-        {{-- <div class="spinner"></div> --}}
         <span class="loader"></span>
     </div>
 </div>

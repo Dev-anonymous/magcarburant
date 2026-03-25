@@ -178,7 +178,12 @@
                             <div class="col-md-12">
                                 <div class="mb-2">
                                     <label class="mb-0">Terminal</label>
-                                    <input class="form-control" required name="terminal">
+                                    <select name="terminal" id="" class="form-control" required>
+                                        <option value="">Sélectionnez un terminal</option>
+                                        @foreach (terminal() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -305,7 +310,11 @@
                             <div class="col-md-12">
                                 <div class="mb-2">
                                     <label class="mb-0">Terminal</label>
-                                    <input class="form-control" required name="terminal">
+                                    <select name="terminal" id="" class="form-control" required>
+                                        @foreach (terminal() as $e)
+                                            <option>{{ $e }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>

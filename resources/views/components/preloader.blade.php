@@ -5,7 +5,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: #fff;
+        background: var(--appcolor);
         display: flex;
         align-items: center;
         justify-content: center;

@@ -788,11 +788,11 @@
                     n++;
                 }
             });
+            var f = $('[fdel2]');
             if (show) {
                 var t = `Supprimer ${n} élément` + (n > 1 ? 's' : '');
                 $('#btnDelAll').slideDown().find('[text]').html(t);
                 $('[deltext]').html(t.toLowerCase());
-                var f = $('[fdel2]');
                 $('[name="ids"]', f).val(JSON.stringify(ids));
                 $('[name="id"]', f).val(ids[0]);
             } else {

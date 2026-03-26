@@ -198,7 +198,7 @@ class DefaultDataSeeder extends Seeder
 
         $mod_log = [
             'Vente' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
-            'Vente liées aux STEs minières' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            // 'Vente liées aux STEs minières' => ['Créer', 'Lire', 'Modifier', 'Supprimer'], //////// delete
             'Tableau de bord' => ['Lire'],
             'Audit' => ['Lire'],
             'Gestion des utilisateurs' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
@@ -225,16 +225,30 @@ class DefaultDataSeeder extends Seeder
             'etatique' => $mod_etat,
         ];
 
+        $expectedPermissions = [];
         foreach ($modulesCrud as $role => $perms) {
             foreach ($perms as $module => $actions) {
                 foreach ($actions as $action) {
-                    Permission::firstOrCreate([
+                    $expectedPermissions[] = [
                         'user_role' => $role,
                         'name' => "{$module} - {$action}",
-                    ]);
+                    ];
                 }
             }
         }
+
+        foreach ($expectedPermissions as $perm) {
+            Permission::firstOrCreate($perm);
+        }
+
+        $expected = collect($expectedPermissions);
+        $r = Permission::all()->filter(function ($perm) use ($expected) {
+            return !$expected->contains(function ($p) use ($perm) {
+                return $p['user_role'] === $perm->user_role
+                    && $p['name'] === $perm->name;
+            });
+        });
+        $r->each->delete();
 
         DB::commit();
     }

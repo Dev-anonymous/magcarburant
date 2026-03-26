@@ -20,7 +20,10 @@
         $isPetrolier =
             $role === 'petrolier' || ($parent && $parent->user_role === 'petrolier' && $role === 'utilisateur');
         $isEtatique = $role === 'etatique' || ($parent && $parent->user_role === 'etatique' && $role === 'utilisateur');
-
+        $role2 = '';
+        if ($role === 'utilisateur') {
+            $role2 = "({$user->role->name})";
+        }
     @endphp
 
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
@@ -121,7 +124,11 @@
                                             <img src="{{ userimg() }}"
                                                 style="border: 2px solid #ccc; object-fit: contain; width: 35px!important; height: 35px!important"
                                                 class="img-fluid rounded-circle ml-1" />
-                                            <br> <small>{{ ucfirst($parent->user_role ?? $user->user_role) }}</small>
+                                            <br>
+                                            <small>
+                                                {{ ucfirst($parent->user_role ?? $user->user_role) }}
+                                                {{ ucfirst($role2) }}
+                                            </small>
                                         </a>
                                     </li>
                                 </ul>
@@ -197,7 +204,10 @@
                                     class="img-fluid rounded-circle mr-2" alt="" />
                                 <div class="media-body">
                                     <a class="h5 m-0">{{ $user->name }}</a>
-                                    <div>{{ ucfirst($parent->user_role ?? $user->user_role) }}</div>
+                                    <div>
+                                        {{ ucfirst($parent->user_role ?? $user->user_role) }}
+                                        {{ ucfirst($role2) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

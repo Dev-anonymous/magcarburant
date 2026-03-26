@@ -81,21 +81,44 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Modules utilisables et permissions pour ce rôle</label>
+                            @php
+                                $groupedPermissions = collect($permissions)->groupBy(function ($item) {
+                                    return explode(' - ', $item->name)[0];
+                                });
+                            @endphp
                             <div class="border rounded p-3 mb-2" style="max-height: 300px; overflow-y: auto;">
-                                <div class="row">
-                                    @foreach ($permissions as $permission)
-                                        <div class="col-12 col-md-3">
-                                            <div class="custom-control custom-checkbox mt-1">
-                                                <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
-                                                    id="perm2_{{ $permission->id }}" class="custom-control-input">
-                                                <label class="custom-control-label" for="perm2_{{ $permission->id }}">
-                                                    {{ $permission->name }}
+                                @foreach ($groupedPermissions as $group => $perms)
+                                    <div class="mb-3">
+                                        <div class="bg-light p-2" style="border-radius: 10px;border:1px solid #dee2e6">
+                                            <div class="custom-control custom-checkbox parent-label">
+                                                <input type="checkbox" class="custom-control-input parent-checkbox"
+                                                    id="parent_{{ Str::slug($group) }}">
+                                                <label class="custom-control-label font-weight-bold text-primary"
+                                                    for="parent_{{ Str::slug($group) }}">
+                                                    {{ $group }}
                                                 </label>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                        <div class="row ml-4 border-left pl-3 mt-2">
+                                            @foreach ($perms as $permission)
+                                                <div class="col-12 col-md-3">
+                                                    <div class="custom-control custom-checkbox mt-1">
+                                                        <input type="checkbox" name="permissions[]"
+                                                            value="{{ $permission->name }}" id="perm2_{{ $permission->id }}"
+                                                            class="custom-control-input child-checkbox parent_{{ Str::slug($group) }}">
+                                                        <label class="custom-control-label"
+                                                            for="perm2_{{ $permission->id }}">
+                                                            {{ explode(' - ', $permission->name)[1] }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
+
+
                             <div class="mb-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary checkAll">
                                     Tout cocher
@@ -164,16 +187,42 @@
 @section('script')
     <x-datatable />
 
+    <style>
+        .parent-label {
+            background-color: #f8f9fa;
+        }
+
+        .child-checkbox+.custom-control-label {
+            color: #555;
+        }
+    </style>
+
     <script>
         $(document).on('click', '.checkAll', function() {
             var form = $(this).closest('form');
             $('input[name="permissions[]"]', form).prop('checked', true);
+            $('.parent-checkbox', form).prop('checked', true);
         });
 
         $(document).on('click', '.uncheckAll', function() {
             var form = $(this).closest('form');
             $('input[name="permissions[]"]', form).prop('checked', false);
+            $('.parent-checkbox', form).prop('checked', false);
         });
+
+        $(document).on('change', '.parent-checkbox', function() {
+            var groupClass = $(this).attr('id');
+            $('.' + groupClass).prop('checked', $(this).prop('checked'));
+        });
+
+        // Si tous les enfants sont cochés/décochés, mettre à jour le parent
+        $(document).on('change', '.child-checkbox', function() {
+            var parentId = $(this).attr('class').match(/parent_[^\s]+/)[0];
+            var parentCheckbox = $('#' + parentId);
+            var allChecked = $('.' + parentId).length === $('.' + parentId + ':checked').length;
+            parentCheckbox.prop('checked', allChecked);
+        });
+
 
         $('#badd').click(function() {
             var mdl = $('#mdlAdd');
@@ -259,6 +308,15 @@
             raw.perms.forEach(function(permId) {
                 $('#perm2_' + permId, mdl).prop('checked', true);
             });
+
+            $('.parent-checkbox', mdl).each(function() {
+                var parentId = $(this).attr('id');
+                var groupClass = 'parent_' + parentId.replace('parent_', '');
+                var allChecked = $('.' + groupClass, mdl).length === $('.' + groupClass + ':checked', mdl)
+                    .length;
+                $(this).prop('checked', allChecked);
+            });
+
             mdl.modal('show');
         });
 

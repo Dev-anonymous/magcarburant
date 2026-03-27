@@ -17,30 +17,19 @@ class RateController extends Controller
      */
     public function index()
     {
+        can('Taux réels - Lire', true);
+
         $user = request()->user();
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif (in_array($user->user_role, ['etatique'])) {
-                $entity  = Entity::findOrFail(request('entity_id'));
-            } else {
-                abort(403);
-            }
-            abort_if(!$entity, 422, "No entity");
-            $data = $entity->rates();
-            // }
-        } else if ($user->user_role === 'sudo') {
-            // $entity = Entity::find(request('entity_id'));
-            // if ($type == 'structure') {
-            //     // admin structure rate
-            //     $rates = Rate::where('type', 'structure');
-            // } else {
-            //     $rates = $entity->rates;
-            // }
-            abort(403);
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+        } elseif (isEtaUser()) {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
         }
+        abort_if(!$entity, 422, "No entity");
+        $data = $entity->rates();
+
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -62,6 +51,26 @@ class RateController extends Controller
                     'usd_cdf' => $row->usd_cdf,
                 ]));
 
+                $btn = "";
+                $btn1 = "
+                    <a class='dropdown-item' href='#' bedit data='$data'>
+                        <i class='material-icons md-14 align-middle'>edit</i>
+                        <span class='align-middle'>Modifier</span>
+                    </a>
+                ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Taux réels - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Taux réels - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -77,17 +86,14 @@ class RateController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class='dropdown-item' href='#' bedit data='$data'>
-                                <i class='material-icons md-14 align-middle'>edit</i>
-                                <span class='align-middle'>Modifier</span>
-                            </a>
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
+
+                if (empty($btn)) {
+                    $t = '';
+                }
 
                 return $t;
             })
@@ -101,6 +107,8 @@ class RateController extends Controller
     public function store(Request $request)
     {
         if (request('action') == 'update') {
+            can('Taux réels - Modifier', true);
+
             $validated = $request->validate([
                 'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -116,9 +124,13 @@ class RateController extends Controller
             $id = request('id');
             $rate = Rate::findOrFail($id);
             $entity = $rate->entity;
-            abort_if(in_array($user->user_role, ['petrolier', 'logisticien']) && $entity->users_id != $user->id, 403, "No permission !!!");
+            $parent = $user->user;
+            if ($parent) {
+                $user = $parent; // enfant qui essaie de modifier
+            }
+            abort_if((isPetroUser() || isLogUser()) && $entity->users_id != $user->id, 403, "No permission !!!");
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+            if (isPetroUser() || isLogUser()) {
                 //
             } else {
                 abort(403);
@@ -171,6 +183,8 @@ class RateController extends Controller
                 'message' => "Le taux a été mis à jour avec succès.",
             ], 200);
         } else {
+            can('Taux réels - Créer', true);
+
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -182,8 +196,8 @@ class RateController extends Controller
             ]);
 
             $user = request()->user();
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
                 abort_if(!$entity, 422, "No entity");
                 $rate = $entity->rates();
                 $lastTx = $entity->rates()->orderByDesc('from')->first();
@@ -240,8 +254,14 @@ class RateController extends Controller
      */
     public function destroy(Rate $rate)
     {
+        can('Taux réels - Supprimer', true);
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien']), 403, "No permission");
+        $parent = $user->user;
+        if ($parent) {
+            $user = $parent; // enfant qui essaie de modifier
+        }
+
+        abort_if(!(isPetroUser() || isLogUser()), 403, "No permission");
         abort_if($rate->entity->users_id != $user->id, 403, "Not permit");
 
         $last = $rate->entity->rates()->orderByDesc('from')->first();

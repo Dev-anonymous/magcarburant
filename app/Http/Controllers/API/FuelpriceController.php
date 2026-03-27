@@ -37,12 +37,16 @@ class FuelpriceController extends Controller
      */
     public function update(Request $request, Fuelprice $fuelprice)
     {
+        can('Structure des prix - Modifier', true);
+
         $validated = $request->validate([
             'price' => 'required|numeric',
         ]);
         $user = request()->user();
-        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+        abort_unless(isProLogEtaUser(), 403, "No permission");
+        if (isPetroUser() || isLogUser()) {
+            $parent = $user->user;
+            if ($parent) $user = $parent;
             abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
         } else {
             //

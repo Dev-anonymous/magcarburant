@@ -101,14 +101,15 @@
                                                 </table>
                                             </div>
                                             <div class="">
-                                                @if (in_array(auth()->user()->user_role, ['logisticien', 'petrolier']))
-                                                    <div class="text-right">
-                                                        <button class="btn btn-sm btn-edit-table">
-                                                            <i class="material-icons md-18">edit</i>
-                                                            Modifier les prix
-                                                        </button>
-                                                    </div>
-                                                @endif
+                                                @canlocal((isPetroUser() || isLogUser()) && can('Structure des prix -
+                                                Modifier'))
+                                                <div class="text-right">
+                                                    <button class="btn btn-sm btn-edit-table">
+                                                        <i class="material-icons md-18">edit</i>
+                                                        Modifier les prix
+                                                    </button>
+                                                </div>
+                                                @endcanlocal
                                             </div>
                                         </div>
                                     </div>

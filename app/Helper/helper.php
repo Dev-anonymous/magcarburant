@@ -456,8 +456,8 @@ function itemsPara()
 function itemslog()
 {
     $user = request()->user();
-    if ($user->user_role === 'logisticien') {
-        $name = $user->entities()->first()?->shortname;
+    if (isLogUser()) {
+        $name = gentity()->shortname;
         if ($name == 'SEP CONGO') {
             return  [
                 (object)['label' => 'PMAG CHANGE SEP CONGO', 'val' => 'item2'],
@@ -710,7 +710,7 @@ function isEtaUser()
 
 function terminal()
 {
-    return Entity::whereIn('id', User::where('user_role', 'logisticien')->pluck('id'))->pluck('shortname')->map(function ($item) {
+    return Entity::whereIn('users_id', User::where('user_role', 'logisticien')->pluck('id'))->pluck('shortname')->map(function ($item) {
         return strtoupper($item);
     })->all();
 }

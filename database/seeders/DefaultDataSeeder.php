@@ -25,6 +25,23 @@ class DefaultDataSeeder extends Seeder
             User::create(['name' => 'Admin', 'email' => 'admin@admin.admin', 'password' => Hash::make('admin1001'), 'user_role' => 'sudo']);
         }
 
+        $zones = mainWays();
+        foreach ($zones as $e) {
+            Zone::firstOrCreate(['zone' => $e]);
+        }
+
+        $fuels = [
+            ['fuel' => 'ESSENCE', 'fuel_type' => 'terrestre'],
+            ['fuel' => 'PETROLE', 'fuel_type' => 'terrestre'],
+            ['fuel' => 'GASOIL', 'fuel_type' => 'terrestre'],
+            ['fuel' => 'FOMI', 'fuel_type' => 'terrestre'],
+            ['fuel' => 'JET', 'fuel_type' => 'aviation'],
+        ];
+
+        foreach ($fuels as $f) {
+            Fuel::firstOrCreate($f);
+        }
+
         $entities = [
             ['TOTAL', 'TOTAL ENERGIES SA', 'petrolier'],
             ['ENGEN', 'ENGEN RDC SA', 'petrolier'],
@@ -80,23 +97,6 @@ class DefaultDataSeeder extends Seeder
                 $ewz->zone_id = $zone->id;
                 $ewz->save();
             }
-        }
-
-        $zones = mainWays();
-        foreach ($zones as $e) {
-            Zone::firstOrCreate(['zone' => $e]);
-        }
-
-        $fuels = [
-            ['fuel' => 'ESSENCE', 'fuel_type' => 'terrestre'],
-            ['fuel' => 'PETROLE', 'fuel_type' => 'terrestre'],
-            ['fuel' => 'GASOIL', 'fuel_type' => 'terrestre'],
-            ['fuel' => 'FOMI', 'fuel_type' => 'terrestre'],
-            ['fuel' => 'JET', 'fuel_type' => 'aviation'],
-        ];
-
-        foreach ($fuels as $f) {
-            Fuel::firstOrCreate($f);
         }
 
         $labels = [
@@ -191,7 +191,7 @@ class DefaultDataSeeder extends Seeder
             'Grand livre manque à gagner' => ['Lire'],
             'Grand livre croisement des créances' => ['Lire'],
             'Grand livre fiscalité' => ['Lire'],
-            'Structure des prix' => ['Lire', 'Modifier'],
+            'Structure des prix' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux structures' => ['Lire'],
         ];
@@ -207,7 +207,7 @@ class DefaultDataSeeder extends Seeder
             'Comptabilité' => ['Lire'],
             'Bilan manque à gagner' => ['Lire'],
             'Grand livre manque à gagner' => ['Lire'],
-            'Structure des prix' => ['Lire', 'Modifier'],
+            'Structure des prix' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux réels' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Taux structures' => ['Lire'],
         ];

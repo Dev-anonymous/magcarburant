@@ -15,25 +15,24 @@ class TxStructure extends Controller
      */
     public function index()
     {
+        can('Taux structures - Lire', true);
+
         $user = request()->user();
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-                abort_if(!$entity, 422, "No entity");
-                $data = $entity->structureprices();
-            } elseif (in_array($user->user_role, ['etatique'])) {
-                if (from_state() || ('view' === rmode() && null == request('entity_id'))) { // mode edit
-                    $data  = StateStructureprice::query();
-                } else {
-                    $entity = Entity::findOrFail(request('entity_id'));
-                    $data = $entity->structureprices();
-                }
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+            abort_if(!$entity, 422, "No entity");
+            $data = $entity->structureprices();
+        } elseif (isEtaUser()) {
+            if (from_state() || ('view' === rmode() && null == request('entity_id'))) { // mode edit
+                $data  = StateStructureprice::query();
             } else {
-                abort(403);
+                $entity = Entity::findOrFail(request('entity_id'));
+                $data = $entity->structureprices();
             }
         } else {
             abort(403);
         }
+
 
         return DataTables::of($data)
             ->addIndexColumn()

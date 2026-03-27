@@ -26,7 +26,7 @@
                         <h4 class="card-title font-weight-bold">
                             Historique des taux
                         </h4>
-                        @if (in_array(auth()->user()->user_role, ['petrolier', 'logisticien']))
+                        @if ((isPetroUser() || isLogUser()) && can('Taux réels - Créer'))
                             <div class="">
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                     <i class="material-icons md-24">add_circle_outline</i>

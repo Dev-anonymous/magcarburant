@@ -17,12 +17,13 @@ class StructurepriceController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['sudo', 'petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        can('Structure des prix - Lire', true);
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity = $user->entities()->first();
-        } elseif (in_array($user->user_role, ['etatique'])) {
+        $user = request()->user();
+
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+        } elseif (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -43,19 +44,23 @@ class StructurepriceController extends Controller
             })
             ->addColumn('view', function ($row) use ($user, $entity) {
                 $param = ['stx' => $row->id];
-                if ($user->user_role == 'petrolier') {
+                if (isPetroUser()) {
                     $href = route('provider.accounting', $param);
-                } elseif ($user->user_role == 'logisticien') {
+                } elseif (isLogUser()) {
                     $href = route('logistics.accounting', $param);
-                } elseif ($user->user_role == 'etatique') {
+                } elseif (isEtaUser()) {
                     $href = state_route('accounting', array_merge(['entity' => $entity->id], $param));
                 } else {
                     $href = route('sudo.provider', $param);
                 }
-                $t = "<a class='btn btn-sm btn-primary' href='$href'>
+                $t = "";
+                if (can('Structure des prix - Modifier')) {
+                    $t = "<a class='btn btn-sm btn-primary' href='$href'>
                         <i class='material-icons md-14 align-middle'>settings</i>
                         <span class='align-middle'>Voies et Structures</span>
                     </a>";
+                }
+
                 return $t;
             })
             ->addColumn('action', function ($row) use ($user) {
@@ -66,6 +71,26 @@ class StructurepriceController extends Controller
                     'to' => $row->to?->format('Y-m-d'),
                     'usd_cdf' => $row->usd_cdf,
                 ]));
+
+                $btn = "";
+                $btn1 = "
+                    <a class='dropdown-item' href='#' bedit data='$data'>
+                        <i class='material-icons md-14 align-middle'>edit</i>
+                        <span class='align-middle'>Modifier</span>
+                    </a>
+                ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Structure des prix - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Structure des prix - Supprimer')) {
+                    $btn .= $btn2;
+                }
 
                 $t = <<<DATA
                     <div class="dropdown">
@@ -82,17 +107,41 @@ class StructurepriceController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class='dropdown-item' href='#' bedit data='$data'>
-                                <i class='material-icons md-14 align-middle'>edit</i>
-                                <span class='align-middle'>Modifier</span>
-                            </a>
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
+
+                if (empty($btn)) {
+                    $t = '';
+                }
+
+                // $t = <<<DATA
+                //     <div class="dropdown">
+                //         <a
+                //             class="btn btn-primary2 btn-sm"
+                //             href="#"
+                //             role="button"
+                //             data-toggle="dropdown"
+                //             aria-haspopup="true"
+                //             aria-expanded="false"
+                //         >
+                //             <i class="material-icons md-18 align-middle"
+                //             >more_vert</i
+                //             >
+                //         </a>
+                //         <div class="dropdown-menu dropdown-menu-right">
+                //             <a class='dropdown-item' href='#' bedit data='$data'>
+                //                 <i class='material-icons md-14 align-middle'>edit</i>
+                //                 <span class='align-middle'>Modifier</span>
+                //             </a>
+                //             <a class="dropdown-item text-danger" href="#" bdel data='$data'>
+                //                 <i class="material-icons md-14 align-middle">delete</i>
+                //                 <span class="align-middle">Supprimer</span>
+                //             </a>
+                //         </div>
+                //     </div>
+                // DATA;
 
                 // if ($user->user_role == 'petrolier') {
                 return $t;
@@ -108,9 +157,10 @@ class StructurepriceController extends Controller
     public function store(Request $request)
     {
         $user = request()->user();
-        abort_unless(in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
+            can('Structure des prix - Modifier', true);
+
             $validated = $request->validate([
                 'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -126,9 +176,13 @@ class StructurepriceController extends Controller
             $str = Structureprice::findOrFail($id);
             $entity = $str->entity;
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+            if (isPetroUser() || isLogUser()) {
+                $parent = $user->user;
+                if ($parent) {
+                    $user = $parent;
+                }
                 abort_if($entity->users_id != $user->id, 403, "No permission !!!");
-            } elseif ($user->user_role == 'etatique') {
+            } elseif (isEtaUser()) {
                 //
             } else {
                 abort(403, "No permission");
@@ -181,6 +235,8 @@ class StructurepriceController extends Controller
                 'message' => "La structure des prix a été mise à jour avec succès.",
             ], 200);
         } else {
+            can('Structure des prix - Créer', true);
+
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
@@ -189,9 +245,9 @@ class StructurepriceController extends Controller
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
             ]);
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif ($user->user_role == 'etatique') {
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } elseif (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403, "No permission");
@@ -256,11 +312,17 @@ class StructurepriceController extends Controller
      */
     public function destroy(Structureprice $structureprice)
     {
+        can('Structure des prix - Supprimer', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
-        if ($user->user_role == 'etatique') {
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        if (isEtaUser()) {
             //
         } else {
+            $parent = $user->user;
+            if ($parent) {
+                $user = $parent;
+            }
             abort_if($structureprice->entity->users_id != $user->id, 403, "Not permit");
         }
 

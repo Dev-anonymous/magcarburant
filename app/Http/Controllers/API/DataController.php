@@ -946,6 +946,8 @@ class DataController extends Controller
             }
 
             if ($type === 'balancelog') {
+                can('Bilan manque à gagner - Lire', true);
+
                 $data = $this->greatBookLogData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -1969,6 +1971,8 @@ class DataController extends Controller
 
     private function greatBookLogData()
     {
+        can('Grand livre manque à gagner - Lire', true);
+
         $reqzone = (array) request('zone');
         $reqfuel = (array) request('fuel');
         $terminal = (array) request('terminal');
@@ -2137,8 +2141,8 @@ class DataController extends Controller
 
         $indexes = null;
 
-        if ($user->user_role === 'logisticien') {
-            $name = $user->entities()->first()?->shortname;
+        if (isLogUser()) {
+            $name = gentity()->shortname;
             if ($name == 'SEP CONGO') {
                 $indexes = array_merge(range(0, 14), [16, 20]);
             }
@@ -2151,7 +2155,7 @@ class DataController extends Controller
             if ($name == 'SOCIR') {
                 $indexes = array_merge(range(0, 13), [15, 19]);
             }
-        } else if ($user->user_role == 'etatique') {
+        } else if (isEtaUser()) {
             if ($items == 'item1') {
                 $indexes = range(0, 19);
             }

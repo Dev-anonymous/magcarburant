@@ -10,19 +10,13 @@ return new class extends Migration
     {
         Schema::create('deliveryfile', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('delivery_id')->unsigned();
+            $table->string('file')->nullable();
 
-            $table->unsignedBigInteger('entity_id');
-            $table->unsignedBigInteger('zone_id');
-            $table->unique(['entity_id', 'zone_id']);
-            $table->foreign('entity_id', 'fk_workingzones_entity')
-                ->references('id')
-                ->on('entities')
-                ->onDelete('cascade');
-
-            $table->foreign('zone_id', 'fk_workingzones_zone')
-                ->references('id')
-                ->on('zones')
-                ->onDelete('cascade');
+            $table->foreign('delivery_id')
+                ->references('id')->on('delivery')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
         });
     }
 

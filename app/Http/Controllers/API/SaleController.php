@@ -26,7 +26,7 @@ class SaleController extends Controller
     {
         can('Vente - Lire', true);
 
-        if (isProLogEtaUser()) {
+        if (isPetroUser() || isLogUser()) {
             $entity = gentity();
         } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
@@ -79,10 +79,11 @@ class SaleController extends Controller
                 return "<div class=''>$f</div>";
             })
             ->addColumn('action', function ($row) {
-                $btn = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
+
+                $btn = "";
                 $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
@@ -94,6 +95,7 @@ class SaleController extends Controller
                             <i class='material-icons md-14 align-middle'>delete</i>
                             <span class='align-middle'>Supprimer</span>
                         </a>";
+                        
                 if (can('Vente - Modifier')) {
                     $btn .= $btn1;
                 }
@@ -217,9 +219,9 @@ class SaleController extends Controller
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } else if ($user->user_role == 'etatique') {
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } else if (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -339,7 +341,7 @@ class SaleController extends Controller
                     continue;
                 }
 
-                if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                if (isPetroUser() || isLogUser()) {
                     if (Sale::where([
                         'way' => $colD,
                         'product' => $colE,
@@ -370,7 +372,7 @@ class SaleController extends Controller
                 $sale = Sale::create($ins);
                 $insert[] = $ins;
 
-                if ($user->user_role === 'etatique') {
+                if (isEtaUser()) {
                     $logTerm = Entity::where('shortname', $colB)->first();
                     abort_if(!$logTerm, 422, "Le terminal spécifié ($colB) n'existe pas dans la base de données."); // uhm
                     $ins2 = $ins;
@@ -378,7 +380,7 @@ class SaleController extends Controller
                     Sale::create($ins2);
                 }
 
-                if ($user->user_role !== 'etatique') {
+                if (!isEtaUser()) {
                     if (strtoupper($colD) == 'OUEST') {
                         if ($entity->user->user_role == 'logisticien') {
                             $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
@@ -424,9 +426,9 @@ class SaleController extends Controller
         } else {
             can('Vente - Créer', true);
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif ($user->user_role == 'etatique') {
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } elseif (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -464,7 +466,7 @@ class SaleController extends Controller
 
             $sale = Sale::create($validated);
 
-            if ($user->user_role === 'etatique') {
+            if (isEtaUser()) {
                 $logTerm = Entity::where('shortname', $validated['terminal'])->first();
                 abort_if(!$logTerm, 422, "Le terminal spécifié (" . $validated['terminal'] . ") n'existe pas dans la base de données."); // uhm
                 $validated2 = $validated;
@@ -473,7 +475,7 @@ class SaleController extends Controller
             }
 
             if ($entity->user->user_role == 'logisticien') {
-                if ($user->user_role !== 'etatique') {
+                if (!isEtaUser()) {
                     $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
                     $w = strtoupper(request('way'));
                     if (in_array($w, $wz) && $w == 'OUEST') {

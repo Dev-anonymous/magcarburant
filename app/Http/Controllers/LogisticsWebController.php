@@ -35,21 +35,25 @@ class LogisticsWebController extends Controller
 
         $item = request('item');
         if ($item == 'rtx') {
+            can('Taux réels - Lire', true);
             $entity = gentity();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
+            can('Taux structures - Lire', true);
             $entity = gentity();
             return view('provider.structrates', compact('entity'));
         }
 
         if ($item == 'pricestr') {
+            can('Structure des prix - Lire', true);
             $entity = gentity();
             return view('common.structprices', compact('entity'));
         }
 
         if ($item == 'gb') {
+            can('Grand livre manque à gagner - Lire', true);
             return view('logistics.greatebook');
         }
 
@@ -58,6 +62,8 @@ class LogisticsWebController extends Controller
             $entity = gentity();
             $structure = $entity?->structureprices()->with(['fuelprices.fuel', 'fuelprices.zone', 'fuelprices.label'])->find($stx);
             if ($structure) {
+                can('Structure des prix - Modifier', true);
+                
                 initfuelprice($structure);
                 $structure->refresh();
 

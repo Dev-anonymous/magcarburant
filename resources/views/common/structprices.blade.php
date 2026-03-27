@@ -29,12 +29,14 @@
                             Historique des structures des prix
                         </h4>
                         {{-- @if (auth()->user()->user_role === 'petrolier') --}}
+                        @canlocal('Structure des prix - Créer')
                         <div class="">
                             <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                 <i class="material-icons md-24">add_circle_outline</i>
                                 Nouvelle structure
                             </button>
                         </div>
+                        @endcanlocal
                         {{-- @endif --}}
                     </div>
                     <div class="py-4">

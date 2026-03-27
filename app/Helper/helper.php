@@ -729,6 +729,10 @@ function can($permissionName, $abort = false)
         $can = $user->role->permissions()->where('name', $permissionName)->exists();
     }
 
+    if ($user->user_role === 'sudo') {
+        $can = true;
+    }
+    
     if (! $can && $abort) {
         abort(403, "Accès refusé [0]");
     }

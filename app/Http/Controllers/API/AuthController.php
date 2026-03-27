@@ -7,7 +7,6 @@ use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Jenssegers\Agent\Agent;
 
 class AuthController extends Controller
 {

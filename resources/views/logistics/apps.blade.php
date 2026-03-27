@@ -7,6 +7,7 @@
         <p class="lead small m-0">{{ $entity->longname }}</p>
         <hr />
         <div class="row">
+            @canlocal('Vente - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('logistics.sale') }}')">
@@ -21,6 +22,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Comptabilité - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('logistics.accounting') }}')">
@@ -32,14 +36,12 @@
                                 <p class="m-0">Gestion de la comptabilité</p>
                             </div>
                         </div>
-                        {{-- <div class="text-center">
-                            <a href="{{ route('logistics.home.rates') }}">Taux réels</a>
-                            <span>|</span>
-                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
-                        </div> --}}
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Tableau de bord - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
                     onclick="location.assign('{{ route('logistics.dash') }}')">
@@ -54,6 +56,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Gestion des utilisateurs - Lire')
             <div class="col-md-6">
                 <div class="carte" style="min-height: 120px"">
                     <div class="w-100">
@@ -75,6 +80,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Audit - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
                     onclick="location.assign('{{ route('applogs') }}')">
@@ -89,7 +97,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+            @endcanlocal
 
-    </div>
-@endsection
+        </div>
+    @endsection

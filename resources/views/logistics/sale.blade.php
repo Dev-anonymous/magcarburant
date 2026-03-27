@@ -97,18 +97,22 @@
                                     </select>
                                 </div>
                                 <div class="form-group mb-1">
+                                    @canlocal('Vente - Créer')
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
                                         data-target="#mdlChose">
                                         <i class="material-icons md-18">add_circle_outline</i> Nouvelle vente
                                     </button>
+                                    @endcanlocal
                                 </div>
                             </form>
                         </div>
                         <div class="card-body">
+                            @canlocal('Vente - Supprimer')
                             <button style="display: none" type="button" class="btn btn-sm btn-danger mb-2"
                                 data-toggle="modal" data-target="#mdldelall" id="btnDelAll">
                                 <i class="material-icons md-18">delete</i> <span text></span>
                             </button>
+                            @endcanlocal
                             <div class="table-responsive">
                                 <table id="table" class="table table-striped table-hover text-center text-nowrap"
                                     style="width:100%">
@@ -587,7 +591,7 @@
             ajax: {
                 url: '{{ route('sale.index') }}',
                 data: function(d) {
-                    d.entity_id = '{{ @$entity->id }}';
+                    // d.entity_id = '{{ @$entity->id }}';
                     d.date = $('[name="date1"]').val() + ' to ' + $('[name="date2"]').val();
                     d.from_mutuality = $('#from_mutuality').val();
                 }

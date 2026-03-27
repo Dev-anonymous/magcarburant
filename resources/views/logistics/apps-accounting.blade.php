@@ -20,6 +20,7 @@
         </div>
         <hr />
         <div class="row">
+            @canlocal('Bilan manque à gagner - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('logistics.analyse') }}')">
@@ -30,10 +31,12 @@
                     </svg>
                     <div class="p-2">
                         <h4 class="font-weight-bold">Manque à gagner</h4>
-                        {{-- <p class="m-0">Gestion des achats</p> --}}
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Grand livre manque à gagner - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('logistics.accounting', ['item' => 'gb']) }}')">
@@ -47,6 +50,8 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
         </div>
 
     </div>

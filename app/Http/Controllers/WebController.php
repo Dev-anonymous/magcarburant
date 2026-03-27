@@ -18,7 +18,8 @@ class WebController extends Controller
     function applogs()
     {
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'logisticien', 'sudo']), 403, "No permission");
+        abort_if(!in_array($user->user_role, ['sudo']) && !isProLogEtaUser(), 403, "No permission");
+        can('Audit - Lire', true);
         return view('applogs');
     }
 

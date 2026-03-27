@@ -9,6 +9,8 @@ use App\Models\Salefile;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -22,12 +24,11 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        can('Vente - Lire', true);
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isProLogEtaUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -77,17 +78,29 @@ class SaleController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) use ($user) {
-                $eb = "";
+            ->addColumn('action', function ($row) {
+                $btn = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
-                $eb = "
+                $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
                         <span class='align-middle'>Modifier</span>
                     </a>
                 ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+                if (can('Vente - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Vente - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -103,20 +116,20 @@ class SaleController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
+
+                if (empty($btn)) {
+                    $t = '';
+                }
 
                 if ($row->from_mutuality) {
                     $t = '';
                 }
 
-                if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+                if (isProLogEtaUser()) {
                     return $t;
                 }
             })
@@ -132,7 +145,9 @@ class SaleController extends Controller
         $user = request()->user();
 
         if (request('action') == 'update') {
-            abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+            can('Vente - Modifier', true);
+
+            abort_if(!isProLogEtaUser(), 403, "No permission");
 
             $id = request('id');
             $sale = Sale::findOrFail($id);
@@ -196,6 +211,8 @@ class SaleController extends Controller
                 'message' => "Votre vente a été mise à jour avec succès !",
             ]);
         } elseif (request('action') == 'import') {
+            can('Vente - Créer', true);
+
             $validated = $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
@@ -405,6 +422,8 @@ class SaleController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
+            can('Vente - Créer', true);
+
             if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
                 $entity = $user->entities()->first();
             } elseif ($user->user_role == 'etatique') {
@@ -512,12 +531,13 @@ class SaleController extends Controller
      */
     public function destroy(Sale $sale)
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
-        if ($user->user_role == 'etatique') {
+        can('Vente - Supprimer', true);
+
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        if (isEtaUser()) {
             //
         } else {
-            $entity = $user->entities()->first();
+            $entity = gentity();
             abort_if($entity->id != $sale->entity_id, 403, "Not permit");
         }
 

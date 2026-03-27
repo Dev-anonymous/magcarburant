@@ -26,7 +26,7 @@ class DataController extends Controller
 
         $type = request('type');
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+        if (isProLogEtaUser()) {
             if ($type === 'purchase') {
                 $date = request('date');
                 $date = explode(' to ', $date);
@@ -34,7 +34,7 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                if ($user->user_role == 'etatique') {
+                if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     $entity = $user->entities()->first();
@@ -74,10 +74,10 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                if ($user->user_role == 'etatique') {
+                if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    $entity = $user->entities()->first();
+                    $entity = gentity();
                 }
                 $base = $entity->sales()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 
@@ -1083,7 +1083,7 @@ class DataController extends Controller
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                if ($user->user_role == 'etatique') {
+                if (isEtaUser()) {
                     $entities = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier', 'logisticien'])->pluck('id'))->get();
                     $entities1 = Entity::whereIn('users_id', User::whereIn('user_role', ['petrolier'])->pluck('id'))->get();
 
@@ -1230,7 +1230,7 @@ class DataController extends Controller
 
                     return compact('data');
                 } else {
-                    $entity = $user->entities()->first();
+                    $entity = gentity();
 
                     $categories = [];
                     $da = $dv = $dl = [];
@@ -1975,9 +1975,9 @@ class DataController extends Controller
         $items = request('items');
 
         $user = request()->user();
-        if ($user->user_role == 'logisticien') {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isLogUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

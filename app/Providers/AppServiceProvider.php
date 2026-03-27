@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer(['state.*', 'common.*'], function ($view) {
             $view->with('mode', request()->route('mode') ?? 'view');
+        });
+
+        Blade::if('canlocal', function ($permission) {
+            return can($permission);
         });
 
         // Schema::disableForeignKeyConstraints();

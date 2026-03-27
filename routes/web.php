@@ -95,12 +95,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('logistics')->middleware(LogisticsMiddleware::class)->group(function () {
         Route::controller(LogisticsWebController::class)->group(function () {
             Route::get('', 'home')->name('logistics.home');
-            Route::get('dash', 'dash')->name('logistics.dash');
-            Route::get('sale', 'sale')->name('logistics.sale');
-            Route::get('mining-sale', 'mining_sale')->name('logistics.mining-sale');
+            Route::get('dash', 'dash')->name('logistics.dash')->middleware('permMdlw:Tableau de bord - Lire');
+            Route::get('sale', 'sale')->name('logistics.sale')->middleware('permMdlw:Vente - Lire');
+            // Route::get('mining-sale', 'mining_sale')->name('logistics.mining-sale')->middleware('permMdlw:Vente - Lire');
             Route::prefix('accounting')->group(function () {
-                Route::get('', 'accounting')->name('logistics.accounting');
-                Route::get('analyse', 'analyse')->name('logistics.analyse');
+                Route::get('', 'accounting')->name('logistics.accounting')->middleware('permMdlw:Comptabilité - Lire');
+                Route::get('analyse', 'analyse')->name('logistics.analyse')->middleware('permMdlw:Bilan manque à gagner - Lire');
             });
         });
     });

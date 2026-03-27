@@ -13,6 +13,10 @@ class AuditService
         $user = Auth::user();
         if (!$user) return;
 
+        $entity_id = $model->entity_id ?? null;
+        $ent = gentity();
+        if ($ent->id === $entity_id) $entity_id = null; // un utilisateur essaie de modifier les donnes dans la session de sont parent
+
         AuditLog::create([
             'event'      => $event,
             'title' => $title,
@@ -20,7 +24,7 @@ class AuditService
             'model_id'   => $model->id ?? null,
             'user_id'    => $user->id,
             'username'   => $user->name,
-            'entity_id'  => $model->entity_id ?? null,
+            'entity_id'  => $entity_id,
             'old_values' => is_array($old) && count($old) ? json_encode($old) : null,
             'new_values' => is_array($new) && count($new) ?  json_encode($new) : null,
             'ip_address' => Request::ip(),

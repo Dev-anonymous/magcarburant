@@ -514,18 +514,17 @@ function incr(&$tab, $key,  $val)
 
 function gb_href($params, $route = null)
 {
-    $user = request()->user();
-    if ($user->user_role === 'petrolier') {
+    if (isPetroUser()) {
         $href = route($route ? "provider.$route" : 'provider.accounting', $params);
-    } elseif ($user->user_role === 'logisticien') {
+    } elseif (isLogUser()) {
         $href = route('logistics.accounting', $params);
-    } elseif ($user->user_role === 'etatique') {
+    } elseif (isEtaUser()) {
         $mode = rmode();
         $entity  = Entity::findOrFail(request('entity_id'));
         $params = array_merge(['entity' => $entity->id, 'mode' => $mode], $params);
         $href = route($route ? "state.$route" : 'state.accounting', $params);
     } else {
-        abort(422, "Invalid role !");
+        abort(422, "Invalid role ! gb_href");
     }
     return $href;
 }
@@ -538,9 +537,7 @@ function rmode()
 
 function from_state()
 {
-    $user = request()->user();
-    // mode view on charge les donnees selon $entity from_state => 0
-    return $user->user_role === 'etatique' && rmode() === 'edit';
+    return isEtaUser() && rmode() === 'edit';
 }
 
 
@@ -649,7 +646,11 @@ function ua()
 function childrenlist(User $user, $withme = true)
 {
     $t = [];
-    if (in_array($user->user_role, ['logisticien', 'etatique', 'petrolier'], true)) {
+    if (isProLogEtaUser()) {
+        $parent = $user->user;
+        if ($parent) {
+            $user = $parent; // role utilisateur -> liste audit
+        }
         $t = $user->users()->pluck('id')->all();
         if ($withme) {
             $t = [$user->id, ...$user->users()->pluck('id')->all()];
@@ -671,10 +672,66 @@ function gentity(): Entity
     throw new Exception("User role not supported for getting entity");
 }
 
+function isProLogEtaUser()
+{
+    return isPetroUser() || isLogUser() || isEtaUser();
+}
+
+
+function isLogUser()
+{
+    $user = request()->user();
+    $role = $user->user_role;
+    $parent = $user->user;
+
+    return
+        $role === 'logisticien' || ($parent && $parent->user_role === 'logisticien' && $role === 'utilisateur');
+}
+
+
+function isPetroUser()
+{
+    $user = request()->user();
+    $role = $user->user_role;
+    $parent = $user->user;
+    return
+        $role === 'petrolier' || ($parent && $parent->user_role === 'petrolier' && $role === 'utilisateur');
+}
+
+
+function isEtaUser()
+{
+    $user = request()->user();
+    $role = $user->user_role;
+    $parent = $user->user;
+    return
+        $role === 'etatique' || ($parent && $parent->user_role === 'etatique' && $role === 'utilisateur');
+}
 
 function terminal()
 {
     return Entity::whereIn('id', User::where('user_role', 'logisticien')->pluck('id'))->pluck('shortname')->map(function ($item) {
         return strtoupper($item);
     })->all();
+}
+
+
+function can($permissionName, $abort = false)
+{
+    $user = request()->user();
+    if (! $user) {
+        return $abort ? abort(403, "Accès refusé [0]") : false;
+    }
+
+    $can = in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'], true);
+
+    if ($user->user_role === 'utilisateur') {
+        $can = $user->role->permissions()->where('name', $permissionName)->exists();
+    }
+
+    if (! $can && $abort) {
+        abort(403, "Accès refusé [0]");
+    }
+
+    return $can;
 }

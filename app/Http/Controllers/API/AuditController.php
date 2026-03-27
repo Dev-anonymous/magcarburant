@@ -17,6 +17,8 @@ class AuditController extends Controller
      */
     public function index()
     {
+        can('Audit - Lire', true);
+
         $user = request()->user();
 
         $date = request('date');
@@ -33,7 +35,7 @@ class AuditController extends Controller
         $logs = AuditLog::whereBetween('created_at', [$from, $to]);
         $logs->whereIn('event', $event);
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
+        if (isProLogEtaUser()) {
             $logs->whereIn('user_id', childrenlist($user));
         } elseif ($user->user_role == 'sudo') {
             //

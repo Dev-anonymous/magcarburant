@@ -3,10 +3,9 @@
 @section('bg-class', 'bg-img-3')
 @section('body')
     @php
-        $isState = in_array(Auth::user()->user_role, ['etatique']);
-        $isPetrol = in_array(Auth::user()->user_role, ['petrolier']);
-        $isLog = in_array(Auth::user()->user_role, ['logisticien']);
-
+        $isState = isEtaUser();
+        $isPetrol = isPetroUser();
+        $isLog = isLogUser();
     @endphp
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
@@ -314,7 +313,6 @@
                             }, false);
                         });
                         chart2.redraw();
- 
                     @endif
                     ldr.hide();
                 },

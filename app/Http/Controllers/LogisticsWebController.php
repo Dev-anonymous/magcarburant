@@ -2,15 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fuel;
-use App\Models\Fuelprice;
-use App\Models\Label;
-use App\Models\Rate;
 use App\Models\Structureprice;
-use App\Models\Zone;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class LogisticsWebController extends Controller
 {
@@ -22,21 +14,25 @@ class LogisticsWebController extends Controller
 
     function dash()
     {
+        can('Tableau de bord - Lire', true);
         return view('common.dash');
     }
 
     function sale()
     {
+        can('Vente - Lire', true);
         return view('logistics.sale');
     }
 
-    function mining_sale()
-    {
-        return view('logistics.mining_sale');
-    }
+    // function mining_sale()
+    // {
+    //     return view('logistics.mining_sale');
+    // }
 
     function accounting()
     {
+        can('Comptabilité - Lire', true);
+
         $item = request('item');
         if ($item == 'rtx') {
             $entity = gentity();
@@ -56,14 +52,6 @@ class LogisticsWebController extends Controller
         if ($item == 'gb') {
             return view('logistics.greatebook');
         }
-
-        // if ($item == 'cc') {
-        //     return view('provider.greatebookCR');
-        // }
-
-        // if ($item == 'pf') {
-        //     return view('provider.greatebookparafisc');
-        // }
 
         $stx = request('stx');
         if ($stx) {
@@ -106,6 +94,7 @@ class LogisticsWebController extends Controller
 
     function analyse()
     {
+        can('Bilan manque à gagner - Lire', true);
         $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('logistics.analyse', compact('ps'));

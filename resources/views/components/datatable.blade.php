@@ -49,4 +49,7 @@
             [25, 50, 100, 200, 500, 1000]
         ],
     });
+    $.fn.dataTable.ext.errMode = function(settings, helpPage, message) {
+        console.error(message);
+    };
 </script>

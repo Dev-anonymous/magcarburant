@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('type')->nullable();
             $table->text('message')->nullable();
             $table->text('source')->nullable();
-            $table->integer('line')->nullable();
-            $table->integer('column')->nullable();
+            $table->text('line')->nullable();
+            $table->text('column')->nullable();
 
             $table->longText('stack')->nullable();
 

@@ -57,31 +57,50 @@
         });
     }
 
+    function normalizeErrorData(data) {
+        const normalized = {};
+        for (const key in data) {
+            const val = data[key];
+            if (typeof val === 'string' || typeof val === 'number' || val === null) {
+                normalized[key] = val;
+            } else {
+                normalized[key] = safeStringify(val);
+            }
+        }
+        return normalized;
+    }
+
+
     window.onerror = function(message, source, lineno, colno, error) {
         if (typeof source === 'string' && source.includes('/log-error')) return;
         if (typeof message === 'string' && message.includes('Script error')) return;
-        const errorData = {
+
+        const rawErrorData = {
             type: 'error',
-            message,
-            source,
+            message: error?.message || message,
             line: lineno,
             column: colno,
             stack: error?.stack || null,
+            source: source,
             url: window.location.href,
             time: new Date().toISOString()
         };
+
+        const errorData = normalizeErrorData(rawErrorData);
         sendError(errorData);
-    };
+
+    }
 
     window.addEventListener('unhandledrejection', function(event) {
         const errorData = {
             type: 'unhandledrejection',
-            message: event.reason?.message || String(event.reason),
-            stack: event.reason?.stack || null,
+            message: event.reason?.message ?
+                String(event.reason.message) : String(event.reason), // 🔑 conversion en chaîne
+            stack: event.reason?.stack ? String(event.reason.stack) : null,
             url: window.location.href,
-            userAgent: navigator.userAgent,
             time: new Date().toISOString()
         };
+
         sendError(errorData);
     });
 </script>

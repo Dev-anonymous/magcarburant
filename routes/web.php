@@ -21,29 +21,25 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::post('/log-error', function () {
-    // try {
-    $data = request()->all();
-    $user = request()->user();
-    $d = [
-        'type'        => $data['type'] ?? null,
-        'message'     => $data['message'] ?? null,
-        'source'      => $data['source'] ?? null,
-        'line'        => $data['line'] ?? null,
-        'column'      => $data['column'] ?? null,
-        'stack'       => $data['stack'] ?? null,
-        'url'         => $data['url'] ?? null,
-        'user_agent'  => ua(),
-        'user_id'     => $user?->id,
-        'ip'          => request()->ip(),
-        'payload'     => json_encode($data),
-    ];
-
-    dd($d);
-    
-    Error::create();
-    return response()->json(['status' => 'ok']);
-    // } catch (\Throwable $e) {
-    // }
+    try {
+        $data = request()->all();
+        $user = request()->user();
+        $d = [
+            'type'        => $data['type'] ?? null,
+            'message'     => $data['message'] ?? null,
+            'source'      => $data['source'] ?? null,
+            'line'        => $data['line'] ?? null,
+            'column'      => $data['column'] ?? null,
+            'stack'       => $data['stack'] ?? null,
+            'url'         => $data['url'] ?? null,
+            'user_agent'  => ua(),
+            'user_id'     => $user?->id,
+            'ip'          => request()->ip(),
+            'payload'     => json_encode($data)
+        ];
+        Error::create($d);
+    } catch (\Throwable $e) {
+    }
 })->name('log-error');
 
 Route::get('def', function () {

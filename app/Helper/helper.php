@@ -541,6 +541,19 @@ function from_state()
 }
 
 
+function canmutuality(Entity $entity, String $product)
+{
+    $productsByCompany = [
+        'SOCIR'     => ['ESSENCE', 'PETROLE', 'GASOIL', 'JET'],
+        'LEREXCOM'  => ['ESSENCE', 'GASOIL'],
+        'SPSA'      => ['ESSENCE', 'GASOIL', 'JET'],
+        'SEP CONGO' => ['ESSENCE', 'PETROLE', 'GASOIL', 'JET'],
+    ];
+    $companyName = $entity->shortname;
+
+    return isset($productsByCompany[$companyName]) && in_array($product, $productsByCompany[$companyName]);
+}
+
 function state_route(string $name, $entity)
 {
     $mode = request()->route('mode', rmode());
@@ -732,7 +745,7 @@ function can($permissionName, $abort = false)
     if ($user->user_role === 'sudo') {
         $can = true;
     }
-    
+
     if (! $can && $abort) {
         abort(403, "Accès refusé [0]");
     }

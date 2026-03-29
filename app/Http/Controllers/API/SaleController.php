@@ -95,7 +95,7 @@ class SaleController extends Controller
                             <i class='material-icons md-14 align-middle'>delete</i>
                             <span class='align-middle'>Supprimer</span>
                         </a>";
-                        
+
                 if (can('Vente - Modifier')) {
                     $btn .= $btn1;
                 }
@@ -389,10 +389,13 @@ class SaleController extends Controller
                                 foreach ($entities as $ent) {
                                     $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
                                     if (in_array('OUEST', $ewz)) {
-                                        $ins['parent_id'] = $sale->id;
-                                        $ins['from_mutuality'] = 1;
-                                        $ins['entity_id'] = $ent->id;
-                                        Sale::create($ins);
+                                        $product = $colE;
+                                        if (canmutuality($ent, $product)) {
+                                            $ins['parent_id'] = $sale->id;
+                                            $ins['from_mutuality'] = 1;
+                                            $ins['entity_id'] = $ent->id;
+                                            Sale::create($ins);
+                                        }
                                     }
                                 }
                             }
@@ -466,7 +469,7 @@ class SaleController extends Controller
 
             $sale = Sale::create($validated);
 
-            if (isEtaUser()) {
+            if (isEtaUser() && $entity->user->user_role === 'petrolier') {
                 $logTerm = Entity::where('shortname', $validated['terminal'])->first();
                 abort_if(!$logTerm, 422, "Le terminal spécifié (" . $validated['terminal'] . ") n'existe pas dans la base de données."); // uhm
                 $validated2 = $validated;
@@ -483,10 +486,13 @@ class SaleController extends Controller
                         foreach ($entities as $ent) {
                             $ewz = $ent->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
                             if (in_array('OUEST', $ewz)) {
-                                $validated['parent_id'] = $sale->id;
-                                $validated['from_mutuality'] = 1;
-                                $validated['entity_id'] = $ent->id;
-                                Sale::create($validated);
+                                $product = $validated['product'];
+                                if (canmutuality($ent, $product)) {
+                                    $validated['parent_id'] = $sale->id;
+                                    $validated['from_mutuality'] = 1;
+                                    $validated['entity_id'] = $ent->id;
+                                    Sale::create($validated);
+                                }
                             }
                         }
                     }

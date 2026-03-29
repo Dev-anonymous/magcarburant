@@ -5,15 +5,13 @@
         left: 0;
         width: 100%;
         height: 100%;
-        /* background: rgb(182, 212, 238); */
-        background: var(--appcolor);
+        background: rgb(182, 212, 238);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 999999;
     }
 
-    /* ///  */
     .loader {
         transform: rotateZ(45deg);
         perspective: 1000px;
@@ -50,16 +48,6 @@
 
         100% {
             transform: translate(-50%, -50%) rotateZ(360deg);
-        }
-    }
-
-    @keyframes rotateccw {
-        0% {
-            transform: translate(-50%, -50%) rotate(0deg);
-        }
-
-        100% {
-            transform: translate(-50%, -50%) rotate(-360deg);
         }
     }
 
@@ -105,8 +93,6 @@
         <span class="loader"></span>
     </div>
 </div>
-
-
 
 
 <script>

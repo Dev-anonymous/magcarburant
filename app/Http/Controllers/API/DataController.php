@@ -2076,13 +2076,21 @@ class DataController extends Controller
                 $errors[] = "Aucune valeur Charge SOCIR n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
             }
 
+            $seplabel = 'Charges Sep Congo';
+            if ($e->way == 'NORD') {
+                $seplabel = 'Charges Sep Congo et Autres entrepots';
+            }
+            if (in_array($e->way, ['SUD', 'EST'])) {
+                $seplabel = "Charges d'exploitation logisticiens (frais d'entreprot)";
+            }
+
             $charge_sep_congo = (float)@$structure?->fuelprices()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
-                ->whereHas('label', fn($q) => $q->where('label', 'Charges Sep Congo'))->first()?->amount;
+                ->whereHas('label', fn($q) => $q->where('label', $seplabel))->first()?->amount;
 
             if (!$charge_sep_congo) {
-                $errors[] = "Aucune valeur Charge Sep Congo n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
+                $errors[] = "Aucune valeur $seplabel n'a été trouvée dans la strucutre de prix #$structure?->id $structure?->name du {$structure?->from?->format('d-m-Y')} ($fuel, $zone)";
             }
 
             $charge_spa_cobil = (float)@$structure?->fuelprices()

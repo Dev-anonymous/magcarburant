@@ -25,6 +25,7 @@ class SaleController extends Controller
     public function index()
     {
         can('Vente - Lire', true);
+        dd(2);
 
         if (isPetroUser() || isLogUser()) {
             $entity = gentity();

@@ -10,7 +10,7 @@ use App\Http\Middleware\APP\LogisticsMiddleware;
 use App\Http\Middleware\APP\ProviderMiddleware;
 use App\Http\Middleware\APP\StateMiddleware;
 use App\Http\Middleware\APP\SudoMiddleware;
-use App\Models\AuditLog;
+use App\Models\Error;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +19,32 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.logout');
 });
+
+Route::post('/log-error', function () {
+    // try {
+    $data = request()->all();
+    $user = request()->user();
+    $d = [
+        'type'        => $data['type'] ?? null,
+        'message'     => $data['message'] ?? null,
+        'source'      => $data['source'] ?? null,
+        'line'        => $data['line'] ?? null,
+        'column'      => $data['column'] ?? null,
+        'stack'       => $data['stack'] ?? null,
+        'url'         => $data['url'] ?? null,
+        'user_agent'  => ua(),
+        'user_id'     => $user?->id,
+        'ip'          => request()->ip(),
+        'payload'     => json_encode($data),
+    ];
+
+    dd($d);
+    
+    Error::create();
+    return response()->json(['status' => 'ok']);
+    // } catch (\Throwable $e) {
+    // }
+})->name('log-error');
 
 Route::get('def', function () {
     $action = request('action');

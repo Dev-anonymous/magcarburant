@@ -95,7 +95,7 @@
         const errorData = {
             type: 'unhandledrejection',
             message: event.reason?.message ?
-                String(event.reason.message) : String(event.reason), // 🔑 conversion en chaîne
+                String(event.reason.message) : String(event.reason),
             stack: event.reason?.stack ? String(event.reason.stack) : null,
             url: window.location.href,
             time: new Date().toISOString()

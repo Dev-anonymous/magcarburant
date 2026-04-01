@@ -4,6 +4,12 @@ body {
     height: auto !important;
 }
 
+.modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto !important;
+}
+
+
 :root {
     /* --appcolor: #1e2a38; */
     --appcolor: #5a90cc;

@@ -150,7 +150,7 @@
         }
     </style>
     <div class="modal fade" id="mdladd" role="dialog">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="defaultModalLabel">Nouvelle vente</h5>

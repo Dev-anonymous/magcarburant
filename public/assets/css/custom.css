@@ -8,6 +8,11 @@ body {
   max-height: calc(100vh - 200px);
   overflow-y: auto !important;
 }
+.modal-dialog {
+  display: flex;
+  align-items: center;   /* centre verticalement */
+  min-height: 100vh;     /* occupe toute la hauteur de l’écran */
+}
 
 
 :root {

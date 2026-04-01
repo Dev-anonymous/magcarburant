@@ -68,10 +68,13 @@
         });
 
 
-        function logout() {
+        function logout(onlyme = false) {
             $.ajax({
                 url: '{{ route('api.logout') }}',
                 method: 'POST',
+                data: {
+                    onlyme: onlyme
+                },
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'accept': 'application/json'
@@ -100,9 +103,8 @@
                         if (!Window.donotshowmodal) {
                             $('#mdlautoout').modal('show');
                         }
-
                         setTimeout(() => {
-                            logout();
+                            logout(true);
                         }, 5000);
                     } else {
                         setTimeout(() => {

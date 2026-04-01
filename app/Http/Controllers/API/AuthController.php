@@ -61,7 +61,11 @@ class AuthController extends Controller
         if (Auth::check()) {
             $user = request()->user();
             Auth::guard('web')->logout();
-            $user->tokens()->delete();
+            if (request('onlyme') == 'true') {
+                //  pas de suppresion des tokens
+            } else {
+                $user->tokens()->delete();
+            }
 
             AuditLog::create([
                 'user_id'    => $user->id,

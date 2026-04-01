@@ -2077,11 +2077,22 @@ class DataController extends Controller
             }
 
             $seplabel = 'Charges Sep Congo';
-            if ($e->way == 'NORD') {
-                $seplabel = 'Charges Sep Congo et Autres entrepots';
-            }
-            if (in_array($e->way, ['SUD', 'EST'])) {
-                $seplabel = "Charges d'exploitation logisticiens (frais d'entreprot)";
+            if ($fuelObj->fuel_type == 'terrestre') {
+                if ($e->way == 'NORD') {
+                    $seplabel = 'Charges Sep Congo et Autres entrepots';
+                }
+                if (in_array($e->way, ['SUD', 'EST'])) {
+                    $seplabel = "Charges d'exploitation logisticiens (frais d'entreprot)";
+                }
+            } elseif ($fuelObj->fuel_type == 'aviation') {
+                if (in_array($e->way, ['SUD', 'EST'])) {
+                    $seplabel = "Charges d'exploitation logisticien (Frais d'entrepot)";
+                }
+                if ($e->way == 'OUEST') {
+                    $seplabel = "Charges d'exploitation Sep Congo";
+                }
+            } else {
+                abort(422, "Invalid fuel type ");
             }
 
             $charge_sep_congo = (float)@$structure?->fuelprices()

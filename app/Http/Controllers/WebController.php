@@ -25,16 +25,30 @@ class WebController extends Controller
 
     function roles()
     {
+        can('Gestion des rôles - Lire', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'logisticien']), 403, "No permission");
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        $parent = $user->user;
+        if ($parent) {
+            $user = $parent;
+        }
         $permissions = Permission::where('user_role', $user->user_role)->orderBy('name')->get();
         return view('roles', compact('permissions'));
     }
 
     function users()
     {
+        can('Gestion des utilisateurs - Lire', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'logisticien']), 403, "No permission");
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+
+        $parent = $user->user;
+        if ($parent) {
+            $user = $parent;
+        }
+
         $roles = $user->roles;
         return view('users', compact('roles'));
     }

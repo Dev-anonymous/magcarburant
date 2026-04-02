@@ -17,8 +17,10 @@ class UserController extends Controller
      */
     public function index()
     {
+        can('Gestion des utilisateurs - Lire', true);
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        $user = $user->user ?? $user;
 
         $data = User::whereIn('id', childrenlist($user, false));
 
@@ -35,12 +37,27 @@ class UserController extends Controller
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
-                $eb = "
+
+                $btn = "";
+                $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
                         <span class='align-middle'>Modifier</span>
                     </a>
                 ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Gestion des utilisateurs - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Gestion des utilisateurs - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -56,14 +73,15 @@ class UserController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
+
+                if (empty($btn)) {
+                    $t = '';
+                }
+
                 return $t;
             })
             ->rawColumns(['action'])
@@ -75,17 +93,20 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!isProLogEtaUser(), 403, "No permission");
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
         if (request('action') == 'update') {
+            can('Gestion des utilisateurs - Modifier', true);
+            $parent = $user->user ?? $user;
+
             $u = User::findOrFail(request('id'));
             $validated = $request->validate([
                 'name' => [
                     'required',
                     'string',
-                    Rule::unique('users')->ignore($u->id)->where(function ($query) use ($user) {
-                        return $query->where('user_id', $user->user_id);
+                    Rule::unique('users')->ignore($u->id)->where(function ($query) use ($parent) {
+                        return $query->where('user_id', $parent->user_id);
                     }),
                 ],
                 'email' => [
@@ -94,7 +115,7 @@ class UserController extends Controller
                     'max:60',
                     Rule::unique('users')->ignore($u->id),
                 ],
-                'role_id' => 'required|in:' . implode(',', $user->roles()->pluck('id')->all()),
+                'role_id' => 'required|in:' . implode(',', $parent->roles()->pluck('id')->all()),
             ]);
 
             DB::beginTransaction();
@@ -102,7 +123,10 @@ class UserController extends Controller
             $u->name = ucfirst($validated['name']);
             $u->email = strtolower($validated['email']);
             $u->save();
-            $u->tokens()->delete();
+
+            if ($u->wasChanged('role_id') || $u->wasChanged('email')) {
+                $u->tokens()->delete();
+            }
             DB::commit();
 
             return response()->json([
@@ -110,23 +134,27 @@ class UserController extends Controller
                 'message' => "L'utilisateur {$u->name} a été mis à jour avec succès !",
             ], 200);
         } else {
+            can('Gestion des utilisateurs - Créer', true);
+
+            $parent = $user->user ?? $user;
+
             $validated = $request->validate([
                 'name' => [
                     'required',
                     'string',
-                    Rule::unique('users')->where(function ($query) use ($user) {
-                        return $query->where('user_id', $user->id);
+                    Rule::unique('users')->where(function ($query) use ($parent) {
+                        return $query->where('user_id', $parent->id);
                     }),
                 ],
                 'email' => 'required|string|max:60|unique:users',
-                'role_id'  => 'required|in:' . implode(',',  $user->roles()->pluck('id')->all()),
+                'role_id'  => 'required|in:' . implode(',',  $parent->roles()->pluck('id')->all()),
                 'password'  => 'nullable|string|max:128',
             ]);
 
             DB::beginTransaction();
             $nuser = new User();
             $nuser->user_role = 'utilisateur';
-            $nuser->user_id = $user->id;
+            $nuser->user_id = $parent->id;
             $nuser->role_id = $validated['role_id'];
             $nuser->name = ucfirst($validated['name']);
             $nuser->email = strtolower($validated['email']);
@@ -162,9 +190,15 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        can('Gestion des utilisateurs - Supprimer', true);
+
         $u = request()->user();
-        abort_if(!in_array($u->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
-        abort_if($user->user_id !== $u->id, 403, "Not permit");
+        $parent = $u->user ?? $u;
+
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        abort_if($user->user_id !== $parent->id, 403, "Not permit");
+        abort_if($user->id == $u->id, 422, "Vous ne pouvez pas supprimer votre propre compte, veuillez demander à un administrateur de le faire.");
+
         $user->delete();
         return response()->json([
             'success' => true,

@@ -27,10 +27,12 @@
                             Liste des utilisateurs
                         </h4>
                         <div class="">
+                            @canlocal('Gestion des utilisateurs - Créer')
                             <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                 <i class="material-icons md-24">add_circle_outline</i>
                                 Nouvel utilisateur
                             </button>
+                            @endcanlocal
                         </div>
                     </div>
                     <div class="card-body">

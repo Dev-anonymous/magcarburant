@@ -7,6 +7,7 @@
         <p class="lead small m-0">{{ $entity->longname }}</p>
         <hr />
         <div class="row">
+            @canlocal('Achat - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.purchase') }}')">
@@ -21,6 +22,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Vente - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.sale') }}')">
@@ -35,6 +39,8 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+            @canlocal('Livraison excédentaire - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.delivery') }}')">
@@ -48,6 +54,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Vente liées aux STEs minières - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.mining-sale') }}')">
@@ -62,6 +71,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Stock de sécurité collecté reversé - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.security-stock', $entity) }}')">
@@ -81,6 +93,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Comptabilité - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ route('provider.accounting') }}')">
@@ -92,14 +107,12 @@
                                 <p class="m-0">Gestion de la comptabilité</p>
                             </div>
                         </div>
-                        {{-- <div class="text-center">
-                            <a href="{{ route('provider.rates') }}">Taux réels</a>
-                            <span>|</span>
-                            <a href="{{ route('provider.prices') }}">Structures des prix</a>
-                        </div> --}}
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal('Tableau de bord - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
                     onclick="location.assign('{{ route('provider.dash') }}')">
@@ -114,27 +127,37 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="carte" style="min-height: 120px"">
-                    <div class="w-100">
-                        <div class="d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                                fill="#000">
-                                <path
-                                    d="M292-527q-42-42-42-108t42-108q42-42 108-42t108 42q42 42 42 108t-42 108q-42 42-108 42t-108-42ZM80-164v-94q0-35 17.5-63t50.5-43q72-32 133.5-46T400-424h23q-6 14-9 27.5t-5 32.5h-9q-58 0-113.5 12.5T172-310q-16 8-24 22.5t-8 29.5v34h269q5 18 12 32.5t17 27.5H80Zm587 44-10-66q-17-5-34.5-14.5T593-222l-55 12-25-42 47-44q-2-9-2-25t2-25l-47-44 25-42 55 12q12-12 29.5-21.5T657-456l10-66h54l10 66q17 5 34.5 14.5T795-420l55-12 25 42-47 44q2 9 2 25t-2 25l47 44-25 42-55-12q-12 12-29.5 21.5T731-186l-10 66h-54Zm85-143q22-22 22-58t-22-58q-22-22-58-22t-58 22q-22 22-22 58t22 58q22 22 58 22t58-22ZM464.5-570.5Q490-596 490-635t-25.5-64.5Q439-725 400-725t-64.5 25.5Q310-674 310-635t25.5 64.5Q361-545 400-545t64.5-25.5ZM400-635Zm9 411Z" />
-                            </svg>
-                            <div class="p-2">
-                                <h4 class="font-weight-bold">Utilisateurs & Rôles</h4>
+            @endcanlocal
+
+            @if (can('Gestion des utilisateurs - Lire') || can('Gestion des rôles - Lire'))
+                <div class="col-md-6">
+                    <div class="carte" style="min-height: 120px"">
+                        <div class="w-100">
+                            <div class="d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960"
+                                    width="48px" fill="#000">
+                                    <path
+                                        d="M292-527q-42-42-42-108t42-108q42-42 108-42t108 42q42 42 42 108t-42 108q-42 42-108 42t-108-42ZM80-164v-94q0-35 17.5-63t50.5-43q72-32 133.5-46T400-424h23q-6 14-9 27.5t-5 32.5h-9q-58 0-113.5 12.5T172-310q-16 8-24 22.5t-8 29.5v34h269q5 18 12 32.5t17 27.5H80Zm587 44-10-66q-17-5-34.5-14.5T593-222l-55 12-25-42 47-44q-2-9-2-25t2-25l-47-44 25-42 55 12q12-12 29.5-21.5T657-456l10-66h54l10 66q17 5 34.5 14.5T795-420l55-12 25 42-47 44q2 9 2 25t-2 25l47 44-25 42-55-12q-12 12-29.5 21.5T731-186l-10 66h-54Zm85-143q22-22 22-58t-22-58q-22-22-58-22t-58 22q-22 22-22 58t22 58q22 22 58 22t58-22ZM464.5-570.5Q490-596 490-635t-25.5-64.5Q439-725 400-725t-64.5 25.5Q310-674 310-635t25.5 64.5Q361-545 400-545t64.5-25.5ZM400-635Zm9 411Z" />
+                                </svg>
+                                <div class="p-2">
+                                    <h4 class="font-weight-bold">Utilisateurs & Rôles</h4>
+                                </div>
                             </div>
-                        </div>
-                        <div class="text-center">
-                            <a class="text-primary" href="{{ route('users') }}">Gestion des utilisateurs</a>
-                            <span>|</span>
-                            <a class="text-primary" href="{{ route('roles') }}">Gestion des rôles</a>
+                            <div class="text-center">
+                                @if (can('Gestion des utilisateurs - Lire'))
+                                    <a class="text-primary" href="{{ route('users') }}">Gestion des utilisateurs</a>
+                                @endif
+                                @if (can('Gestion des rôles - Lire'))
+                                    <span>|</span>
+                                    <a class="text-primary" href="{{ route('roles') }}">Gestion des rôles</a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
+
+            @canlocal('Audit - Lire')
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px;"
                     onclick="location.assign('{{ route('applogs') }}')">
@@ -149,6 +172,7 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
         </div>
 
     </div>

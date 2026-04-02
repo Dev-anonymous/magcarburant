@@ -20,10 +20,13 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        can('Gestion des rôles - Lire', true);
 
-        $roles = $user->roles;
+        $user = request()->user();
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+
+        $parent = $user->user ?? $user;
+        $roles = $parent->roles;
 
         return DataTables::of($roles)
             ->addIndexColumn()
@@ -50,12 +53,26 @@ class RoleController extends Controller
                     'perms' => $row->permissions->pluck('id')->all(),
                 ]));
 
-                $eb = "
+                $btn = "";
+                $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
                         <span class='align-middle'>Modifier</span>
                     </a>
                 ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Gestion des rôles - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Gestion des rôles - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -71,15 +88,14 @@ class RoleController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
 
+                if (empty($btn)) {
+                    $t = '';
+                }
                 return $t;
             })
             ->rawColumns(['raw_data', 'action'])
@@ -92,24 +108,28 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        abort_if(!isProLogEtaUser(), 403, "No permission");
 
         if (request('action') == 'update') {
+            can('Gestion des rôles - Modifier', true);
+
             $role = Role::findOrFail(request('id'));
+
+            $parent = $user->user ?? $user;
 
             $request->validate([
                 'name' => [
                     'required',
                     'string',
-                    Rule::unique('roles')->where(function ($query) use ($user) {
-                        return $query->where('users_id', $user->id);
+                    Rule::unique('roles')->where(function ($query) use ($parent) {
+                        return $query->where('users_id', $parent->id);
                     })->ignore($role->id),
                 ],
                 'permissions' => 'nullable|array',
                 'permissions.*' => 'exists:permissions,name',
             ]);
 
-            DB::transaction(function () use ($request, $user, $role) {
+            DB::transaction(function () use ($request, $parent, $role) {
                 $role->update([
                     'name' => strtolower($request->name),
                 ]);
@@ -117,7 +137,7 @@ class RoleController extends Controller
                 RoleHasPermission::where('role_id', $role->id)->delete();
                 if ($request->filled('permissions')) {
                     $permissions = Permission::whereIn('name', $request->permissions)
-                        ->where('user_role', $user->user_role)
+                        ->where('user_role', $parent->user_role)
                         ->get();
 
                     foreach ($permissions as $permission) {
@@ -134,24 +154,27 @@ class RoleController extends Controller
                 'message' => 'Rôle mis à jour avec succès',
             ]);
         } else {
+            can('Gestion des rôles - Créer', true);
+            $parent = $user->user ?? $user;
+
             $request->validate([
                 'name' => [
                     'required',
                     'string',
-                    Rule::unique('roles')->where(function ($query) use ($user) {
-                        return $query->where('users_id', $user->id);
+                    Rule::unique('roles')->where(function ($query) use ($parent) {
+                        return $query->where('users_id', $parent->id);
                     }),
                 ],
                 'permissions' => 'nullable|array',
                 'permissions.*' => 'exists:permissions,name',
             ]);
 
-            DB::transaction(function () use ($request, $user) {
+            DB::transaction(function () use ($request, $parent) {
                 $role = Role::create([
                     'name' => strtolower($request->name),
-                    'users_id' => $user->id,
+                    'users_id' => $parent->id,
                 ]);
-                $permissions = Permission::whereIn('name', (array) $request->permissions)->where('user_role', $user->user_role)->get();
+                $permissions = Permission::whereIn('name', (array) $request->permissions)->where('user_role', $parent->user_role)->get();
                 foreach ($permissions as $permission) {
                     RoleHasPermission::create([
                         'role_id' => $role->id,
@@ -188,10 +211,14 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+        can('Gestion des rôles - Supprimer', true);
 
-        $i = childrenlist($user, false);
+        $user = request()->user();
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+
+        $parent = $user->user ?? $user;
+
+        $i = childrenlist($parent, false);
         $n = User::whereIn('id', $i)->where('role_id', $role->id)->count();
 
         abort_if($n, 422, "Vous ne pouvez pas supprimer ce rôle pour le moment, car il contient $n utilisateur(s)");

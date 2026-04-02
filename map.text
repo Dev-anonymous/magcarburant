@@ -20,10 +20,31 @@ Charge SOCIR =>
 Charges Sep Congo =>
 
 
-Je disais, pour les carburant de type terrestre, labels
-                    'Charges Sep Congo et Autres entrepots', NORD,
-                     "Charges d'exploitation logisticiens (frais d'entreprot)" EST, SUD font reference au label 'Charges Sep Congo' ;
 
+$seplabel = 'Charges Sep Congo';
+            if ($fuelObj->fuel_type == 'terrestre') {
+                if ($e->way == 'NORD') {
+                    $seplabel = 'Charges Sep Congo et Autres entrepots';
+                }
+                if (in_array($e->way, ['SUD', 'EST'])) {
+                    $seplabel = "Charges d'exploitation logisticiens (frais d'entreprot)";
+                }
+            } elseif ($fuelObj->fuel_type == 'aviation') {
+                if (in_array($e->way, ['SUD', 'EST'])) {
+                    $seplabel = "Charges d'exploitation logisticien (Frais d'entrepot)";
+                }
+                if ($e->way == 'OUEST') {
+                    $seplabel = "Charges d'exploitation Sep Congo";
+                }
+            } else {
 
-                     
+Carburant de type terrestre
+
+au NORD, 'Charges Sep Congo et Autres entrepots' = 'Charges Sep Congo'
+au SUD, EST, "Charges d'exploitation logisticiens (frais d'entreprot)" = 'Charges Sep Congo'
+
+carburant de type aviation
+
+au SUD, EST, "Charges d'exploitation logisticien (Frais d'entrepot)" = 'Charges Sep Congo'
+a l'OUEST, "Charges d'exploitation Sep Congo" = 'Charges Sep Congo'
 

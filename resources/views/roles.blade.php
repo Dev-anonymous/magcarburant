@@ -28,9 +28,11 @@
                                 Liste des rôles
                             </h4>
                             <div class="">
+                                @canlocal('Gestion des rôles - Créer')
                                 <button type="button" class="btn btn-sm btn-primary" id="badd">
                                     <i class="material-icons md-18">add_circle_outline</i> Nouveau role
                                 </button>
+                                @endcanlocal
                             </div>
                         </div>
                     </div>

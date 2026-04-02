@@ -37,7 +37,7 @@ class DataController extends Controller
                 if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    $entity = $user->entities()->first();
+                    $entity = gentity();
                 }
                 $base = $entity->purchases()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 

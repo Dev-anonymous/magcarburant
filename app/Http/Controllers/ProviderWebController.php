@@ -100,11 +100,13 @@ class ProviderWebController extends Controller
 
     function purchase()
     {
+        can('Achat - Lire', true);
         return view('provider.purchase');
     }
 
     function sale()
     {
+        can('Vente - Lire', true);
         return view('provider.sale');
     }
 

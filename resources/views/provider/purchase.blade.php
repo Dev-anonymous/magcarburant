@@ -82,35 +82,37 @@
                                     $d = now()->startOfMonth()->toDateString();
                                     $d2 = now()->toDateString();
                                 @endphp
-                                @if (auth()->user()->user_role === 'petrolier')
-                                    <div class="col-xs-12 col-sm-6">
-                                        <form class="form-inline filters-form pull-right" role="form">
-                                            <div class="form-group mb-1">
-                                                <label class="mr-2" for="dv222">Du</label>
-                                                <input class="form-control flatpickr2" id="dv222"
-                                                    value="{{ $d }}" name="date1" style="width:100px" />
-                                            </div>
-                                            <div class="form-group mb-1">
-                                                <label class="mr-2" for="dv22">Au</label>
-                                                <input class="form-control flatpickr2" id="dv22"
-                                                    value="{{ $d2 }}" name="date2" style="width:100px" />
-                                            </div>
-                                            <div class="form-group mb-1">
-                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
-                                                    data-target="#mdlChose">
-                                                    <i class="material-icons md-18">add_circle_outline</i> Nouvel achat
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                @endif
+                                <div class="col-xs-12 col-sm-6">
+                                    <form class="form-inline filters-form pull-right" role="form">
+                                        <div class="form-group mb-1">
+                                            <label class="mr-2" for="dv222">Du</label>
+                                            <input class="form-control flatpickr2" id="dv222"
+                                                value="{{ $d }}" name="date1" style="width:100px" />
+                                        </div>
+                                        <div class="form-group mb-1">
+                                            <label class="mr-2" for="dv22">Au</label>
+                                            <input class="form-control flatpickr2" id="dv22"
+                                                value="{{ $d2 }}" name="date2" style="width:100px" />
+                                        </div>
+                                        @canlocal('Achat - Créer')
+                                        <div class="form-group mb-1">
+                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                                                data-target="#mdlChose">
+                                                <i class="material-icons md-18">add_circle_outline</i> Nouvel achat
+                                            </button>
+                                        </div>
+                                        @endcanlocal
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body">
+                            @canlocal('Achat - Supprimer')
                             <button style="display: none" type="button" class="btn btn-sm btn-danger mb-2"
                                 data-toggle="modal" data-target="#mdldelall" id="btnDelAll">
                                 <i class="material-icons md-18">delete</i> <span text></span>
                             </button>
+                            @endcanlocal
                             <div class="table-responsive">
                                 <table id="table" class="table table-striped table-hover text-center text-nowrap"
                                     style="width:100%">

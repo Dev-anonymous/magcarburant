@@ -17,8 +17,10 @@ class AccountingClosureController extends Controller
      */
     public function index()
     {
+        can('Configuration - Lire', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $entity = Entity::findOrFail(request('entity_id'));
 
@@ -61,6 +63,8 @@ class AccountingClosureController extends Controller
                     </div>
                 DATA;
 
+                if (!can('Configuration - Modifier')) return;
+
                 return $t;
             })->rawColumns(['action'])
             ->make(true);
@@ -71,8 +75,10 @@ class AccountingClosureController extends Controller
      */
     public function store(Request $request)
     {
+        can('Configuration - Modifier', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $validated = $request->validate([
             'closed_until' => 'required|date|before_or_equal:today',

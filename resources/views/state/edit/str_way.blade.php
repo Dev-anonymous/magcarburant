@@ -100,12 +100,14 @@
                                                 </table>
                                             </div>
                                             <div class="">
-                                                <div class="text-right">
-                                                    <button class="btn btn-sm btn-edit-table">
-                                                        <i class="material-icons md-18">edit</i>
-                                                        Modifier les prix
-                                                    </button>
-                                                </div>
+                                                @if (isEtaUser() && can('Configuration - Modifier'))
+                                                    <div class="text-right">
+                                                        <button class="btn btn-sm btn-edit-table">
+                                                            <i class="material-icons md-18">edit</i>
+                                                            Modifier les prix
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

@@ -16,8 +16,10 @@ class StateRateController extends Controller
      */
     public function index()
     {
+        can('Configuration - Lire', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, 'Not permit');
+        abort_if(!isEtaUser(), 403, 'Not permit');
 
         $data = StateRate::query();
 
@@ -41,6 +43,26 @@ class StateRateController extends Controller
                     'usd_cdf' => $row->usd_cdf,
                 ]));
 
+                $btn = "";
+                $btn1 = "
+                    <a class='dropdown-item' href='#' bedit data='$data'>
+                        <i class='material-icons md-14 align-middle'>edit</i>
+                        <span class='align-middle'>Modifier</span>
+                    </a>
+                ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Configuration - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Configuration - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -56,17 +78,15 @@ class StateRateController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class='dropdown-item' href='#' bedit data='$data'>
-                                <i class='material-icons md-14 align-middle'>edit</i>
-                                <span class='align-middle'>Modifier</span>
-                            </a>
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
+
+                if (empty($btn)) {
+                    $t = '';
+                }
+
 
                 return $t;
             })
@@ -80,6 +100,8 @@ class StateRateController extends Controller
     public function store(Request $request)
     {
         if (request('action') == 'update') {
+            can('Configuration - Modifier', true);
+
             $validated = $request->validate([
                 'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -94,7 +116,7 @@ class StateRateController extends Controller
             $user = request()->user();
             $id = request('id');
             $rate = StateRate::findOrFail($id);
-            abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+            abort_if(!isEtaUser(), 403, "No permission");
 
             if ($rate->to) {
                 DB::beginTransaction();
@@ -141,6 +163,8 @@ class StateRateController extends Controller
                 'message' => "Le taux a été mis à jour avec succès.",
             ], 200);
         } else {
+            can('Configuration - Créer', true);
+
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -152,7 +176,7 @@ class StateRateController extends Controller
             ]);
 
             $user = request()->user();
-            if (in_array($user->user_role, ['etatique'])) {
+            if (isEtaUser()) {
                 $rate = new StateRate;
                 $lastTx = StateRate::orderByDesc('from')->first();
             } else {
@@ -208,8 +232,10 @@ class StateRateController extends Controller
      */
     public function destroy(StateRate $staterate)
     {
+        can('Configuration - Supprimer', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $last = $staterate->orderByDesc('from')->first();
         if ($last->id !== $staterate->id) {

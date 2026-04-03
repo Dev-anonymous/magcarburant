@@ -128,6 +128,7 @@
             }, 100);
         });
 
+        @canlocal('Configuration - Modifier')
         $(document).on('click', '.editdata', function() {
             var tr = $(this);
             var data = tr.data('data');
@@ -148,7 +149,8 @@
             $('[name="ouest"]', mdl).val(data.OUEST.v);
             mdl.modal('show');
         });
-
+        @endcan
+        
         $('[fedit]').on('submit', function(e) {
             e.preventDefault();
             var form = $(this);

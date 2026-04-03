@@ -16,8 +16,10 @@ class StateStructurepriceController extends Controller
      */
     public function index()
     {
+        can('Configuration - Lire', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $structureprices = StateStructureprice::query();
 
@@ -34,10 +36,14 @@ class StateStructurepriceController extends Controller
             })
             ->addColumn('view', function ($row) use ($user) {
                 $href = route('state.str-price', ['stx' => $row->id]);
-                $t = "<a class='btn btn-sm btn-primary' href='$href'>
+                $t = "";
+                if (can('Configuration - Modifier')) {
+                    $t = "<a class='btn btn-sm btn-primary' href='$href'>
                         <i class='material-icons md-14 align-middle'>settings</i>
                         <span class='align-middle'>Voies et Structures</span>
                     </a>";
+                }
+
                 return $t;
             })
             ->addColumn('action', function ($row) use ($user) {
@@ -48,6 +54,26 @@ class StateStructurepriceController extends Controller
                     'to' => $row->to?->format('Y-m-d'),
                     'usd_cdf' => $row->usd_cdf,
                 ]));
+
+                $btn = "";
+                $btn1 = "
+                    <a class='dropdown-item' href='#' bedit data='$data'>
+                        <i class='material-icons md-14 align-middle'>edit</i>
+                        <span class='align-middle'>Modifier</span>
+                    </a>
+                ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Configuration - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Configuration - Supprimer')) {
+                    $btn .= $btn2;
+                }
 
                 $t = <<<DATA
                     <div class="dropdown">
@@ -64,21 +90,16 @@ class StateStructurepriceController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class='dropdown-item' href='#' bedit data='$data'>
-                                <i class='material-icons md-14 align-middle'>edit</i>
-                                <span class='align-middle'>Modifier</span>
-                            </a>
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
 
-                // if ($user->user_role == 'petrolier') {
+                if (empty($btn)) {
+                    $t = '';
+                }
+
                 return $t;
-                // }
             })
             ->rawColumns(['action', 'view', 'tx'])
             ->make(true);
@@ -89,10 +110,14 @@ class StateStructurepriceController extends Controller
      */
     public function store(Request $request)
     {
+        can('Configuration - Créer', true);
+
         $user = request()->user();
-        abort_unless(in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_unless(isEtaUser(), 403, "No permission");
 
         if (request('action') == 'update') {
+            can('Configuration - Modifier', true);
+
             $validated = $request->validate([
                 'from' => 'nullable|string|date|before_or_equal:today',
                 'to' => 'nullable|string|date|after_or_equal:from|before_or_equal:today',
@@ -152,6 +177,8 @@ class StateStructurepriceController extends Controller
                 'message' => "La structure des prix a été mise à jour avec succès.",
             ], 200);
         } else {
+            can('Configuration - Créer', true);
+
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
                 'usd_cdf' => 'required|numeric|min:0.00000001',
@@ -219,8 +246,10 @@ class StateStructurepriceController extends Controller
      */
     public function destroy(StateStructureprice $statestructureprice)
     {
+        can('Configuration - Supprimer', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $last = StateStructureprice::orderByDesc('from')->first();
         if ($last->id !== $statestructureprice->id) {

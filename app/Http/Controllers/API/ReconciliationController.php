@@ -20,9 +20,11 @@ class ReconciliationController extends Controller
 {
     function reconciliation()
     {
+        can('Réconciliation - Lire', true);
+
         $user = request()->user();
 
-        abort_unless($user->user_role == 'etatique', 403, 'Not permit');
+        abort_unless(isEtaUser(), 403, 'Not permit');
         $entity_id = request('entity_id');
         $entity = Entity::findOrFail($entity_id);
         $item = (array) request('item');
@@ -31,7 +33,7 @@ class ReconciliationController extends Controller
         $date = array_filter($date);
         $from = @$date[0] ?? nnow()->toDateString();
         $to = @$date[1] ?? $from;
-        $me = $user->entities()->first();
+        $me = gentity();
 
         $date1 = new DateTime($from);
         $date2 = new DateTime($to);

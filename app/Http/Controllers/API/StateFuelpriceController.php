@@ -37,11 +37,13 @@ class StateFuelpriceController extends Controller
      */
     public function update(Request $request, StateFuelprice $statefuelprice)
     {
+        can('Configuration - Modifier', true);
+
         $validated = $request->validate([
             'price' => 'required|numeric',
         ]);
         $user = request()->user();
-        abort_unless(in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_unless(isEtaUser(), 403, "No permission");
 
         abort_if($statefuelprice->zone->zone !==  "OUEST" && $statefuelprice->label->tag === 'L', 403, "Can't edit");
         abort_if(in_array($statefuelprice->label->label, noteditable($statefuelprice->fuel->fuel_type, $statefuelprice->zone->zone)), 403, "Can't edit");

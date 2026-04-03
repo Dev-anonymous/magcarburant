@@ -20,6 +20,7 @@ class StateWebController extends Controller
 
     function dash()
     {
+        can('Tableau de bord - Lire', true);
         return view('common.dash');
     }
 
@@ -125,6 +126,8 @@ class StateWebController extends Controller
 
     function avg_price()
     {
+        can('Configuration - Lire', true);
+
         initAvgPrice();
         $years = AverageFuelPrice::selectRaw('YEAR(month) as year')
             ->distinct()
@@ -136,27 +139,34 @@ class StateWebController extends Controller
 
     function reconciliation(Entity $entity)
     {
+        can('Réconciliation - Lire', true);
+
         $me = gentity();
         return view('state.views.reconciliation', compact('entity', 'me'));
     }
 
     function config()
     {
+        can('Configuration - Lire', true);
         return view('state.views.apps-config');
     }
 
     function real_tx()
     {
+        can('Configuration - Lire', true);
         return view('state.edit.real_tx');
     }
 
     function struct_tx()
     {
+        can('Configuration - Lire', true);
         return view('state.views.strates_v');
     }
 
     function str_price()
     {
+        can('Configuration - Lire', true);
+
         $stx = request('stx');
         if ($stx) {
             $structure = StateStructureprice::with(['state_fuelprices.fuel', 'state_fuelprices.zone', 'state_fuelprices.label'])->find($stx);

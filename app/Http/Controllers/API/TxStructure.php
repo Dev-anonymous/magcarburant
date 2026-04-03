@@ -15,7 +15,7 @@ class TxStructure extends Controller
      */
     public function index()
     {
-        can('Taux structures - Lire', true);
+        can('Configuration - Lire', true);
 
         $user = request()->user();
         if (isPetroUser() || isLogUser()) {

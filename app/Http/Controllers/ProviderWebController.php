@@ -34,12 +34,14 @@ class ProviderWebController extends Controller
 
         $item = request('item');
         if ($item == 'rtx') {
+            can('Taux réels - Lire', true);
             $user = request()->user();
             $entity = gentity();
             return view('common.rates', compact('entity'));
         }
 
         if ($item == 'stx') {
+            can('Taux structures - Lire', true);
             $user = request()->user();
             $entity = gentity();
             return view('provider.structrates', compact('entity'));

@@ -116,36 +116,8 @@ class StructurepriceController extends Controller
                     $t = '';
                 }
 
-                // $t = <<<DATA
-                //     <div class="dropdown">
-                //         <a
-                //             class="btn btn-primary2 btn-sm"
-                //             href="#"
-                //             role="button"
-                //             data-toggle="dropdown"
-                //             aria-haspopup="true"
-                //             aria-expanded="false"
-                //         >
-                //             <i class="material-icons md-18 align-middle"
-                //             >more_vert</i
-                //             >
-                //         </a>
-                //         <div class="dropdown-menu dropdown-menu-right">
-                //             <a class='dropdown-item' href='#' bedit data='$data'>
-                //                 <i class='material-icons md-14 align-middle'>edit</i>
-                //                 <span class='align-middle'>Modifier</span>
-                //             </a>
-                //             <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                //                 <i class="material-icons md-14 align-middle">delete</i>
-                //                 <span class="align-middle">Supprimer</span>
-                //             </a>
-                //         </div>
-                //     </div>
-                // DATA;
-
-                // if ($user->user_role == 'petrolier') {
                 return $t;
-                // }
+
             })
             ->rawColumns(['action', 'view', 'tx'])
             ->make(true);

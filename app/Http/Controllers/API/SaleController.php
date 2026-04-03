@@ -24,11 +24,12 @@ class SaleController extends Controller
      */
     public function index()
     {
-        can('Vente - Lire', true);
 
         if (isPetroUser() || isLogUser()) {
+            can('Vente - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
+            can(['Mode lecture - Lire'], true);
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

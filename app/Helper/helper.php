@@ -728,8 +728,7 @@ function terminal()
     })->all();
 }
 
-
-function can($permissionName, $abort = false)
+function can(string|array $permissionNames, bool $abort = false): bool
 {
     $user = request()->user();
     if (! $user) {
@@ -739,7 +738,15 @@ function can($permissionName, $abort = false)
     $can = in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'], true);
 
     if ($user->user_role === 'utilisateur') {
-        $can = $user->role->permissions()->where('name', $permissionName)->exists();
+        if (is_string($permissionNames)) {
+            $can = $user->role->permissions()
+                ->where('name', $permissionNames)
+                ->exists();
+        } else {
+            $can = $user->role->permissions()
+                ->whereIn('name', $permissionNames)
+                ->exists();
+        }
     }
 
     if ($user->user_role === 'sudo') {

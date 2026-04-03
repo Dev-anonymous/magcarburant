@@ -27,10 +27,12 @@
                             Historique des structures des prix
                         </h4>
                         <div class="">
+                            @canlocal('Configuration - Créer')
                             <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                 <i class="material-icons md-24">add_circle_outline</i>
                                 Nouvelle structure
                             </button>
+                            @endcanlocal
                         </div>
                     </div>
                     <div class="py-4">

@@ -21,11 +21,12 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        can('Achat - Lire', true);
 
         if (isPetroUser()) {
+            can('Achat - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
+            can(['Mode lecture - Lire'], true);
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

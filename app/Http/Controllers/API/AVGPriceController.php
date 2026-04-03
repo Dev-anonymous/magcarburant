@@ -15,6 +15,8 @@ class AVGPriceController extends Controller
      */
     public function index()
     {
+        can('Configuration - Lire', true);
+
         $year = request('year', nnow()->year);
 
         $rows = AverageFuelPrice::with('zone')
@@ -51,8 +53,10 @@ class AVGPriceController extends Controller
      */
     public function store(Request $request)
     {
+        can('Configuration - Modifier', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['etatique']), 403, "No permission");
+        abort_if(!isEtaUser(), 403, "No permission");
 
         $validated = $request->validate([
             'nord_id'  => 'required|numeric|exists:average_fuel_prices,id',

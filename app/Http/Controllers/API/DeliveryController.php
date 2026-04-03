@@ -21,13 +21,14 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-        can('Livraison excédentaire - Lire', true);
 
         $user = request()->user();
 
         if (isPetroUser()) {
+            can('Livraison excédentaire - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
+            can(['Mode lecture - Lire'], true);
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -53,7 +54,7 @@ class DeliveryController extends Controller
         return DataTables::of($deliveries)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
-                if(!can('Livraison excédentaire - Supprimer')) return;
+                if (!can('Livraison excédentaire - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>

@@ -27,10 +27,12 @@
                             Historique des taux
                         </h4>
                         <div class="">
+                            @canlocal('Configuration - Créer')
                             <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#mdladd">
                                 <i class="material-icons md-24">add_circle_outline</i>
                                 Nouveau taux
                             </button>
+                            @endcanlocal
                         </div>
                     </div>
                     <div class="py-4">
@@ -229,8 +231,7 @@
                 targets: 3,
                 width: '1%'
             }],
-            columns: [
-                {
+            columns: [{
                     data: 'rate',
                     name: 'rate',
                     className: 'text-nowrap font-weight-bold',

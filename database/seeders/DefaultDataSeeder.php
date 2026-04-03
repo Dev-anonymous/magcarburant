@@ -217,6 +217,10 @@ class DefaultDataSeeder extends Seeder
             'Mode écriture' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
             'Réconciliation' => ['Lire',],
             'Configuration' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Tableau de bord' => ['Lire'],
+            'Audit' => ['Lire'],
+            'Gestion des utilisateurs' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
+            'Gestion des rôles' => ['Créer', 'Lire', 'Modifier', 'Supprimer'],
         ];
 
         $modulesCrud = [

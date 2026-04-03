@@ -89,32 +89,38 @@
                                                 value="{{ $d2 }}" name="date2" style="width:100px" />
                                         </div>
                                         <div class="form-group mb-1">
+                                            @canlocal('Vente liées aux STEs minières - Créer')
                                             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
                                                 data-target="#mdlChose">
                                                 <i class="material-icons md-18">add_circle_outline</i> Nouvelle vente
                                             </button>
+                                            @endcanlocal
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
+                            @canlocal('Vente liées aux STEs minières - Supprimer')
                             <button style="display: none" type="button" class="btn btn-sm btn-danger mb-2"
                                 data-toggle="modal" data-target="#mdldelall" id="btnDelAll">
                                 <i class="material-icons md-18">delete</i> <span text></span>
                             </button>
+                            @endcanlocal
                             <div class="table-responsive">
                                 <table id="table" class="table table-striped table-hover text-center text-nowrap"
                                     style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>
+                                                @canlocal('Vente liées aux STEs minières - Supprimer')
                                                 <div class="custom-control custom-checkbox mt-3">
                                                     <input type="checkbox" name="remember" class="custom-control-input"
                                                         id="selall">
                                                     <label class="custom-control-label" for="selall">
                                                     </label>
                                                 </div>
+                                                @endcanlocal
                                             </th>
                                             <th>Terminal</th>
                                             <th>Date</th>
@@ -670,7 +676,9 @@
             }, ],
 
         }).on('draw.dt', function(e, settings, data, xhr) {
-            sell[0].checked = false;
+            try {
+                sell[0].checked = false;
+            } catch (error) {}
             canshow();
 
             $('[bedit]').off('click').click(function() {

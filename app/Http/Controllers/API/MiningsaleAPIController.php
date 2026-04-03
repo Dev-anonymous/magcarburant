@@ -22,12 +22,12 @@ class MiningsaleAPIController extends Controller
      */
     public function index()
     {
+        can('Vente liées aux STEs minières - Lire', true);
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
 
-        if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -55,6 +55,7 @@ class MiningsaleAPIController extends Controller
         return DataTables::of($sales)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
+                if (!can('Vente liées aux STEs minières - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
@@ -79,16 +80,30 @@ class MiningsaleAPIController extends Controller
                 return "<div class=''>$f</div>";
             })
             ->addColumn('action', function ($row) use ($user) {
-                $eb = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
-                $eb = "
+
+                $btn = "";
+                $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
                         <span class='align-middle'>Modifier</span>
                     </a>
                 ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Vente liées aux STEs minières - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Vente liées aux STEs minières - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -104,22 +119,16 @@ class MiningsaleAPIController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
 
-                if ($row->from_mutuality) {
+                if (empty($btn)) {
                     $t = '';
                 }
 
-                if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-                    return $t;
-                }
+                return $t;
             })
             ->rawColumns(['action', 'salefile', 'selall'])
             ->make(true);
@@ -133,7 +142,9 @@ class MiningsaleAPIController extends Controller
         $user = request()->user();
 
         if (request('action') == 'update') {
-            abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
+            can('Vente liées aux STEs minières - Modifier', true);
+
+            abort_if(!isProLogEtaUser(), 403, "No permission");
 
             $id = request('id');
             $sale = MiningSale::findOrFail($id);
@@ -190,13 +201,15 @@ class MiningsaleAPIController extends Controller
                 'message' => "Votre vente a été mise à jour avec succès !",
             ]);
         } elseif (request('action') == 'import') {
+            can('Vente liées aux STEs minières - Créer', true);
+
             $validated = $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } else if ($user->user_role == 'etatique') {
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } else if (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -309,7 +322,7 @@ class MiningsaleAPIController extends Controller
                     continue;
                 }
 
-                if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
+                if (isPetroUser() || isLogUser()) {
                     if (MiningSale::where([
                         'way' => $colD,
                         'product' => $colE,
@@ -340,7 +353,7 @@ class MiningsaleAPIController extends Controller
                 $sale = MiningSale::create($ins);
                 $insert[] = $ins;
 
-                if ($user->user_role !== 'etatique') {
+                if (!isEtaUser()) {
                     if (strtoupper($colD) == 'OUEST') {
                         if ($entity->user->user_role == 'logisticien') {
                             $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
@@ -384,9 +397,11 @@ class MiningsaleAPIController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif ($user->user_role == 'etatique') {
+            can('Vente liées aux STEs minières - Créer', true);
+
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } elseif (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -418,7 +433,7 @@ class MiningsaleAPIController extends Controller
             $sale = MiningSale::create($validated);
 
             if ($entity->user->user_role == 'logisticien') {
-                if ($user->user_role !== 'etatique') {
+                if (!isEtaUser()) {
                     $wz = $entity->workingzones()->with('zone')->get()->pluck('zone.zone')->all();
                     $w = strtoupper(request('way'));
                     if (in_array($w, $wz) && $w == 'OUEST') {
@@ -477,12 +492,14 @@ class MiningsaleAPIController extends Controller
      */
     public function destroy(MiningSale $miningsale)
     {
+        can('Vente liées aux STEs minières - Supprimer', true);
+
         $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'logisticien', 'etatique']), 403, "No permission");
-        if ($user->user_role == 'etatique') {
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        if (isEtaUser()) {
             //
         } else {
-            $entity = $user->entities()->first();
+            $entity = gentity();
             abort_if($entity->id != $miningsale->entity_id, 403, "Not permit");
         }
 

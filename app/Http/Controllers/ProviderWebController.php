@@ -12,6 +12,7 @@ use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Can;
 
 class ProviderWebController extends Controller
 {
@@ -23,11 +24,14 @@ class ProviderWebController extends Controller
 
     function dash()
     {
+        can('Tableau de bord - Lire', true);
         return view('common.dash');
     }
 
     function accounting()
     {
+        can('Comptabilité - Lire', true);
+
         $item = request('item');
         if ($item == 'rtx') {
             $user = request()->user();
@@ -42,20 +46,24 @@ class ProviderWebController extends Controller
         }
 
         if ($item == 'pricestr') {
+            can('Structure des prix - Lire', true);
             $user = request()->user();
             $entity = gentity();
             return view('common.structprices', compact('entity'));
         }
 
         if ($item == 'gb') {
+            can('Grand livre manque à gagner - Lire', true);
             return view('provider.greatebook');
         }
 
         if ($item == 'cc') {
+            can('Grand livre croisement des créances - Lire', true);
             return view('provider.greatebookCR');
         }
 
         if ($item == 'pf') {
+            can('Grand livre fiscalité - Lire', true);
             return view('provider.greatebookparafisc');
         }
 
@@ -112,11 +120,13 @@ class ProviderWebController extends Controller
 
     function mining_sale()
     {
+        can('Vente liées aux STEs minières - Lire', true);
         return view('provider.mining_sale');
     }
 
     function analyse()
     {
+        can('Bilan manque à gagner - Lire', true);
         $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.analyse', compact('ps'));
@@ -124,6 +134,7 @@ class ProviderWebController extends Controller
 
     function claim()
     {
+        can('Bilan croisement des créances - Lire', true);
         $entity = gentity();
         $ps = Structureprice::where('entity_id', $entity->id)->orderByDesc('id')->get();
         return view('provider.claim', compact('ps'));
@@ -131,16 +142,19 @@ class ProviderWebController extends Controller
 
     function delivery()
     {
+        can('Livraison excédentaire - Lire', true);
         return view('provider.delivery');
     }
 
     function taxation()
     {
+        can('Bilan fiscalité - Lire', true);
         return view('provider.taxation');
     }
 
     function security_stock()
     {
+        can('Stock de sécurité collecté reversé - Lire', true);
         initStockPrice();
         $years = SecurityStock::selectRaw('YEAR(month) as year')
             ->distinct()

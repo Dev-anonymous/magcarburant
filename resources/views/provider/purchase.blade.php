@@ -119,12 +119,13 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                                <div class="custom-control custom-checkbox mt-3">
-                                                    <input type="checkbox" name="remember" class="custom-control-input"
-                                                        id="selall">
-                                                    <label class="custom-control-label" for="selall">
-                                                    </label>
-                                                </div>
+                                                @if (can('Achat - Supprimer'))
+                                                    <div class="custom-control custom-checkbox mt-3">
+                                                        <input type="checkbox" class="custom-control-input" id="selall">
+                                                        <label class="custom-control-label" for="selall">
+                                                        </label>
+                                                    </div>
+                                                @endif
                                             </th>
                                             <th>Date</th>
                                             <th>Voie</th>
@@ -644,7 +645,9 @@
                 }
             }, ],
         }).on('draw.dt', function(e, settings, data, xhr) {
-            sell[0].checked = false;
+            try {
+                sell[0].checked = false;
+            } catch (error) {}
             canshow();
 
             $('[bedit]').off('click').click(function() {

@@ -101,15 +101,14 @@
                                                 </table>
                                             </div>
                                             <div class="">
-                                                @canlocal((isPetroUser() || isLogUser()) && can('Structure des prix -
-                                                Modifier'))
-                                                <div class="text-right">
-                                                    <button class="btn btn-sm btn-edit-table">
-                                                        <i class="material-icons md-18">edit</i>
-                                                        Modifier les prix
-                                                    </button>
-                                                </div>
-                                                @endcanlocal
+                                                @if (isProLogEtaUser() && can('Structure des prix - Modifier'))
+                                                    <div class="text-right">
+                                                        <button class="btn btn-sm btn-edit-table">
+                                                            <i class="material-icons md-18">edit</i>
+                                                            Modifier les prix
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

@@ -129,16 +129,18 @@ class DataController extends Controller
             }
 
             if ($type === 'mining-sale') {
+                can('Vente liées aux STEs minières - Lire', true);
+
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
                 $from = @$date[0] ?? nnow()->toDateString();
                 $to = @$date[1] ?? $from;
 
-                if ($user->user_role == 'etatique') {
+                if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    $entity = $user->entities()->first();
+                    $entity = gentity();
                 }
                 $base = $entity->mining_sales()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 
@@ -190,6 +192,8 @@ class DataController extends Controller
             }
 
             if ($type === 'delivery') {
+                can('Livraison excédentaire - Lire', true);
+
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
@@ -198,10 +202,10 @@ class DataController extends Controller
                 $zones = (array) request('zones');
                 $fuels = (array) request('fuels');
 
-                if ($user->user_role == 'etatique') {
+                if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    $entity = $user->entities()->first();
+                    $entity = gentity();
                 }
 
                 $base = $entity->deliveries()->whereBetween('date', [$from, $to])->where('from_state', from_state());
@@ -229,14 +233,17 @@ class DataController extends Controller
                 return compact('chart1', 'chart2');
             }
             if ($type === 'greatbook') {
+                can('Grand livre manque à gagner - Lire', true);
                 return $this->greatBookData();
             }
 
             if ($type === 'greatbookcr') {
+                can('Grand livre croisement des créances - Lire', true);
                 return $this->greatBookCrData();
             }
 
             if ($type === 'greatbookfisc') {
+                can('Grand livre fiscalité - Lire', true);
                 return $this->greatBookFiscData();
             }
 
@@ -245,6 +252,8 @@ class DataController extends Controller
             }
 
             if ($type === 'balance') {
+                can('Bilan manque à gagner - Lire', true);
+
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -368,9 +377,11 @@ class DataController extends Controller
             }
 
             if ($type === 'balancecr') {
-                if ($user->user_role == 'petrolier') {
-                    $entity = $user->entities()->first();
-                } else if ($user->user_role == 'etatique') {
+                can('Bilan croisement des créances - Lire', true);
+
+                if (isPetroUser()) {
+                    $entity = gentity();
+                } else if (isEtaUser()) {
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     abort(403);
@@ -746,6 +757,8 @@ class DataController extends Controller
             }
 
             if ($type === 'balancefisc') {
+                can('Bilan fiscalité - Lire', true);
+
                 $data = $this->greatBookFiscData();
                 $dhead = $data['head'];
                 $drows = $data['rows'];
@@ -1079,6 +1092,8 @@ class DataController extends Controller
             }
 
             if ($type === 'dash') {
+                can('Tableau de bord - Lire', true);
+
                 $date = request('date');
                 $date = explode(' to ', $date);
                 $date = array_filter($date);
@@ -1343,9 +1358,9 @@ class DataController extends Controller
         $isState = false;
         $mode = rmode();
         $user = request()->user();
-        if ($user->user_role == 'petrolier') {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isPetroUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
             $isState = true;
         } else {
@@ -1568,9 +1583,9 @@ class DataController extends Controller
 
         $user = request()->user();
         $isState = false;
-        if ($user->user_role == 'petrolier') {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isPetroUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
             $isState = true;
         } else {
@@ -1727,9 +1742,9 @@ class DataController extends Controller
         $items = request('items');
 
         $user = request()->user();
-        if ($user->user_role == 'petrolier') {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isPetroUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

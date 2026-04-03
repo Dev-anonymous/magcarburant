@@ -18,20 +18,19 @@ class SecurityStockController extends Controller
      */
     public function index()
     {
+        can('Stock de sécurité collecté reversé - Lire', true);
+
         $user = request()->user();
-        if (in_array($user->user_role, ['petrolier', 'logisticien', 'etatique'])) {
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } elseif (in_array($user->user_role, ['etatique'])) {
-                $entity  = Entity::findOrFail(request('entity_id'));
-            } else {
-                abort(403);
-            }
-            abort_if(!$entity, 422, "No entity");
-            $data = $entity->security_stocks()->where('from_state', from_state());
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+        } elseif (isEtaUser()) {
+            $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
         }
+        abort_if(!$entity, 422, "No entity");
+        $data = $entity->security_stocks()->where('from_state', from_state());
+
 
         $year = request('year', nnow()->year);
         $data->whereYear('month', $year);
@@ -55,15 +54,18 @@ class SecurityStockController extends Controller
                 return "<div class=''>$f</div>";
             })
             ->addColumn('action', function ($row) use ($user) {
-                $date = $row->month;
-                $m = ucfirst($date->translatedFormat('F')) . ' ' . $date->format('Y');
-                $data = e(json_encode(array_merge($row->toArray(), ['monthname' => $m])));
-
-                $t = "<button class='btn btn-sm btn-primary editdata'  data-data='$data'>
-                        <i class='material-icons md-14 align-middle'>edit</i>
-                        <span class='align-middle'>Modifier</span>
+                $t = '';
+                if (can('Stock de sécurité collecté reversé - Modifier')) {
+                    $date = $row->month;
+                    $m = ucfirst($date->translatedFormat('F')) . ' ' . $date->format('Y');
+                    $data = e(json_encode(array_merge($row->toArray(), ['monthname' => $m])));
+                    $t = "<button class='btn btn-sm btn-primary editdata'  data-data='$data'>
+                    <i class='material-icons md-14 align-middle'>edit</i>
+                    <span class='align-middle'>Modifier</span>
                     </button>";
-                if ($user->user_role == 'etatique') {
+                }
+
+                if (isEtaUser()) {
                     if (from_state()) {
                         return $t;
                     }
@@ -82,7 +84,7 @@ class SecurityStockController extends Controller
     {
         if (request('action') == 'update') {
             $user = request()->user();
-            abort_if(!in_array($user->user_role, ['petrolier', 'etatique', 'etatique']), 403, "No permission");
+            abort_if(!isProLogEtaUser(), 403, "No permission");
             $validated = $request->validate([
                 'id' => 'required|exists:security_stock',
                 'amount' => 'required|numeric|min:0',

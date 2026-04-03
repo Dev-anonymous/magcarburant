@@ -55,6 +55,7 @@ class SaleController extends Controller
         return DataTables::of($sales)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
+                if(!can('Vente - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>

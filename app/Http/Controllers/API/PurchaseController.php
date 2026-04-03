@@ -48,6 +48,7 @@ class PurchaseController extends Controller
         return DataTables::of($purchases)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
+                if (!can('Achat - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
@@ -402,7 +403,7 @@ class PurchaseController extends Controller
     public function destroy(Purchase $purchase)
     {
         can('Achat - Supprimer', true);
-        
+
         abort_if(!(isPetroUser() || isEtaUser()), 403, "No permission");
 
         if (isEtaUser()) {

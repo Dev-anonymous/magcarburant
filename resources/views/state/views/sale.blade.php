@@ -731,7 +731,9 @@
             }, ],
 
         }).on('draw.dt', function(e, settings, data, xhr) {
-            sell[0].checked = false;
+            try {
+                sell[0].checked = false;
+            } catch (error) {}
             canshow();
             @if ('view' == $mode)
                 $('#selall,.selall').closest('div').hide();

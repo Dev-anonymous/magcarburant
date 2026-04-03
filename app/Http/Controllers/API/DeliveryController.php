@@ -21,13 +21,13 @@ class DeliveryController extends Controller
      */
     public function index()
     {
+        can('Livraison excédentaire - Lire', true);
+
         $user = request()->user();
 
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
-
-        if ($user->user_role == 'petrolier') {
-            $entity = $user->entities()->first();
-        } else if ($user->user_role == 'etatique') {
+        if (isPetroUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -53,6 +53,7 @@ class DeliveryController extends Controller
         return DataTables::of($deliveries)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
+                if(!can('Livraison excédentaire - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
@@ -79,12 +80,27 @@ class DeliveryController extends Controller
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
-                $eb = "
+
+                $btn = "";
+                $btn1 = "
                     <a class='dropdown-item' href='#' bedit data='$data'>
                         <i class='material-icons md-14 align-middle'>edit</i>
                         <span class='align-middle'>Modifier</span>
                     </a>
                 ";
+                $btn2 = "
+                        <a class='dropdown-item text-danger' href='#' bdel data='$data'>
+                            <i class='material-icons md-14 align-middle'>delete</i>
+                            <span class='align-middle'>Supprimer</span>
+                        </a>";
+
+                if (can('Livraison excédentaire - Modifier')) {
+                    $btn .= $btn1;
+                }
+                if (can('Livraison excédentaire - Supprimer')) {
+                    $btn .= $btn2;
+                }
+
                 $t = <<<DATA
                     <div class="dropdown">
                         <a
@@ -100,18 +116,16 @@ class DeliveryController extends Controller
                             >
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            $eb
-                            <a class="dropdown-item text-danger" href="#" bdel data='$data'>
-                                <i class="material-icons md-14 align-middle">delete</i>
-                                <span class="align-middle">Supprimer</span>
-                            </a>
+                            $btn
                         </div>
                     </div>
                 DATA;
 
-                if (in_array($user->user_role, ['petrolier', 'etatique'])) {
-                    return $t;
+                if (empty($btn)) {
+                    $t = '';
                 }
+
+                return $t;
             })
             ->rawColumns(['action', 'deliveryfile', 'total', 'selall'])
             ->make(true);
@@ -125,6 +139,8 @@ class DeliveryController extends Controller
         $user = request()->user();
 
         if (request('action') == 'update') {
+            can('Livraison excédentaire - Modifier', true);
+
             $id = request('id');
             $delivery = Delivery::findOrFail($id);
 
@@ -176,13 +192,15 @@ class DeliveryController extends Controller
                 'message' => "Votre livraison a été mise à jour avec succès !",
             ]);
         } elseif (request('action') == 'import') {
+            can('Livraison excédentaire - Créer', true);
+
             $validated = $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls'
             ]);
 
-            if (in_array($user->user_role, ['petrolier', 'logisticien'])) {
-                $entity = $user->entities()->first();
-            } else if ($user->user_role == 'etatique') {
+            if (isPetroUser() || isLogUser()) {
+                $entity = gentity();
+            } else if (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -369,9 +387,11 @@ class DeliveryController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            if ($user->user_role == 'petrolier') {
-                $entity = $user->entities()->first();
-            } else if ($user->user_role == 'etatique') {
+            can('Livraison excédentaire - Créer', true);
+
+            if (isPetroUser()) {
+                $entity = gentity();
+            } else if (isEtaUser()) {
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -442,13 +462,15 @@ class DeliveryController extends Controller
      */
     public function destroy(Delivery $delivery)
     {
-        $user = request()->user();
-        abort_if(!in_array($user->user_role, ['petrolier', 'etatique']), 403, "No permission");
+        can('Livraison excédentaire - Supprimer', true);
 
-        if ($user->user_role == 'etatique') {
+        $user = request()->user();
+        abort_if(!(isPetroUser() || isEtaUser()), 403, "No permission");
+
+        if (isEtaUser()) {
             //
         } else {
-            $entity = $user->entities()->first();
+            $entity = gentity();
             abort_if($entity->id != $delivery->entity_id, 403, "Not permit");
         }
 

@@ -27,12 +27,11 @@ jobs:
             **/node_modules/**
 
       - name: 📥 Installer lftp
-            # run: sudo apt-get update && sudo apt-get install -y lftp
-            run: |
-            sudo rm -f /etc/apt/sources.list.d/*microsoft*.list || true
-            sudo apt-get clean
-            sudo apt-get update
-            sudo apt-get install -y lftp
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/*microsoft*.list || true
+          sudo apt-get clean
+          sudo apt-get update
+          sudo apt-get install -y lftp
 
       - name: Mirror /webdata/dev/public vers _tmp_data_public (nouveaux fichiers uniquement)
         run: |
@@ -57,3 +56,4 @@ jobs:
           local-dir: ./_tmp_data_public/
           security: loose
 
+# run: sudo apt-get update && sudo apt-get install -y lftp

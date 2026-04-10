@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Yajra\DataTables\Facades\DataTables;
@@ -154,7 +155,13 @@ class PurchaseController extends Controller
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'way' => 'required|string|in:' . implode(',', mainWays()),
                 'provider'  => 'required|string|max:128',
-                'billnumber'  => 'required|string|unique:purchase,billnumber,' . $purchase->id,
+                'billnumber' => [
+                    'required',
+                    'string',
+                    Rule::unique('purchase')
+                        ->where(fn($q) => $q->where('entity_id', $purchase->entity->id))
+                        ->ignore($purchase->id)
+                ],
                 'unitprice'  => 'required|numeric|min:0.001',
                 'qtytm'  => 'required|numeric|min:0.001',
                 'qtym3'  => 'required|numeric|min:0.001',
@@ -276,11 +283,11 @@ class PurchaseController extends Controller
                     $lineErrors[] = "Cellule E$rowNumber : veuillez renseigner le numéro facture";
                 } else {
                     $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE, 'from_state' => 0])->exists();
-                    if ($exi && $user->user_role === 'petrolier') {
+                    if ($exi && isPetroUser()) {
                         $lineErrors[] = "Cellule E$rowNumber : l'achat avec le numéro facture $colE est déjà enregistré";
                     }
                     $exi = Purchase::where(['entity_id' => $entity->id, 'billnumber' => $colE, 'from_state' => 1])->exists();
-                    if ($exi && $user->user_role === 'etatique') {
+                    if ($exi && isEtaUser()) {
                         $lineErrors[] = "Cellule E$rowNumber : l'achat avec le numéro facture $colE est déjà enregistré";
                     }
                 }
@@ -349,7 +356,13 @@ class PurchaseController extends Controller
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
                 'way' => 'required|string|in:' . implode(',', mainWays()),
                 'provider'  => 'required|string|max:128',
-                'billnumber'  => 'required|string|unique:purchase',
+                'billnumber' => [
+                    'required',
+                    'string',
+                    Rule::unique('purchase')->where(function ($query) use ($entity) {
+                        return $query->where('entity_id', $entity->id);
+                    }),
+                ],
                 'unitprice'  => 'required|numeric|min:0.001',
                 'qtytm'  => 'required|numeric|min:0.001',
                 'qtym3'  => 'required|numeric|min:0.001',

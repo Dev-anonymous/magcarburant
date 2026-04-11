@@ -3,3 +3,6 @@
 livraison excedentaire : champ terminal crud
 
 
+====> etat mode lecture comptea : bilan  GL OK
+
+

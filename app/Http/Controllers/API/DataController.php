@@ -234,7 +234,13 @@ class DataController extends Controller
                 return compact('chart1', 'chart2');
             }
             if ($type === 'greatbook') {
-                can('Grand livre manque à gagner - Lire', true);
+                if (isPetroUser() || isLogUser()) {
+                    can('Grand livre manque à gagner - Lire', true);
+                } elseif (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                } else {
+                    abort(422, 'error');
+                }
                 return $this->greatBookData();
             }
 

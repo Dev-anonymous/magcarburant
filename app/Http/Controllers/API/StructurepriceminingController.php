@@ -3,25 +3,33 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\StateStructureprice;
+use App\Models\Entity;
+use App\Models\Structurepricemining;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
+use Yajra\DataTables\DataTables;
 
-class StateStructurepriceController extends Controller
+class StructurepriceminingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        can('Configuration - Lire', true);
+        can('Structure des prix - Lire', true);
 
         $user = request()->user();
-        abort_if(!isEtaUser(), 403, "No permission");
 
-        $structureprices = StateStructureprice::query();
+        if (isPetroUser() || isLogUser()) {
+            $entity = gentity();
+        } elseif (isEtaUser()) {
+            $entity  = Entity::findOrFail(request('entity_id'));
+        } else {
+            abort(403);
+        }
+        abort_if(!$entity, 422, "No entity");
+        $structureprices = $entity->structurepriceminings();
 
         return DataTables::of($structureprices)
             ->addIndexColumn()
@@ -34,10 +42,19 @@ class StateStructurepriceController extends Controller
             ->addColumn('tx', function ($row) {
                 return "<span>1 USD = $row->usd_cdf CDF</span>";
             })
-            ->addColumn('view', function ($row) use ($user) {
-                $href = route('state.str-price', ['stx' => $row->id]);
+            ->addColumn('view', function ($row) use ($user, $entity) {
+                $param = ['stxm' => $row->id];
+                if (isPetroUser()) {
+                    $href = route('provider.accounting', $param);
+                } elseif (isLogUser()) {
+                    $href = route('logistics.accounting', $param);
+                } elseif (isEtaUser()) {
+                    $href = state_route('accounting', array_merge(['entity' => $entity->id], $param));
+                } else {
+                    $href = route('sudo.provider', $param);
+                }
                 $t = "";
-                if (can('Configuration - Modifier')) {
+                if (can('Structure des prix - Modifier')) {
                     $t = "<a class='btn btn-sm btn-primary' href='$href'>
                         <i class='material-icons md-14 align-middle'>settings</i>
                         <span class='align-middle'>Voies et Structures</span>
@@ -52,7 +69,6 @@ class StateStructurepriceController extends Controller
                     'name' => $row->name,
                     'from' => $row->from->format('Y-m-d'),
                     'to' => $row->to?->format('Y-m-d'),
-                    'usd_cdf' => $row->usd_cdf,
                 ]));
 
                 $btn = "";
@@ -68,10 +84,10 @@ class StateStructurepriceController extends Controller
                             <span class='align-middle'>Supprimer</span>
                         </a>";
 
-                if (can('Configuration - Modifier')) {
+                if (can('Structure des prix - Modifier')) {
                     $btn .= $btn1;
                 }
-                if (can('Configuration - Supprimer')) {
+                if (can('Structure des prix - Supprimer')) {
                     $btn .= $btn2;
                 }
 
@@ -105,18 +121,16 @@ class StateStructurepriceController extends Controller
             ->make(true);
     }
 
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        can('Configuration - Créer', true);
-
         $user = request()->user();
-        abort_unless(isEtaUser(), 403, "No permission");
 
         if (request('action') == 'update') {
-            can('Configuration - Modifier', true);
+            can('Structure des prix - Modifier', true);
 
             $validated = $request->validate([
                 'from' => 'nullable|string|date|before_or_equal:today',
@@ -130,7 +144,20 @@ class StateStructurepriceController extends Controller
 
             $user = request()->user();
             $id = request('id');
-            $str = StateStructureprice::findOrFail($id);
+            $str = Structurepricemining::findOrFail($id);
+            $entity = $str->entity;
+
+            if (isPetroUser()) {
+                $parent = $user->user;
+                if ($parent) {
+                    $user = $parent;
+                }
+                abort_if($entity->users_id != $user->id, 403, "No permission !!!");
+            } elseif (isEtaUser()) {
+                //
+            } else {
+                abort(403, "No permission");
+            }
 
             if ($str->to) {
                 DB::beginTransaction();
@@ -142,7 +169,8 @@ class StateStructurepriceController extends Controller
                 ], 200);
             }
 
-            $strActif = StateStructureprice::whereNull('to')
+            $strActif = $entity->structurepriceminings()
+                ->whereNull('to')
                 ->where('id', '!=', $str->id)
                 ->first();
 
@@ -153,7 +181,8 @@ class StateStructurepriceController extends Controller
                 ], 422);
             }
 
-            $dernierStr = StateStructureprice::whereNotNull('to')
+            $dernierStr = $entity->structurepriceminings()
+                ->whereNotNull('to')
                 ->orderByDesc('to')
                 ->first();
 
@@ -177,7 +206,7 @@ class StateStructurepriceController extends Controller
                 'message' => "La structure des prix a été mise à jour avec succès.",
             ], 200);
         } else {
-            can('Configuration - Créer', true);
+            can('Structure des prix - Créer', true);
 
             $validated = $request->validate([
                 'from' => 'required|string|date|before_or_equal:today',
@@ -187,8 +216,16 @@ class StateStructurepriceController extends Controller
                 'from.before_or_equal' => 'La date de début ne peut pas être supérieure à la date actuelle.',
             ]);
 
+            if (isPetroUser()) {
+                $entity = gentity();
+            } elseif (isEtaUser()) {
+                $entity  = Entity::findOrFail(request('entity_id'));
+            } else {
+                abort(403, "No permission");
+            }
 
-            $structureprices = new StateStructureprice;
+            abort_if(!$entity, 422, "No entity");
+            $structureprices = $entity->structurepriceminings();
 
             DB::beginTransaction();
 
@@ -214,7 +251,7 @@ class StateStructurepriceController extends Controller
             }
 
             $st = $structureprices->create($validated);
-            $name = strname(null, $st);
+            $name = strname($entity, $st);
             $st->update(['name' => $name]);
             DB::commit();
 
@@ -228,7 +265,15 @@ class StateStructurepriceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(StateStructureprice $statestructureprice)
+    public function show(Structurepricemining $structurepricemining)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Structurepricemining $structurepricemining)
     {
         //
     }
@@ -236,7 +281,7 @@ class StateStructurepriceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StateStructureprice $statestructureprice)
+    public function update(Request $request, Structurepricemining $structurepricemining)
     {
         //
     }
@@ -244,23 +289,32 @@ class StateStructurepriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StateStructureprice $statestructureprice)
+    public function destroy(Structurepricemining $structurepricemining)
     {
-        can('Configuration - Supprimer', true);
+        can('Structure des prix - Supprimer', true);
 
         $user = request()->user();
-        abort_if(!isEtaUser(), 403, "No permission");
+        abort_if(!isProLogEtaUser(), 403, "No permission");
+        if (isEtaUser()) {
+            //
+        } else {
+            $parent = $user->user;
+            if ($parent) {
+                $user = $parent;
+            }
+            abort_if($structurepricemining->entity->users_id != $user->id, 403, "Not permit");
+        }
 
-        $last = StateStructureprice::orderByDesc('from')->first();
-        if ($last->id !== $statestructureprice->id) {
+        $last = $structurepricemining->entity->structurepriceminings()->orderByDesc('from')->first();
+        if ($last->id !== $structurepricemining->id) {
             return response()->json(['success' => false, 'message' => "Vous ne pouvez pas supprimer une structure de prix du milieu, commencer par supprimer les dernières structures jusqu'à celle-ci",], 422);
         }
 
-        $statestructureprice->delete();
+        $structurepricemining->delete();
 
         return response()->json([
             'success' => true,
-            'message' => "Vous avez supprimé la structure $statestructureprice->name avec succès !",
+            'message' => "Vous avez supprimé la structure $structurepricemining->name avec succès !",
         ], 200);
     }
 }

@@ -5,7 +5,9 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité</h2>
+                <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité des
+                    {{ $isminier ? 'sociétés minières' : 'sociétés non minières' }}
+                </h2>
                 <p class="lead small m-0">Grand Livre Fiscalité & Parafiscalité sur les ventes des produits</p>
             </div>
             <div class="m-2">
@@ -22,13 +24,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card transparent">
-                    <div class="card-header">
+                    <div class="card-header">bbbbb
                         @php
                             $d = now()->startOfMonth()->toDateString();
                             $d2 = now()->toDateString();
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
                             <input type="hidden" name="type" value="greatbookfisc">
+                            <input type="hidden" name="minier" value="{{ (int) ($isminier == 1) }}">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
                                 <input type="text" class="form-control flatpickr" id="dv222" name="date1"

@@ -153,7 +153,7 @@ class MiningsaleAPIController extends Controller
                 'date' => 'required|string|date|before_or_equal:today',
                 'terminal'  => 'required|string|max:255',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
-                'way' => 'required|string|in:' . implode(',', mainWays()),
+                'way' => 'required|string|in:SUD', // . implode(',', mainWays()),
                 'client'  => 'required|string|max:128',
                 'locality'  => 'required|string',
                 'delivery_note'  => 'required|string',
@@ -165,7 +165,7 @@ class MiningsaleAPIController extends Controller
                 'salefile.*' => 'mimes:pdf|max:10240'
             ]);
 
-            abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
+            // abort_if('JET' == request('product') && 'NORD' == request('way'), 422, "Le JET n'est vendu qu'au SUD, EST et OUEST");
 
             DB::beginTransaction();
 
@@ -276,6 +276,8 @@ class MiningsaleAPIController extends Controller
                 // === D : Voie ===
                 if (!in_array($colD, mainWays(), true)) {
                     $lineErrors[] = "Cellule D$rowNumber : la voie \"$colD\" n'est pas valide";
+                } elseif ($colD != 'SUD') {
+                    $lineErrors[] = "Cellule D$rowNumber : la voie ne peut etre que SUD";
                 }
 
                 // === E : Produit ===
@@ -313,9 +315,9 @@ class MiningsaleAPIController extends Controller
                     }
                 }
 
-                if ('JET' == $colE && 'NORD' == $colD) {
-                    $lineErrors[] = "Cellule E$rowNumber : le JET n'est vendu qu'au SUD, EST et OUEST";
-                }
+                // if ('JET' == $colE && 'NORD' == $colD) {
+                //     $lineErrors[] = "Cellule E$rowNumber : le JET n'est vendu qu'au SUD, EST et OUEST";
+                // }
                 // === Gestion des erreurs ===
                 if (!empty($lineErrors)) {
                     $errors[] = implode('; ', $lineErrors);
@@ -412,7 +414,7 @@ class MiningsaleAPIController extends Controller
                 'date' => 'required|string|date|before_or_equal:today',
                 'terminal'  => 'required|string|max:255',
                 'product' => 'required|string|in:' . implode(',', mainfuels()),
-                'way' => 'required|string|in:' . implode(',', mainWays()),
+                'way' => 'required|string|in:SUD', // . implode(',', mainWays()),
                 'client'  => 'required|string|max:128',
                 'locality'  => 'required|string',
                 'delivery_note'  => 'required|string',

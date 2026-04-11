@@ -45,8 +45,10 @@ class StateFuelpriceController extends Controller
         $user = request()->user();
         abort_unless(isEtaUser(), 403, "No permission");
 
+        $str = $statefuelprice->state_structureprice()->first();
+
         abort_if($statefuelprice->zone->zone !==  "OUEST" && $statefuelprice->label->tag === 'L', 403, "Can't edit");
-        abort_if(in_array($statefuelprice->label->label, noteditable($statefuelprice->fuel->fuel_type, $statefuelprice->zone->zone)), 403, "Can't edit");
+        abort_if(in_array($statefuelprice->label->label, noteditable($statefuelprice->fuel->fuel_type, $statefuelprice->zone->zone, $str)), 403, "Can't edit");
 
         $statefuelprice->amount = $request->price;
         $statefuelprice->currency = 'USD';

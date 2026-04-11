@@ -163,7 +163,7 @@
                         row.map(e => {
                             h += `<td ${e?.title?'title="'+e?.title+'"':''}  ${e?.href?'href="'+e?.href+'"':''} class="${e.class??""}">${e.label}</td>`
                         })
-                        h += '</tr>'
+                        h += '</tr>';
                     });
 
                     h += '</tbody></table>'
@@ -172,26 +172,26 @@
                     $('[data]').css('opacity', 1);
                     rep.hide();
 
-                    $('#table').DataTable({
-                        dom: 'Brt',
-                        ordering: false,
-                        buttons: [{
-                            extend: 'excelHtml5',
-                            title: 'Export Excel',
-                            exportOptions: {
-                                format: {
-                                    body: function(data, row, column, node) {
-                                        if (!data) return data;
-                                        let cleaned = data.toString().replace(/\s+/g,
-                                            '');
-                                        cleaned = cleaned.replace(',', '.');
-                                        let num = Number(cleaned);
-                                        return isNaN(num) ? data : num;
-                                    }
-                                }
-                            }
-                        }, ],
-                    });
+                    // $('#table').DataTable({
+                    //     dom: 'Brt',
+                    //     ordering: false,
+                    //     buttons: [{
+                    //         extend: 'excelHtml5',
+                    //         title: 'Export Excel',
+                    //         exportOptions: {
+                    //             format: {
+                    //                 body: function(data, row, column, node) {
+                    //                     if (!data) return data;
+                    //                     let cleaned = data.toString().replace(/\s+/g,
+                    //                         '');
+                    //                     cleaned = cleaned.replace(',', '.');
+                    //                     let num = Number(cleaned);
+                    //                     return isNaN(num) ? data : num;
+                    //                 }
+                    //             }
+                    //         }
+                    //     }, ],
+                    // });
 
                     $('td[href]').click(function() {
                         event.preventDefault();

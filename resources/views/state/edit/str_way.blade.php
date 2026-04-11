@@ -74,7 +74,7 @@
                                                             @php
                                                                 $noedit = in_array(
                                                                     $labelName,
-                                                                    noteditable($type, $zoneName),
+                                                                    noteditable($type, $zoneName, $structure),
                                                                 );
                                                             @endphp
                                                             <tr tag="{{ $tag }}"
@@ -148,7 +148,7 @@
                                                             @php
                                                                 $noedit = in_array(
                                                                     $labelName,
-                                                                    noteditable($type, $zoneName),
+                                                                    noteditable($type, $zoneName, $structure),
                                                                 );
                                                             @endphp
                                                             <tr tag="{{ $tag }}"

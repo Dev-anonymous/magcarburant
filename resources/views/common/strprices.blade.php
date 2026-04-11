@@ -5,6 +5,7 @@
         <div class="d-flex justify-content-between">
             <div class="">
                 <h2 class="font-weight-bold">Voies et Structures des prix
+                    ({{ $isminier ? 'sociétés minières' : 'sociétés non minières' }})
                     | {{ $structure->entity->shortname }}
                 </h2>
                 <p class="lead small m-0">Gestion des structures des prix</p>
@@ -75,7 +76,7 @@
                                                             @php
                                                                 $noedit = in_array(
                                                                     $labelName,
-                                                                    noteditable($type, $zoneName),
+                                                                    noteditable($type, $zoneName, $structure),
                                                                 );
                                                             @endphp
                                                             <tr tag="{{ $tag }}"
@@ -149,7 +150,7 @@
                                                             @php
                                                                 $noedit = in_array(
                                                                     $labelName,
-                                                                    noteditable($type, $zoneName),
+                                                                    noteditable($type, $zoneName, $structure),
                                                                 );
                                                             @endphp
                                                             <tr tag="{{ $tag }}"
@@ -297,75 +298,90 @@
             }
         });
 
-        const Glfomulas = {
-            terrestre_zone_nord: {
-                S: "J",
-                V: "T+U",
-                AD: "W+X+AA+AB",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AD+AL",
-                AN: "AM/1000"
-            },
-            terrestre_zone_sud: {
-                S: "O",
-                V: "T+U",
-                AD: "W+X+AA+AB+Y+AC",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AD+AL",
-                AN: "AM/1000"
-            },
-            terrestre_zone_est: {
-                S: "O+M",
-                V: "T+U",
-                AD: "W+X+AA+AB+Y+AC",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AD+AL",
-                AN: "AM/1000"
-            },
-            terrestre_zone_ouest: {
-                S: "H+I+K+N",
-                V: "T+U",
-                AD: "W+X+Y+Z+AA+AB+AC",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AD+AL",
-                AN: "AM/1000"
-            },
-            aviation_zone_sud: {
-                S: "P",
-                V: "T+U",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AL",
-                AN: "AM/1000"
-            },
-            aviation_zone_est: {
-                S: "P",
-                V: "T+U",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AL",
-                AN: "AM/1000"
-            },
-            aviation_zone_ouest: {
-                S: "R+Q+L",
-                V: "T+U",
-                AJ: "AG+AH+AI",
-                AK: "AF-AI",
-                AL: "AJ+AK",
-                AM: "G+S+V+AL",
-                AN: "AM/1000"
-            }
-        };
+        @if ($isminier)
+            const Glfomulas = {
+                terrestre_zone_sud: {
+                    C: "B",
+                    F: "D+E",
+                    M: "G+H+I+J+K+L",
+                    S: "P+Q+R",
+                    T: "O-R",
+                    U: "S+T",
+                    V: "A+C+F+M+U",
+                    W: "V/1000"
+                },
+            };
+        @else
+            const Glfomulas = {
+                terrestre_zone_nord: {
+                    S: "J",
+                    V: "T+U",
+                    AD: "W+X+AA+AB",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AD+AL",
+                    AN: "AM/1000"
+                },
+                terrestre_zone_sud: {
+                    S: "O",
+                    V: "T+U",
+                    AD: "W+X+AA+AB+Y+AC",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AD+AL",
+                    AN: "AM/1000"
+                },
+                terrestre_zone_est: {
+                    S: "O+M",
+                    V: "T+U",
+                    AD: "W+X+AA+AB+Y+AC",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AD+AL",
+                    AN: "AM/1000"
+                },
+                terrestre_zone_ouest: {
+                    S: "H+I+K+N",
+                    V: "T+U",
+                    AD: "W+X+Y+Z+AA+AB+AC",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AD+AL",
+                    AN: "AM/1000"
+                },
+                aviation_zone_sud: {
+                    S: "P",
+                    V: "T+U",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AL",
+                    AN: "AM/1000"
+                },
+                aviation_zone_est: {
+                    S: "P",
+                    V: "T+U",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AL",
+                    AN: "AM/1000"
+                },
+                aviation_zone_ouest: {
+                    S: "R+Q+L",
+                    V: "T+U",
+                    AJ: "AG+AH+AI",
+                    AK: "AF-AI",
+                    AL: "AJ+AK",
+                    AM: "G+S+V+AL",
+                    AN: "AM/1000"
+                }
+            };
+        @endif
 
         function getRowValues(tag, table) {
             return $(`tr[tag="${tag}"] td`, table).slice(2).map((i, td) => {
@@ -491,8 +507,14 @@
                 'opacity': '0.5'
             });
 
+            @if ($isminier)
+                var url = `{{ route('fuelpricemining.index') }}/${fuelpriceId}`;
+            @else
+                var url = `{{ route('fuelprice.index') }}/${fuelpriceId}`;
+            @endif
+
             $.ajax({
-                url: `{{ route('fuelprice.index') }}/${fuelpriceId}`,
+                url: url,
                 type: 'PUT',
                 data: {
                     price: numericPrice

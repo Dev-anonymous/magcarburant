@@ -348,15 +348,7 @@ class ReconciliationController extends Controller
             $head = [];
             $body = [];
             if ($sameMonth) {
-                $tab = [];
-                foreach (Zone::all() as $z) {
-                    foreach (['terrestre', 'aviation'] as $t) {
-                        $tab = [...$tab, ...noteditable($t, $z->zone)];
-                    }
-                }
 
-                $tab = array_values(array_unique($tab));
-                $labels = Label::orderBy('tag')->whereNotIn('label', $tab)->get();
                 $fuels = Fuel::all();
                 $zones = Zone::all();
 
@@ -382,6 +374,16 @@ class ReconciliationController extends Controller
                         $q->whereNull('to')->where('from', '<=', $fromObj);
                     });
                 })->orderByDesc('from')->first();
+
+                $tab = [];
+                foreach (Zone::all() as $z) {
+                    foreach (['terrestre', 'aviation'] as $t) {
+                        $tab = [...$tab, ...noteditable($t, $z->zone, $prov_structure)];
+                    }
+                }
+
+                $tab = array_values(array_unique($tab));
+                $labels = Label::orderBy('tag')->whereNotIn('label', $tab)->get();
 
 
                 foreach ($labels as $label) {

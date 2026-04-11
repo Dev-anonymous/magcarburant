@@ -1,4 +1,5 @@
 # page livraison excedentaire : ajout achat , les donnee ne se charge pas
 
+livraison excedentaire : champ terminal crud
 
 

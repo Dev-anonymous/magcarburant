@@ -192,7 +192,13 @@ class DataController extends Controller
             }
 
             if ($type === 'delivery') {
-                can('Livraison excédentaire - Lire', true);
+                if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                    $entity  = Entity::findOrFail(request('entity_id'));
+                } else {
+                    can('Livraison excédentaire - Lire', true);
+                    $entity = gentity();
+                }
 
                 $date = request('date');
                 $date = explode(' to ', $date);
@@ -202,11 +208,6 @@ class DataController extends Controller
                 $zones = (array) request('zones');
                 $fuels = (array) request('fuels');
 
-                if (isEtaUser()) {
-                    $entity  = Entity::findOrFail(request('entity_id'));
-                } else {
-                    $entity = gentity();
-                }
 
                 $base = $entity->deliveries()->whereBetween('date', [$from, $to])->where('from_state', from_state());
 
@@ -244,7 +245,8 @@ class DataController extends Controller
 
             if ($type === 'greatbookfisc') {
                 can('Grand livre fiscalité - Lire', true);
-                return $this->greatBookFiscData();
+                $minier = request('minier') == 1;
+                return $minier ? $this->greatBookFiscMiningData() :  $this->greatBookFiscData();
             }
 
             if ($type === 'greatbooklog') {
@@ -252,7 +254,13 @@ class DataController extends Controller
             }
 
             if ($type === 'balance') {
-                can('Bilan manque à gagner - Lire', true);
+                if (isPetroUser() || isLogUser()) {
+                    can('Bilan manque à gagner - Lire', true);
+                } else if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                } else {
+                    abort('- no permission');
+                }
 
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
@@ -779,6 +787,18 @@ class DataController extends Controller
 
                 $rows = [];
 
+                $rows[] = array_merge(
+                    [['label' => 'FISCALITE & PARA FISCALITE DES SOCIETES NON MINIERES', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => '',
+                            'class' => 'title'
+                        ];
+                    }, $fuels),
+                    [['label' => '', 'class' => 'title']]
+                );
+
+
                 /// PARA FISC
                 $items1 = [
                     'Stock de Sécurité 1',
@@ -790,10 +810,12 @@ class DataController extends Controller
                     'CRP & Comité de suivi des Prix des produits Petroliers'
                 ];
 
-                $tabt = [];
+                $tabv = [];
                 foreach ($fuels as $z) {
                     $tabv["tot_para_$z"] = 0;
-                    $tabt["tot_fisc_$z"] = 0;
+                    $tabv["tot_fisc_$z"] = 0;
+                    $tabv["tot_param_$z"] = 0;
+                    $tabv["tot_fiscm_$z"] = 0;
                 }
 
                 foreach ($items1 as $ti) {
@@ -842,7 +864,7 @@ class DataController extends Controller
 
                 $line0 = [];
                 $line0[] = [
-                    'label' => "TOTAL PARA FISCALITE",
+                    'label' => "TOTAL PARA FISCALITE (A1)",
                     'class' => "title1",
                     'href' => gb_href(['item' => 'pf', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails para fiscalité.",
@@ -876,11 +898,11 @@ class DataController extends Controller
                     "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"
                 ];
 
-                $tabt = [];
-                foreach ($fuels as $z) {
-                    $tabv["tot_para_$z"] = 0;
-                    $tabv["tot_fisc_$z"] = 0;
-                }
+                // $tabt = [];
+                // foreach ($fuels as $z) {
+                //     $tabv["tot_para_$z"] = 0;
+                //     $tabv["tot_fisc_$z"] = 0;
+                // }
 
                 foreach ($items1 as $idx => $ti) {
                     $line0 = [];
@@ -929,7 +951,7 @@ class DataController extends Controller
 
                 $line0 = [];
                 $line0[] = [
-                    'label' => "TOTAL FISCALITE",
+                    'label' => "TOTAL FISCALITE (B1)",
                     'class' => "title1",
                     'href' => gb_href(['item' => 'pf', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
                     'title' => "Afficher les détails fiscalité.",
@@ -952,6 +974,256 @@ class DataController extends Controller
                     'title' => "Afficher les détails fiscalité.",
                 ];
                 $rows[] = $line0;
+
+                /////// Fisc Ste Minieres
+                /////////////////////////////////////////
+                $data = $this->greatBookFiscMiningData();
+                $dhead = $data['head'];
+                $drows = $data['rows'];
+
+                $rows[] = array_merge(
+                    [['label' => '', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => '',
+                            'class' => 'title'
+                        ];
+                    }, $fuels),
+                    [['label' => '', 'class' => 'title']]
+                );
+                $rows[] = array_merge(
+                    [['label' => 'FISCALITE & PARA FISCALITE DES SOCIETES MINIERES', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => '',
+                            'class' => 'title'
+                        ];
+                    }, $fuels),
+                    [['label' => '', 'class' => 'title']]
+                );
+
+                /// PARA FISC
+                $items1 = [
+                    // 'Stock de Sécurité 1',
+                    // 'Stock de Sécurité 2',
+                    'Effort de reconstruction et Stock Stratégiques',
+                    "FONER (Fonds National d'Entretien Routier)",
+                    'Marquage moléculaire',
+                    'Interventions Economiques',
+                    'CRP & Comité de suivi des Prix des produits Petroliers'
+                ];
+
+
+                foreach ($items1 as $ti) {
+                    $line0 = [];
+                    $line0[] = [
+                        'label' => $ti,
+                    ];
+
+                    $tot = 0;
+                    foreach ($fuels as $fuel) {
+                        $t = 0;
+                        $index = findIndexByLabel($dhead, $ti);
+                        abort_if(is_null($index), 422, "Can't process: label \"$ti\" not found in greatebook");
+
+                        //
+                        foreach ($drows as $r) {
+                            $v = (float) $r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = $r[3]['v'];
+                            $pro = $r[4]['v'];
+                            abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                            abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                            if ($pro === $fuel && in_array($zo, $zones)) {
+                                $t += round($v, 3); //
+                            }
+                        }
+
+                        incr($tabv, "tot_param_$fuel", $t);
+
+                        $tot += $t;
+                        $line0[] = [
+                            'label' => v($t),
+                            'title' => "Montant $ti du produit $fuel",
+                            // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                            // 'title' => "Afficher les détails pour le produit $fuel.",
+                        ];
+                    }
+                    $line0[] = [
+                        'label' => v($tot),
+                        'title' => "Total Montant $ti des produits.",
+                        // 'href' => route('provider.accounting', ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    ];
+                    $rows[] = $line0;
+                }
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL PARA FISCALITE HORS STOCK DE SECURITE (A2)",
+                    'class' => "title1",
+                    'href' => gb_href(['item' => 'pfm', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails para fiscalité.",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_param_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'href' => gb_href(['item' => 'pfm', 'el' => 'item1', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'title' => "Afficher les détails para fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'href' => gb_href(['item' => 'pfm', 'el' => 'item1', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails para fiscalité.",
+                ];
+                $rows[] = $line0;
+
+
+                /// FISC
+                $items1 = [
+                    'TVA à la vente (TVAV)',
+                    'Droits de douane (10% PMF Commercial)',
+                    'Droits de consommation (25%, 15%, 0% du PMFF)',
+                    "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"
+                ];
+
+
+                foreach ($items1 as $idx => $ti) {
+                    $line0 = [];
+                    $line0[] = [
+                        'label' => $ti,
+                    ];
+
+                    $tot = 0;
+                    foreach ($fuels as $fuel) {
+                        $t = 0;
+                        $index = findIndexByLabel($dhead, $ti);
+                        abort_if(is_null($index), 422, "Can't process: label \"$ti\" not found in greatebook");
+
+                        //
+                        foreach ($drows as $r) {
+                            $v = (float) $r[$index + 1]['vv']; // colonne suivante qui represente le montant
+                            $zo = @$r[3]['v'];
+                            $pro = @$r[4]['v'];
+                            abort_if(!in_array($zo, mainWays()), 422, "Can't process: Invalid zone : $zo");
+                            abort_if(!in_array($pro, mainfuels()), 422, "Can't process: Invalid product : $pro");
+                            if ($pro === $fuel && in_array($zo, $zones)) {
+                                $t += round($v, 3); //
+                            }
+                        }
+
+                        if ($idx != 0) {
+                            //  pas  de tva a la vente dans fiscalite
+                            incr($tabv, "tot_fiscm_$fuel", $t);
+                        }
+
+                        $tot += $t;
+                        $line0[] = [
+                            'label' => v($t),
+                            'title' => "Montant $ti du produit $fuel",
+                            // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2'), 'fuel' => $fuel]),
+                            // 'title' => "Afficher les détails pour le produit $fuel.",
+                        ];
+                    }
+                    $line0[] = [
+                        'label' => v($tot),
+                        'title' => "Total Montant $ti des produits.",
+                        // 'href' => gb_href( ['item' => 'cc', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    ];
+                    $rows[] = $line0;
+                }
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL FISCALITE (B2)",
+                    'class' => "title1",
+                    'href' => gb_href(['item' => 'pfm', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails fiscalité.",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_fiscm_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'href' => gb_href(['item' => 'pfm', 'el' => 'item2', 'fuel' => $fuel, 'date1' => request('date1'), 'date2' => request('date2')]),
+                        'title' => "Afficher les détails fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'href' => gb_href(['item' => 'pfm', 'el' => 'item2', 'date1' => request('date1'), 'date2' => request('date2')]),
+                    'title' => "Afficher les détails fiscalité.",
+                ];
+                $rows[] = $line0;
+
+                $rows[] = array_merge(
+                    [['label' => '', 'class' => 'title']],
+                    array_map(function ($z) {
+                        return [
+                            'label' => '',
+                            'class' => 'title'
+                        ];
+                    }, $fuels),
+                    [['label' => '', 'class' => 'title']]
+                );
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL PARA FISCALITE (A1+A2)",
+                    'class' => "title1",
+                    'title' => "Total para fiscalité sociétés minières et non minières .",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_param_$fuel"];
+                    $v += $tabv["tot_para_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'title' => "Total para fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'title' => "Total",
+                ];
+                $rows[] = $line0;
+
+                $line0 = [];
+                $line0[] = [
+                    'label' => "TOTAL FISCALITE (B1+B2)",
+                    'class' => "title1",
+                    'title' => "Total fiscalité sociétés minières et non minières .",
+                ];
+                $tot = 0;
+                foreach ($fuels as $fuel) {
+                    $v = $tabv["tot_fiscm_$fuel"];
+                    $v += $tabv["tot_fisc_$fuel"];
+                    $tot += $v;
+                    $line0[] = [
+                        'label' => v($v),
+                        'class' => "title1",
+                        'title' => "Total fiscalité du produit $fuel.",
+                    ];
+                }
+                $line0[] = [
+                    'label' => v($tot),
+                    'class' => "title1",
+                    'title' => "Total",
+                ];
+                $rows[] = $line0;
+
+
 
                 array_unshift($rows, $head);
 
@@ -1971,6 +2243,235 @@ class DataController extends Controller
             foreach ($rows as $r) {
                 $head0 = array_slice($r, 0, 12);
                 $head1 = array_slice($r, 28);
+                $t[]   = [...$head0, ...$head1];
+            }
+            $rows = $t;
+        }
+
+        foreach ($head as &$item) {
+            $item['label'] = ucfirst(strtolower($item['label']));
+        }
+        unset($item);
+
+        return compact('head', 'rows', 'errors');
+    }
+
+    private function greatBookFiscMiningData()
+    {
+        $reqzone = (array) request('zone');
+        $reqfuel = (array) request('fuel');
+        $items = request('items');
+
+        $user = request()->user();
+        if (isPetroUser()) {
+            $entity = gentity();
+        } else if (isEtaUser()) {
+            $entity  = Entity::findOrFail(request('entity_id'));
+        } else {
+            abort(403);
+        }
+
+        $from = request('date1') ?? nnow()->toDateString();
+        $to = request('date2') ?? nnow()->toDateString();
+
+        $head = [
+            ['label' => 'Terminal'],
+            ['label' => 'Date'],
+            ['label' => 'Localité'],
+            ['label' => 'Voie'],
+            ['label' => 'Produit'],
+            ['label' => 'Bon de livraison'],
+            ['label' => 'Progr. de livraison'],
+            ['label' => 'Client'],
+            ['label' => 'Lata'],
+            ['label' => 'L15'],
+            ['label' => 'Densité'],
+            ['label' => 'M3'],
+        ];
+
+        $rows = [];
+        $errors = [];
+
+        $labels = [
+            // ['label' => 'Stock de Sécurité 1'],
+            // ['label' => 'Montant Sto. Sécurité 1'],
+            // ['label' => 'Stock de Sécurité 2'],
+            // ['label' => 'Montant Sto. Sécurité 2'],
+            // ['label' => 'Stock de Sécurité'],
+            // ['label' => 'Montant Stock de Sécurité'],
+            ['label' => 'Effort de reconstruction et Stock Stratégiques'],
+            ['label' => 'Montant Eff. reconst. et Sto. Strat.'],
+            ['label' => "FONER (Fonds National d'Entretien Routier)"],
+            ['label' => 'Montant FONER'],
+            ['label' => 'Marquage moléculaire'],
+            ['label' => 'Montant Marq. molécul.'],
+            ['label' => 'Interventions Economiques'],
+            ['label' => 'Montant Interv. Eco.'],
+            ['label' => 'CRP & Comité de suivi des Prix des produits Petroliers'],
+            ['label' => 'Montant CRP & Comité ...'],
+
+            ['label' => 'TVA à la vente (TVAV)'],
+            ['label' => 'Montant TVAV'],
+            ['label' => 'Droits de douane (10% PMF Commercial)'],
+            ['label' => 'Montant Droits de douane'],
+            ['label' => 'Droits de consommation (25%, 15%, 0% du PMFF)'],
+            ['label' => 'Montant Droits de consommation'],
+            ['label' => 'TVA à l\'importation (TVAI) = 16%(PMFC+DD+DC)'],
+            ['label' => 'Montant TVAI'],
+            ['label' => 'TVA nette à l\'intérieur (TVAIr=TVAV-TVAI)'],
+            ['label' => 'Montant TVAIr'],
+        ];
+
+        $head = [...$head, ...$labels];
+
+        $sales = $entity->mining_sales()->where('from_state', from_state())->where(function ($q) use ($reqfuel, $reqzone) {
+            $q->whereIn('product', $reqfuel);
+            $q->whereIn('way', $reqzone);
+        })->whereBetween('date', [$from, $to])->orderBy('date')->get();
+
+        foreach ($sales as $e) {
+            $saledate = $e->date;
+            $structure = $entity->structurepriceminings()->where(function ($q) use ($saledate) {
+                $q->where(function ($q) use ($saledate) {
+                    $q->where('from', '<=', $saledate)->where('to', '>=', $saledate);
+                })->orWhere(function ($q) use ($saledate) {
+                    $q->whereNull('to')->where('from', '<=', $saledate);
+                });
+            })->orderByDesc('from')->first();
+
+            $m3 = ((float) $e->lata) / 1000;
+
+            $zone = $e->way;
+            $fuel = $e->product;
+
+            if (!$structure) {
+                $errors[] = "Aucune structure de prix n'a été trouvée pour la vente #$e->id du {$e->date?->format('d-m-Y')} ($fuel, $zone)";
+            }
+
+            $fuelObj = Fuel::where(compact('fuel'))->first();
+
+            $effort_reconst = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', 'Effort de reconstruction et Stock Stratégiques'))->first()?->amount;
+            $mt_effort_reconst = $effort_reconst * $m3;
+
+            $foner = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "FONER (Fonds National d'Entretien Routier)"))->first()?->amount;
+            $mt_foner = $foner * $m3;
+
+            $marquage_molecu = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "Marquage moléculaire"))->first()?->amount;
+            $mt_marquage_molecu = $marquage_molecu * $m3;
+
+            $intervention_eco = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "Interventions Economiques"))->first()?->amount;
+            $mt_intervention_eco = $intervention_eco * $m3;
+
+            $cpr_comite_suivi = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
+            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
+
+            $cpr_comite_suivi = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
+            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
+
+            $tva_vente = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "TVA à la vente (TVAV) pour calcul"))->first()?->amount;
+            $mt_tva_vente = $tva_vente * $m3;
+
+            $droit_douane = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "Droits de douane (10% PMF Commercial)"))->first()?->amount;
+            $mt_droit_douane = $droit_douane * $m3;
+
+
+            $droit_consom = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "Droits de consommation (25%, 15%, 0% du PMFF)"))->first()?->amount;
+            $mt_droit_consom = $droit_consom * $m3;
+
+            $tva_import = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)"))->first()?->amount;
+            $mt_tva_import = $tva_import * $m3;
+
+            $tva_interieur = $tva_vente - $tva_import;
+            $mt_tva_interieur = $tva_interieur * $m3;
+
+            $pline = [
+                ['v' => $e->terminal],
+                ['v' => $e->date?->format('d-m-Y')],
+                ['v' => $e->locality],
+                ['v' => $e->way],
+                ['v' => $e->product],
+                ['v' => $e->delivery_note],
+                ['v' => $e->delivery_program],
+                ['v' => $e->client],
+                ['v' => v($e->lata)],
+                ['v' => v($e->l15)],
+                ['v' => v($e->density)],
+                ['v' => v($m3)],
+                ['v' => v($effort_reconst)],
+                ['v' => v($mt_effort_reconst), 'vv' => $mt_effort_reconst, 'title' => "Effort Reconst. St. Strat. * M3"],
+                ['v' => v($foner)],
+                ['v' => v($mt_foner), 'vv' => $mt_foner, 'title' => "FONER * M3"],
+                ['v' => v($marquage_molecu)],
+                ['v' => v($mt_marquage_molecu), 'vv' => $mt_marquage_molecu, 'title' => "Marquage Molécule * M3"],
+                ['v' => v($intervention_eco)],
+                ['v' => v($mt_intervention_eco), 'vv' => $mt_intervention_eco, 'title' => "Intervention Eco. * M3"],
+                ['v' => v($cpr_comite_suivi)],
+                ['v' => v($mt_cpr_comite_suivi), 'vv' => $mt_cpr_comite_suivi, 'title' => "CRP * M3"],
+                ['v' => v($tva_vente)],
+                ['v' => v($mt_tva_vente), 'vv' => $mt_tva_vente, 'title' => "TVAV * M3"],
+                ['v' => v($droit_douane)],
+                ['v' => v($mt_droit_douane), 'vv' => $mt_droit_douane, 'title' => "DD * M3"],
+                ['v' => v($droit_consom)],
+                ['v' => v($mt_droit_consom), 'vv' => $mt_droit_consom, 'title' => "DC * M3"],
+                ['v' => v($tva_import)],
+                ['v' => v($mt_tva_import), 'vv' => $mt_tva_import, 'title' => "TVAI * M3"],
+                ['v' => v($tva_interieur)],
+                ['v' => v($mt_tva_interieur), 'vv' => $mt_tva_interieur, 'title' => "TVAIr * M3"],
+            ];
+
+            $rows[] = $pline;
+        }
+
+        $errors = array_values(array_unique($errors));
+
+        if ($items == 'item1') {
+            $head = array_slice($head, 0, 22);
+            $t = [];
+            foreach ($rows as $r) {
+                $t[] = array_slice($r, 0, 22);
+            }
+            $rows = $t;
+        }
+
+        if ($items == 'item2') {
+            $head0 = array_slice($head, 0, 12);
+            $head1 = array_slice($head, 22);
+            $head  = [...$head0, ...$head1];
+
+            $t = [];
+            foreach ($rows as $r) {
+                $head0 = array_slice($r, 0, 12);
+                $head1 = array_slice($r, 22);
                 $t[]   = [...$head0, ...$head1];
             }
             $rows = $t;

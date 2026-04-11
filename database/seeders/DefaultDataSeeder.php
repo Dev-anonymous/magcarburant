@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Label;
+use App\Models\Labelmining;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -165,6 +166,49 @@ class DefaultDataSeeder extends Seeder
             } while ($n >= 0);
 
             Label::firstOrCreate(
+                ['label' => $text],
+                ['tag' => $tag]
+            );
+            $index++;
+        }
+
+
+        $labels2 = [
+            "PMFC en M3",
+            "Charges d'exploitation logisticiens (frais d'entreprot)",
+            "Total frais des sociétés de logistique",
+            "Charges d'exploitation Sociétés commerciales",
+            "Marges Sociétés Commerciales (10% PMF)",
+            "Total frais des sociétés Commerciales",
+            "Stock de sécurité 1",
+            "Stock de sécurité 2",
+            "Marquage moléculaire",
+            "FONER (Fonds National d'Entretien Routier)",
+            "Effort de reconstruction et Stock Stratégiques",
+            "Interventions Economiques",
+            "Total Parafiscalité",
+            "PMF fiscal (PMFF=Ki*PMFC)",
+            "TVA à la vente (TVAV) pour calcul",
+            "Droits de douane (10% PMF Commercial)",
+            "Droits de consommation (25%, 15%, 0% du PMFF)",
+            "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
+            "Total Fiscalité 1",
+            "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+            "Total Fiscalité 2",
+            'Prix de référence réel (USD/M3)',
+            'Prix de référence à appliquer (USD/L)',
+        ];
+        $index = 0;
+
+        foreach ($labels2 as $text) {
+            $tag = '';
+            $n = $index;
+            do {
+                $tag = $alphabet[$n % 26] . $tag;
+                $n = intdiv($n, 26) - 1;
+            } while ($n >= 0);
+
+            Labelmining::firstOrCreate(
                 ['label' => $text],
                 ['tag' => $tag]
             );

@@ -192,12 +192,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Voie</label>
-                                    <select name="way" id="" class="form-control" required>
+                                    {{-- <select --name="way" id="" class="form-control" disabled>
                                         <option value="">Sélectionnez une voie</option>
                                         @foreach (mainWays() as $e)
                                             <option>{{ $e }}</option>
                                         @endforeach
-                                    </select>
+                                        <option>SUD</option>
+                                    </select> --}}
+                                    <input type="text" name="way" class="form-control" value="SUD" id="" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -319,11 +321,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2">
                                     <label class="mb-0">Voie</label>
-                                    <select name="way" id="" class="form-control" required>
+                                    {{-- <select --name="way" id="" class="form-control" disabled>
+                                        <option value="">Sélectionnez une voie</option>
                                         @foreach (mainWays() as $e)
                                             <option>{{ $e }}</option>
                                         @endforeach
-                                    </select>
+                                        <option>SUD</option>
+                                    </select> --}}
+                                    <input type="text" name="way" class="form-control" value="SUD" id="" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">

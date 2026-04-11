@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Structure des prix Stes Non minières')
+@section('title', 'Structure des prix Stes minières')
 @section('body')
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Structures des prix des sociétés non minières @isset($entity)
+                <h2 class="font-weight-bold">Structures des prix des sociétés minières @isset($entity)
                         | {{ $entity->shortname }}
                     @endisset </h2>
                 <p class="lead small m-0">Gestion des structures des prix</p>
@@ -226,7 +226,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route('structureprice.index') }}',
+                url: '{{ route('structurepricemining.index') }}',
                 data: function(d) {
                     d.entity_id = '{{ @$entity->id }}'
                 }
@@ -349,7 +349,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('structureprice.store') }}',
+                url: '{{ route('structurepricemining.store') }}',
                 method: 'POST',
                 data: data,
                 success: function(resp) {
@@ -390,7 +390,7 @@
             $('[text]', btn).hide();
 
             $.ajax({
-                url: '{{ route('structureprice.index') }}/' + id,
+                url: '{{ route('structurepricemining.index') }}/' + id,
                 method: 'delete',
                 success: function(resp) {
                     var mess = resp?.message ?? "Erreur, veuillez réessayer !";

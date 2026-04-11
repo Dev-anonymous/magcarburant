@@ -8,6 +8,7 @@ use App\Models\Label;
 use App\Models\Rate;
 use App\Models\SecurityStock;
 use App\Models\Structureprice;
+use App\Models\Structurepricemining;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,13 @@ class ProviderWebController extends Controller
             return view('common.structprices', compact('entity'));
         }
 
+        if ($item == 'pricestr-m') {
+            can('Structure des prix - Lire', true);
+            $user = request()->user();
+            $entity = gentity();
+            return view('common.structprices-m', compact('entity'));
+        }
+
         if ($item == 'gb') {
             can('Grand livre manque à gagner - Lire', true);
             return view('provider.greatebook');
@@ -64,9 +72,10 @@ class ProviderWebController extends Controller
             return view('provider.greatebookCR');
         }
 
-        if ($item == 'pf') {
+        if (in_array($item, ['pf', 'pfm'])) {
             can('Grand livre fiscalité - Lire', true);
-            return view('provider.greatebookparafisc');
+            $isminier = $item == 'pfm';
+            return view('provider.greatebookparafisc',compact('isminier'));
         }
 
         $stx = request('stx');
@@ -102,7 +111,45 @@ class ProviderWebController extends Controller
                     ];
                 }
 
-                return view('common.strprices', compact('grouped', 'structure'));
+                $isminier=false;
+                return view('common.strprices', compact('grouped', 'structure','isminier'));
+            }
+        }
+
+        $stxm = request('stxm');
+        if ($stxm) {
+            $entity = gentity();
+            $structure = $entity?->structurepriceminings()->with(['fuelpriceminings.fuel', 'fuelpriceminings.zone', 'fuelpriceminings.labelmining'])->find($stxm);
+            if ($structure) {
+                initfuelpricemining($structure);
+                $structure->refresh();
+
+                $terrestre = ['ESSENCE', 'GASOIL', 'PETROLE'];
+                $grouped = [
+                    'terrestre' => [],
+                ];
+                foreach ($structure->fuelpriceminings as $price) {
+                    $fuelName  = strtoupper($price->fuel->fuel);
+                    $zoneName  = $price->zone->zone;
+                    $labelName = $price->labelmining->label;
+                    $labelTag  = $price->labelmining->tag;
+
+                    $type = 'terrestre';
+
+                    if (!isset($grouped[$type][$zoneName][$fuelName])) {
+                        $grouped[$type][$zoneName][$fuelName] = [];
+                    }
+
+                    $grouped[$type][$zoneName][$fuelName][$labelName] = [
+                        'id' => $price->id,
+                        'amount' => $price->amount,
+                        'tag'    => $labelTag,
+                    ];
+                }
+
+                $isminier = $structure instanceof Structurepricemining;
+
+                return view('common.strprices', compact('grouped', 'structure', 'isminier'));
             }
         }
         return view('provider.apps-accounting');

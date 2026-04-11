@@ -4,11 +4,14 @@ use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\Fuel;
 use App\Models\Fuelprice;
+use App\Models\Fuelpricemining;
 use App\Models\Label;
+use App\Models\Labelmining;
 use App\Models\SecurityStock;
 use App\Models\StateFuelprice;
 use App\Models\StateStructureprice;
 use App\Models\Structureprice;
+use App\Models\Structurepricemining;
 use App\Models\User;
 use App\Models\Zone;
 use Carbon\Carbon;
@@ -24,95 +27,111 @@ function nnow()
     return now('Africa/Lubumbashi');
 }
 
-function noteditable($type, $zone)
+function noteditable($type, $zone, Structureprice|Structurepricemining|StateStructureprice $structure)
 {
     $type = strtolower($type);
     $zone = strtolower($zone);
 
-    $noedit = [
-        'terrestre' => [
-            'nord' => [
-                'Total frais des sociétés de logistique',
-                'Total frais des sociétés Commerciales',
-                'Total Parafiscalité',
-                'Total Fiscalité 1',
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)"
+    if ($structure instanceof Structureprice || $structure instanceof StateStructureprice) {
+        $noedit = [
+            'terrestre' => [
+                'nord' => [
+                    'Total frais des sociétés de logistique',
+                    'Total frais des sociétés Commerciales',
+                    'Total Parafiscalité',
+                    'Total Fiscalité 1',
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)"
+                ],
+                'sud' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    "Total Parafiscalité",
+                    "Total Fiscalité 1",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)",
+                ],
+                'est' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    "Total Parafiscalité",
+                    "Total Fiscalité 1",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)",
+                ],
+                'ouest' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    "Total Parafiscalité",
+                    "Total Fiscalité 1",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)",
+                ],
             ],
-            'sud' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                "Total Parafiscalité",
-                "Total Fiscalité 1",
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)",
+            'aviation' => [
+                'nord' => [],
+                'sud' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    'Total Fiscalité 1',
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)"
+                ],
+                'est' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    'Total Fiscalité 1',
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)"
+                ],
+                'ouest' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    'Total Fiscalité 1',
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)"
+                ],
+            ]
+        ];
+    } else {
+        $noedit = [
+            'terrestre' => [
+                'sud' => [
+                    "Total frais des sociétés de logistique",
+                    "Total frais des sociétés Commerciales",
+                    "Total Parafiscalité",
+                    "Total Fiscalité 1",
+                    "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                    "Total Fiscalité 2",
+                    "Prix de référence réel (USD/M3)",
+                    "Prix de référence à appliquer (USD/L)",
+                ],
             ],
-            'est' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                "Total Parafiscalité",
-                "Total Fiscalité 1",
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)",
-            ],
-            'ouest' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                "Total Parafiscalité",
-                "Total Fiscalité 1",
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)",
-            ],
-        ],
-        'aviation' => [
-            'nord' => [],
-            'sud' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                'Total Fiscalité 1',
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)"
-            ],
-            'est' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                'Total Fiscalité 1',
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)"
-            ],
-            'ouest' => [
-                "Total frais des sociétés de logistique",
-                "Total frais des sociétés Commerciales",
-                'Total Fiscalité 1',
-                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
-                "Total Fiscalité 2",
-                "Prix de référence réel (USD/M3)",
-                "Prix de référence à appliquer (USD/L)"
-            ],
-        ]
-    ];
-
+        ];
+    }
     return (array) @$noedit[$type][$zone];
 }
 
-function uneditable()
+function uneditable(Structureprice|Structurepricemining $structure)
 {
     $ignore = [];
     foreach (['aviation', 'terrestre'] as $t) {
         foreach (mainWays() as $z) {
-            $ignore = [...$ignore, ...noteditable($t, $z)];
+            $ignore = [...$ignore, ...noteditable($t, $z, $structure)];
         }
     }
     return array_values(array_unique($ignore));
@@ -376,6 +395,87 @@ function initfuelprice(Structureprice|StateStructureprice $structure)
     }
 }
 
+
+function initfuelpricemining(Structurepricemining $structure)
+{
+    $isState = !($structure instanceof Structurepricemining);
+
+    if ($isState) {
+        dd('stta');
+    } else {
+        $exists = Fuelpricemining::where(['structurepricemining_id' => $structure->id])->exists();
+    }
+
+    if ($exists) return;
+
+    $zoneLabels = [
+        'Sud' => [
+            'terrestre' => [
+                "PMFC en M3",
+                "Charges d'exploitation logisticiens (frais d'entreprot)",
+                "Total frais des sociétés de logistique",
+                "Charges d'exploitation Sociétés commerciales",
+                "Marges Sociétés Commerciales (10% PMF)",
+                "Total frais des sociétés Commerciales",
+                "Stock de sécurité 1",
+                "Stock de sécurité 2",
+                "Marquage moléculaire",
+                "FONER (Fonds National d'Entretien Routier)",
+                "Effort de reconstruction et Stock Stratégiques",
+                "Interventions Economiques",
+                "Total Parafiscalité",
+                "PMF fiscal (PMFF=Ki*PMFC)",
+                "TVA à la vente (TVAV) pour calcul",
+                "Droits de douane (10% PMF Commercial)",
+                "Droits de consommation (25%, 15%, 0% du PMFF)",
+                "TVA à l'importation (TVAI) = 16%(PMFC+DD+DC)",
+                "Total Fiscalité 1",
+                "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)",
+                "Total Fiscalité 2",
+                'Prix de référence réel (USD/M3)',
+                'Prix de référence à appliquer (USD/L)',
+            ],
+        ],
+    ];
+
+    foreach ($zoneLabels as $zoneName => $types) {
+        $zone = Zone::where('zone', $zoneName)->first();
+        foreach ($types as $fuelType => $labels) {
+            $fuels = Fuel::whereIn('fuel', ['ESSENCE', 'GASOIL', 'PETROLE'])->get();
+            foreach ($fuels as $fuel) {
+                foreach ($labels as $labelName) {
+                    $label = Labelmining::where('label', $labelName)->first();
+                    if ($label && $zone) {
+                        if ($isState) {
+                            abort('e404');
+                        } else {
+                            $exists = Fuelpricemining::where('structurepricemining_id', $structure->id)
+                                ->where('fuel_id', $fuel->id)
+                                ->where('zone_id', $zone->id)
+                                ->where('labelmining_id', $label->id)
+                                ->exists();
+                        }
+                        if (! $exists) {
+                            if ($isState) {
+                                //
+                            } else {
+                                Fuelpricemining::create([
+                                    'structurepricemining_id' => $structure->id,
+                                    'fuel_id' => $fuel->id,
+                                    'zone_id' => $zone->id,
+                                    'labelmining_id' => $label->id,
+                                    'amount' => 0,
+                                    'currency' => 'USD',
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 function userimg(?User $user = null)
 {
     if (Auth::check()) {
@@ -404,13 +504,18 @@ function userimg(?User $user = null)
     }
 }
 
-function strname(?Entity $entity, Structureprice|StateStructureprice $str, $isState = false)
+function strname(?Entity $entity, Structureprice|Structurepricemining|StateStructureprice $str)
 {
-    if ($isState) {
+    if ($str instanceof Structureprice) {
+        $n = $entity->structureprices()->whereNotNull('name')->count() + 1;
+    } elseif ($str instanceof Structurepricemining) {
+        $n = $entity->structurepriceminings()->whereNotNull('name')->count() + 1;
+    } elseif ($str instanceof StateStructureprice) {
         $n = StateStructureprice::whereNotNull('name')->count() + 1;
     } else {
-        $n = $entity->structureprices()->whereNotNull('name')->count() + 1;
+        abort(" Erreur strname() ");
     }
+
     if ($n <= 9) {
         $n = "00$n";
     }

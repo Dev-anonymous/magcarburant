@@ -18,12 +18,12 @@ class SecurityStockController extends Controller
      */
     public function index()
     {
-        can('Stock de sécurité collecté reversé - Lire', true);
-
         $user = request()->user();
         if (isPetroUser() || isLogUser()) {
+            can('Stock de sécurité collecté reversé - Lire', true);
             $entity = gentity();
         } elseif (isEtaUser()) {
+            can(['Mode lecture - Lire'], true);
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

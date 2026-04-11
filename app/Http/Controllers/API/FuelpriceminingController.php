@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Fuelprice;
+use App\Models\Fuelpricemining;
 use Illuminate\Http\Request;
 
-class FuelpriceController extends Controller
+class FuelpriceminingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class FuelpriceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Fuelprice $fuelprice)
+    public function show(Fuelpricemining $fuelpricemining)
     {
         //
     }
@@ -35,7 +35,7 @@ class FuelpriceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Fuelprice $fuelprice)
+    public function update(Request $request, Fuelpricemining $fuelpricemining)
     {
         can('Structure des prix - Modifier', true);
 
@@ -47,18 +47,18 @@ class FuelpriceController extends Controller
         if (isPetroUser() || isLogUser()) {
             $parent = $user->user;
             if ($parent) $user = $parent;
-            abort_if($fuelprice->structureprice->entity->users_id != $user->id, 403, "No permit");
+            abort_if($fuelpricemining->structurepricemining->entity->users_id != $user->id, 403, "No permit");
         } else {
             //
         }
 
-        $str = $fuelprice->structureprice()->first();
-        abort_if($fuelprice->zone->zone !==  "OUEST" && $fuelprice->label->tag === 'L', 403, "Can't edit");
-        abort_if(in_array($fuelprice->label->label, noteditable($fuelprice->fuel->fuel_type, $fuelprice->zone->zone, $str)), 403, "Can't edit");
+        $str = $fuelpricemining->structurepricemining()->first();
+        // abort_if($fuelpricemining->zone->zone !==  "OUEST" && $fuelpricemining->label->tag === 'L', 403, "Can't edit");
+        abort_if(in_array($fuelpricemining->labelmining->label, noteditable($fuelpricemining->fuel->fuel_type, $fuelpricemining->zone->zone, $str)), 403, "Can't edit");
 
-        $fuelprice->amount = $request->price;
-        $fuelprice->currency = 'USD';
-        $fuelprice->save();
+        $fuelpricemining->amount = $request->price;
+        $fuelpricemining->currency = 'USD';
+        $fuelpricemining->save();
         return response()->json([
             'success' => true,
             'message' => 'OK'
@@ -68,7 +68,7 @@ class FuelpriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Fuelprice $fuelprice)
+    public function destroy(Fuelpricemining $fuelpricemining)
     {
         //
     }

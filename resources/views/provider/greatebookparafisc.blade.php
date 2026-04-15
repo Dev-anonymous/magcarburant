@@ -64,7 +64,7 @@
                                 <label for="fuel" class="control-label d-block mb-0">Produit</label>
                                 <select name="fuel[]" id="fuel" class="form-control" multiple
                                     style="min-width:150px;">
-                                    @foreach (mainfuels() as $e)
+                                    @foreach (mainfuels($isminier) as $e)
                                         <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>

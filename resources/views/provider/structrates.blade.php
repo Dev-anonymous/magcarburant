@@ -2,10 +2,17 @@
 @section('title', 'Taux Structures')
 @section('bg-class', 'bg-img-3')
 @section('body')
+    @php
+        $item = request('item');
+    @endphp
     <div class="container">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Taux structure | {{ $entity->shortname }} </h2>
+                <h2 class="font-weight-bold">Taux structure des sociétés
+                    @if ($item == 'stx')
+                        non
+                    @endif minières | {{ $entity->shortname }}
+                </h2>
                 <p class="lead small m-0">Gestion de taux structure</p>
             </div>
             <div class="m-2">
@@ -62,6 +69,9 @@
             serverSide: true,
             ajax: {
                 url: '{{ route('tx-structure.index') }}',
+                data: {
+                    item: "{{ $item }}"
+                }
             },
             order: [
                 [2, "desc"]

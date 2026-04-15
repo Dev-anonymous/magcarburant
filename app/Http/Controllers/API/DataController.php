@@ -904,12 +904,6 @@ class DataController extends Controller
                     "TVA nette à l'intérieur (TVAIr=TVAV-TVAI)"
                 ];
 
-                // $tabt = [];
-                // foreach ($fuels as $z) {
-                //     $tabv["tot_para_$z"] = 0;
-                //     $tabv["tot_fisc_$z"] = 0;
-                // }
-
                 foreach ($items1 as $idx => $ti) {
                     $line0 = [];
                     $line0[] = [
@@ -1010,13 +1004,12 @@ class DataController extends Controller
 
                 /// PARA FISC
                 $items1 = [
-                    // 'Stock de Sécurité 1',
-                    // 'Stock de Sécurité 2',
+                    'Stock de Sécurité 1',
+                    'Stock de Sécurité 2',
                     'Effort de reconstruction et Stock Stratégiques',
                     "FONER (Fonds National d'Entretien Routier)",
                     'Marquage moléculaire',
                     'Interventions Economiques',
-                    'CRP & Comité de suivi des Prix des produits Petroliers'
                 ];
 
 
@@ -2299,12 +2292,12 @@ class DataController extends Controller
         $errors = [];
 
         $labels = [
-            // ['label' => 'Stock de Sécurité 1'],
-            // ['label' => 'Montant Sto. Sécurité 1'],
-            // ['label' => 'Stock de Sécurité 2'],
-            // ['label' => 'Montant Sto. Sécurité 2'],
-            // ['label' => 'Stock de Sécurité'],
-            // ['label' => 'Montant Stock de Sécurité'],
+            ['label' => 'Stock de Sécurité 1'],
+            ['label' => 'Montant Sto. Sécurité 1'],
+            ['label' => 'Stock de Sécurité 2'],
+            ['label' => 'Montant Sto. Sécurité 2'],
+            ['label' => 'Stock de Sécurité'],
+            ['label' => 'Montant Stock de Sécurité'],
             ['label' => 'Effort de reconstruction et Stock Stratégiques'],
             ['label' => 'Montant Eff. reconst. et Sto. Strat.'],
             ['label' => "FONER (Fonds National d'Entretien Routier)"],
@@ -2313,8 +2306,6 @@ class DataController extends Controller
             ['label' => 'Montant Marq. molécul.'],
             ['label' => 'Interventions Economiques'],
             ['label' => 'Montant Interv. Eco.'],
-            ['label' => 'CRP & Comité de suivi des Prix des produits Petroliers'],
-            ['label' => 'Montant CRP & Comité ...'],
 
             ['label' => 'TVA à la vente (TVAV)'],
             ['label' => 'Montant TVAV'],
@@ -2356,6 +2347,21 @@ class DataController extends Controller
 
             $fuelObj = Fuel::where(compact('fuel'))->first();
 
+            $ss_1 = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', 'Stock de Sécurité 1'))->first()?->amount;
+            $mss1 = $ss_1 * $m3;
+
+            $ss_2 = (float)@$structure?->fuelpriceminings()
+                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
+                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
+                ->whereHas('labelmining', fn($q) => $q->where('label', 'Stock de Sécurité 2'))->first()?->amount;
+            $mss2 = $ss_2 * $m3;
+
+            $ss = $ss_1 + $ss_2;
+            $mss = $ss * $m3;
+
             $effort_reconst = (float)@$structure?->fuelpriceminings()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
@@ -2379,18 +2385,6 @@ class DataController extends Controller
                 ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
                 ->whereHas('labelmining', fn($q) => $q->where('label', "Interventions Economiques"))->first()?->amount;
             $mt_intervention_eco = $intervention_eco * $m3;
-
-            $cpr_comite_suivi = (float)@$structure?->fuelpriceminings()
-                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
-                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
-                ->whereHas('labelmining', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
-            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
-
-            $cpr_comite_suivi = (float)@$structure?->fuelpriceminings()
-                ->whereHas('zone', fn($q) => $q->where('zone', $zone))
-                ->whereHas('fuel', fn($q) => $q->where('fuel', $fuel))
-                ->whereHas('labelmining', fn($q) => $q->where('label', "CRP & Comité de suivi des Prix des produits Petroliers"))->first()?->amount;
-            $mt_cpr_comite_suivi = $cpr_comite_suivi * $m3;
 
             $tva_vente = (float)@$structure?->fuelpriceminings()
                 ->whereHas('zone', fn($q) => $q->where('zone', $zone))
@@ -2433,6 +2427,12 @@ class DataController extends Controller
                 ['v' => v($e->l15)],
                 ['v' => v($e->density)],
                 ['v' => v($m3)],
+                ['v' => v($ss_1), 'title' => "Stock de sécurité 1 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($mss1), 'vv' => $mss1, 'title' => "Stock de sécurité 1 * M3"],
+                ['v' => v($ss_2), 'title' => "Stock de sécurité 2 $fuel (zone $zone) de la structure de prix #{$structure?->id} du {$structure?->from?->format('d-m-Y')}"],
+                ['v' => v($mss2), 'vv' => $mss2, 'title' => "Stock de sécurité 2 * M3"],
+                ['v' => v($ss)],
+                ['v' => v($mss)],
                 ['v' => v($effort_reconst)],
                 ['v' => v($mt_effort_reconst), 'vv' => $mt_effort_reconst, 'title' => "Effort Reconst. St. Strat. * M3"],
                 ['v' => v($foner)],
@@ -2441,8 +2441,6 @@ class DataController extends Controller
                 ['v' => v($mt_marquage_molecu), 'vv' => $mt_marquage_molecu, 'title' => "Marquage Molécule * M3"],
                 ['v' => v($intervention_eco)],
                 ['v' => v($mt_intervention_eco), 'vv' => $mt_intervention_eco, 'title' => "Intervention Eco. * M3"],
-                ['v' => v($cpr_comite_suivi)],
-                ['v' => v($mt_cpr_comite_suivi), 'vv' => $mt_cpr_comite_suivi, 'title' => "CRP * M3"],
                 ['v' => v($tva_vente)],
                 ['v' => v($mt_tva_vente), 'vv' => $mt_tva_vente, 'title' => "TVAV * M3"],
                 ['v' => v($droit_douane)],
@@ -2461,23 +2459,23 @@ class DataController extends Controller
         $errors = array_values(array_unique($errors));
 
         if ($items == 'item1') {
-            $head = array_slice($head, 0, 22);
+            $head = array_slice($head, 0, 26);
             $t = [];
             foreach ($rows as $r) {
-                $t[] = array_slice($r, 0, 22);
+                $t[] = array_slice($r, 0, 26);
             }
             $rows = $t;
         }
 
         if ($items == 'item2') {
             $head0 = array_slice($head, 0, 12);
-            $head1 = array_slice($head, 22);
+            $head1 = array_slice($head, 26);
             $head  = [...$head0, ...$head1];
 
             $t = [];
             foreach ($rows as $r) {
                 $head0 = array_slice($r, 0, 12);
-                $head1 = array_slice($r, 22);
+                $head1 = array_slice($r, 26);
                 $t[]   = [...$head0, ...$head1];
             }
             $rows = $t;

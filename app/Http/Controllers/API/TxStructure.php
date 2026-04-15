@@ -15,14 +15,19 @@ class TxStructure extends Controller
      */
     public function index()
     {
-        can('Configuration - Lire', true);
-
-        $user = request()->user();
         if (isPetroUser() || isLogUser()) {
+            can('Structure des prix - Lire', true);
+            $item = request('item');
             $entity = gentity();
             abort_if(!$entity, 422, "No entity");
-            $data = $entity->structureprices();
+            if ($item == 'stx') {
+                $data = $entity->structureprices();
+            } else {
+                $data = $entity->structurepriceminings();
+            }
         } elseif (isEtaUser()) {
+            can('Configuration - Lire', true);
+
             if (from_state() || ('view' === rmode() && null == request('entity_id'))) { // mode edit
                 $data  = StateStructureprice::query();
             } else {
@@ -32,7 +37,6 @@ class TxStructure extends Controller
         } else {
             abort(403);
         }
-
 
         return DataTables::of($data)
             ->addIndexColumn()

@@ -137,9 +137,9 @@ function uneditable(Structureprice|Structurepricemining $structure)
     return array_values(array_unique($ignore));
 }
 
-function mainfuels()
+function mainfuels($isminier = false)
 {
-    return ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI', 'JET'];
+    return $isminier ?  ['ESSENCE', 'PETROLE', 'GASOIL'] :  ['ESSENCE', 'PETROLE', 'GASOIL', 'FOMI', 'JET'];
 }
 
 function mainWays()

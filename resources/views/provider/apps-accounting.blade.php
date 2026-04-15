@@ -109,8 +109,7 @@
 
             @canlocal('Grand livre fiscalité - Lire')
             <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'pf']) }}')">
+                <div class="carte" style="min-height: 120px">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                         fill="#000000">
                         <path
@@ -118,41 +117,15 @@
                     </svg>
                     <div class="p-2">
                         <h4 class="font-weight-bold">Grand livre fiscalité</h4>
-                        <p class="text-danger font-weight-bold">Des sociétés non minières</p>
-                    </div>
-                </div>
-            </div>
-            @endcanlocal
-
-            @canlocal('Bilan fiscalité - Lire')
-            <div class="col-md-6">
-                <div class="carte d-none" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.taxation') }}')">
-                    {{-- <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                        fill="#000000">
-                        <path
-                            d="M120-120v-76l60-60v136h-60Zm165 0v-236l60-60v296h-60Zm165 0v-296l60 61v235h-60Zm165 0v-235l60-60v295h-60Zm165 0v-396l60-60v456h-60ZM120-356v-85l280-278 160 160 280-281v85L560-474 400-634 120-356Z" />
-                    </svg>
-                    <div class="p-2">
-                        <h4 class="font-weight-bold">Fiscalité et parafiscalité</h4>
-                        <p class="text-secondary font-weight-bold">Des sociétés minières</p>
-                    </div> --}}
-                </div>
-            </div>
-            @endcanlocal
-
-            @canlocal('Grand livre fiscalité - Lire')
-            <div class="col-md-6">
-                <div class="carte" style="cursor: pointer;min-height: 120px"
-                    onclick="location.assign('{{ route('provider.accounting', ['item' => 'pfm']) }}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                        fill="#000000">
-                        <path
-                            d="M132-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h696q24 0 42 18t18 42v600q0 24-18 42t-42 18H132Zm0-60h696v-600H132v600Zm68-100h200v-80H200v80Zm382-80 198-198-57-57-141 142-57-57-56 57 113 113Zm-382-80h200v-80H200v80Zm0-160h200v-80H200v80Zm-68 420v-600 600Z" />
-                    </svg>
-                    <div class="p-2">
-                        <h4 class="font-weight-bold">Grand livre fiscalité</h4>
-                        <p class="text-secondary font-weight-bold">Des sociétés minières</p>
+                        <div class="text-center">
+                            <a class="text-primary" href="{{ route('provider.accounting', ['item' => 'pf']) }}">
+                                Sociétés non minières
+                            </a>
+                            <span>|</span>
+                            <a class="text-primary" href="{{ route('provider.accounting', ['item' => 'pfm']) }}">
+                                Sociétés minières
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

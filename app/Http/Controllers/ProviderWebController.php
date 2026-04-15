@@ -41,7 +41,7 @@ class ProviderWebController extends Controller
             return view('common.rates', compact('entity'));
         }
 
-        if ($item == 'stx') {
+        if (in_array($item, ['stx', 'stxm'])) {
             can('Taux structures - Lire', true);
             $user = request()->user();
             $entity = gentity();
@@ -75,7 +75,7 @@ class ProviderWebController extends Controller
         if (in_array($item, ['pf', 'pfm'])) {
             can('Grand livre fiscalité - Lire', true);
             $isminier = $item == 'pfm';
-            return view('provider.greatebookparafisc',compact('isminier'));
+            return view('provider.greatebookparafisc', compact('isminier'));
         }
 
         $stx = request('stx');
@@ -111,8 +111,8 @@ class ProviderWebController extends Controller
                     ];
                 }
 
-                $isminier=false;
-                return view('common.strprices', compact('grouped', 'structure','isminier'));
+                $isminier = false;
+                return view('common.strprices', compact('grouped', 'structure', 'isminier'));
             }
         }
 

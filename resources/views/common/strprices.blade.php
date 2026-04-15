@@ -259,7 +259,16 @@
 
         $('.editable-price').on('focus', function() {
             let td = $(this);
-            td.text(unformatFr(td.text()));
+            var v = unformatFr(td.text());
+            v = Number(v) || 0;
+            td.text(v);
+
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(this);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
         });
 
         // Activer l'édition

@@ -66,11 +66,12 @@
                         <div class="table-responsive" data></div>
                         <div class="my-3 text-danger" errdiv></div>
                     </div>
+
                 </div>
             </div>
         </div>
-
     </div>
+
 @endsection
 @section('modals')
 
@@ -167,31 +168,34 @@
                     });
 
                     h += '</tbody></table>'
+                    h = `<div class="table-responsive">${h}</div>`;
 
                     $('[data]').html(h);
                     $('[data]').css('opacity', 1);
                     rep.hide();
 
-                    // $('#table').DataTable({
-                    //     dom: 'Brt',
-                    //     ordering: false,
-                    //     buttons: [{
-                    //         extend: 'excelHtml5',
-                    //         title: 'Export Excel',
-                    //         exportOptions: {
-                    //             format: {
-                    //                 body: function(data, row, column, node) {
-                    //                     if (!data) return data;
-                    //                     let cleaned = data.toString().replace(/\s+/g,
-                    //                         '');
-                    //                     cleaned = cleaned.replace(',', '.');
-                    //                     let num = Number(cleaned);
-                    //                     return isNaN(num) ? data : num;
-                    //                 }
-                    //             }
-                    //         }
-                    //     }, ],
-                    // });
+                    $('#table').DataTable({
+                        dom: 'Brt',
+                        pageLength: 100,
+                        ordering: false,
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            title: 'Export Excel',
+                            exportOptions: {
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        if (!data) return data;
+                                        let cleaned = data.toString().replace(
+                                            /\s+/g,
+                                            '');
+                                        cleaned = cleaned.replace(',', '.');
+                                        let num = Number(cleaned);
+                                        return isNaN(num) ? data : num;
+                                    }
+                                }
+                            }
+                        }, ],
+                    });
 
                     $('td[href]').click(function() {
                         event.preventDefault();

@@ -176,6 +176,7 @@
 
                     $('#table').DataTable({
                         dom: 'Brt',
+                        pageLength: 100,
                         ordering: false,
                         buttons: [{
                             extend: 'excelHtml5',

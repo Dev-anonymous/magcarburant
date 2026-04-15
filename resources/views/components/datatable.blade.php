@@ -43,10 +43,10 @@
                 sortDescending: ": activer pour trier la colonne par ordre décroissant"
             }
         },
-        pageLength: 25,
+        pageLength: 50,
         lengthMenu: [
-            [25, 50, 100, 200, 500, 1000],
-            [25, 50, 100, 200, 500, 1000]
+            [50, 100, 200, 500, 1000],
+            [50, 100, 200, 500, 1000]
         ],
     });
     $.fn.dataTable.ext.errMode = function(settings, helpPage, message) {

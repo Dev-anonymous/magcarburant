@@ -245,12 +245,24 @@ class DataController extends Controller
             }
 
             if ($type === 'greatbookcr') {
-                can('Grand livre croisement des créances - Lire', true);
+                if (isPetroUser()) {
+                    can('Grand livre croisement des créances - Lire', true);
+                } else if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                } else {
+                    abort('- no permission');
+                }
                 return $this->greatBookCrData();
             }
 
             if ($type === 'greatbookfisc') {
-                can('Grand livre fiscalité - Lire', true);
+                if (isPetroUser()) {
+                    can('Grand livre fiscalité - Lire', true);
+                } else if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                } else {
+                    abort('- no permission');
+                }
                 $minier = request('minier') == 1;
                 return $minier ? $this->greatBookFiscMiningData() :  $this->greatBookFiscData();
             }
@@ -391,15 +403,16 @@ class DataController extends Controller
             }
 
             if ($type === 'balancecr') {
-                can('Bilan croisement des créances - Lire', true);
-
                 if (isPetroUser()) {
+                    can('Bilan croisement des créances - Lire', true);
                     $entity = gentity();
                 } else if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    abort(403);
+                    abort('- no permission');
                 }
+
                 $data = $this->greatBookData();
                 $zones = (array) request('zone');
                 $fuels = (array) request('fuel');
@@ -771,7 +784,13 @@ class DataController extends Controller
             }
 
             if ($type === 'balancefisc') {
-                can('Bilan fiscalité - Lire', true);
+                if (isPetroUser()) {
+                    can('Bilan fiscalité - Lire', true);
+                } else if (isEtaUser()) {
+                    can(['Mode lecture - Lire'], true);
+                } else {
+                    abort('- no permission');
+                }
 
                 $data = $this->greatBookFiscData();
                 $dhead = $data['head'];
@@ -2261,7 +2280,6 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
 
-        $user = request()->user();
         if (isPetroUser()) {
             $entity = gentity();
         } else if (isEtaUser()) {

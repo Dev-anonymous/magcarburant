@@ -26,26 +26,36 @@ class StateWebController extends Controller
 
     function apps($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.apps', compact('entity'));
     }
 
     function purchase($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.purchase', compact('entity'));
     }
 
     function sale($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.sale', compact('entity'));
     }
 
     function delivery($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.delivery', compact('entity'));
     }
 
     function accounting($mode, Entity $entity)
     {
+        statecan();
+
         $item = request('item');
         if ($item == 'rtx') {
             return view('state.views.rrates', compact('entity'));
@@ -112,16 +122,22 @@ class StateWebController extends Controller
 
     function analyse($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.analyse', compact('entity'));
     }
 
     function claim($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.claim', compact('entity'));
     }
 
     function taxation($mode, Entity $entity)
     {
+        statecan();
+
         return view('state.views.taxation', compact('entity'));
     }
 
@@ -208,6 +224,8 @@ class StateWebController extends Controller
 
     function security_stock($mode, Entity $entity)
     {
+        statecan();
+
         initStockPrice();
         $years = SecurityStock::selectRaw('YEAR(month) as year')
             ->distinct()

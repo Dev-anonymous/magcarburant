@@ -29,7 +29,7 @@ class SaleController extends Controller
             can('Vente - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
-            can(['Mode lecture - Lire'], true);
+            statecan();
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -56,7 +56,7 @@ class SaleController extends Controller
         return DataTables::of($sales)
             ->addIndexColumn()
             ->addColumn('selall', function ($row) {
-                if(!can('Vente - Supprimer')) return;
+                if (!can('Vente - Supprimer')) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>

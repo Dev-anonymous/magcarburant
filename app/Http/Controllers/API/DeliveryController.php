@@ -21,14 +21,11 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-
-        $user = request()->user();
-
         if (isPetroUser()) {
             can('Livraison excédentaire - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
-            can(['Mode lecture - Lire'], true);
+            statecan();
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);
@@ -76,7 +73,7 @@ class DeliveryController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) use ($user) {
+            ->addColumn('action', function ($row) {
                 $eb = "";
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
@@ -137,7 +134,6 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
-        $user = request()->user();
 
         if (request('action') == 'update') {
             can('Livraison excédentaire - Modifier', true);

@@ -23,7 +23,7 @@ class SecurityStockController extends Controller
             can('Stock de sécurité collecté reversé - Lire', true);
             $entity = gentity();
         } elseif (isEtaUser()) {
-            can(['Mode lecture - Lire'], true);
+            statecan();
             $entity  = Entity::findOrFail(request('entity_id'));
         } else {
             abort(403);

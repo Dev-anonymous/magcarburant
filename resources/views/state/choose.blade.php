@@ -100,7 +100,7 @@
             </div>
             @endcanlocal
 
-            @if (can('Gestion des utilisateurs - Lire') || can('Gestion des rôles - Lire'))
+            @if (can(['Gestion des utilisateurs - Lire', 'Gestion des rôles - Lire']))
                 <div class="col-md-6">
                     <div class="carte" style="min-height: 145px"">
                         <div class="w-100">

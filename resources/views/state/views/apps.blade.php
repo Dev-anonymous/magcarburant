@@ -19,8 +19,15 @@
             </div>
         </div>
         <hr />
+        @php
+            $perm = 'Mode écriture - Lire';
+            if ($mode == 'view') {
+                $perm = 'Mode lecture - Lire';
+            }
+        @endphp
         <div class="row">
             @if ($entity->user->user_role == 'petrolier' && 'view' == $mode)
+                @canlocal($perm)
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
                         onclick="location.assign('{{ state_route('purchase', $entity) }}')">
@@ -35,7 +42,9 @@
                         </div>
                     </div>
                 </div>
+                @endcanlocal
             @endif
+            @canlocal($perm)
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ state_route('sale', $entity) }}')">
@@ -50,7 +59,10 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
             @if ($entity->user->user_role == 'petrolier')
+                @canlocal($perm)
                 <div class="col-md-6">
                     <div class="carte" style="cursor: pointer;min-height: 120px"
                         onclick="location.assign('{{ state_route('delivery', $entity) }}')">
@@ -65,7 +77,10 @@
                         </div>
                     </div>
                 </div>
+                @endcanlocal
             @endif
+
+            @canlocal($perm)
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ state_route('security-stock', $entity) }}')">
@@ -85,6 +100,9 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
+
+            @canlocal($perm)
             <div class="col-md-6">
                 <div class="carte" style="cursor: pointer;min-height: 120px"
                     onclick="location.assign('{{ state_route('accounting', $entity) }}')">
@@ -99,6 +117,7 @@
                     </div>
                 </div>
             </div>
+            @endcanlocal
         </div>
 
     </div>

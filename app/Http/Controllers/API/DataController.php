@@ -35,6 +35,7 @@ class DataController extends Controller
                 $to = @$date[1] ?? $from;
 
                 if (isEtaUser()) {
+                    statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     $entity = gentity();
@@ -75,8 +76,11 @@ class DataController extends Controller
                 $to = @$date[1] ?? $from;
 
                 if (isEtaUser()) {
+                    statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
+                    can(['Vente - Lire'], true);
+
                     $entity = gentity();
                 }
                 $base = $entity->sales()->whereBetween('date', [$from, $to])->where('from_state', from_state());
@@ -138,6 +142,7 @@ class DataController extends Controller
                 $to = @$date[1] ?? $from;
 
                 if (isEtaUser()) {
+                    statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     $entity = gentity();
@@ -193,7 +198,7 @@ class DataController extends Controller
 
             if ($type === 'delivery') {
                 if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     can('Livraison excédentaire - Lire', true);
@@ -237,7 +242,7 @@ class DataController extends Controller
                 if (isPetroUser() || isLogUser()) {
                     can('Grand livre manque à gagner - Lire', true);
                 } elseif (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                 } else {
                     abort(422, 'error');
                 }
@@ -248,7 +253,7 @@ class DataController extends Controller
                 if (isPetroUser()) {
                     can('Grand livre croisement des créances - Lire', true);
                 } else if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                 } else {
                     abort('- no permission');
                 }
@@ -259,7 +264,7 @@ class DataController extends Controller
                 if (isPetroUser()) {
                     can('Grand livre fiscalité - Lire', true);
                 } else if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                 } else {
                     abort('- no permission');
                 }
@@ -268,6 +273,14 @@ class DataController extends Controller
             }
 
             if ($type === 'greatbooklog') {
+                if (isLogUser()) {
+                    can('Grand livre manque à gagner - Lire', true);
+                } elseif (isEtaUser()) {
+                    statecan();
+                } else {
+                    abort(422, 'error');
+                }
+
                 return $this->greatBookLogData();
             }
 
@@ -275,7 +288,7 @@ class DataController extends Controller
                 if (isPetroUser() || isLogUser()) {
                     can('Bilan manque à gagner - Lire', true);
                 } else if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                 } else {
                     abort('- no permission');
                 }
@@ -407,7 +420,7 @@ class DataController extends Controller
                     can('Bilan croisement des créances - Lire', true);
                     $entity = gentity();
                 } else if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
                     abort('- no permission');
@@ -787,7 +800,7 @@ class DataController extends Controller
                 if (isPetroUser()) {
                     can('Bilan fiscalité - Lire', true);
                 } else if (isEtaUser()) {
-                    can(['Mode lecture - Lire'], true);
+                    statecan();
                 } else {
                     abort('- no permission');
                 }
@@ -1249,7 +1262,13 @@ class DataController extends Controller
             }
 
             if ($type === 'balancelog') {
-                can('Bilan manque à gagner - Lire', true);
+                if (isLogUser()) {
+                    can('Bilan manque à gagner - Lire', true);
+                } else if (isEtaUser()) {
+                    statecan();
+                } else {
+                    abort('- no permission');
+                }
 
                 $data = $this->greatBookLogData();
                 $zones = (array) request('zone');
@@ -2509,8 +2528,6 @@ class DataController extends Controller
 
     private function greatBookLogData()
     {
-        can('Grand livre manque à gagner - Lire', true);
-
         $reqzone = (array) request('zone');
         $reqfuel = (array) request('fuel');
         $terminal = (array) request('terminal');

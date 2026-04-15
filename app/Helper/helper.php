@@ -864,3 +864,13 @@ function can(string|array $permissionNames, bool $abort = false): bool
 
     return $can;
 }
+
+function statecan()
+{
+    $mode = rmode();
+    $perm = 'Mode écriture - Lire';
+    if ($mode == 'view') {
+        $perm = 'Mode lecture - Lire';
+    }
+    can($perm, true);
+}

@@ -67,8 +67,9 @@ class StateWebController extends Controller
             return view('state.views.greatebookCR', compact('entity'));
         }
 
-        if ($item == 'pf') {
-            return view('state.views.greatebookparafisc', compact('entity'));
+        if (in_array($item, ['pf', 'pfm'])) {
+            $isminier = $item == 'pfm';
+            return view('state.views.greatebookparafisc', compact('entity', 'isminier'));
         }
 
         $stx = request('stx');

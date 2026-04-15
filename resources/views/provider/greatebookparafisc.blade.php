@@ -24,7 +24,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card transparent">
-                    <div class="card-header">bbbbb
+                    <div class="card-header">
                         @php
                             $d = now()->startOfMonth()->toDateString();
                             $d2 = now()->toDateString();

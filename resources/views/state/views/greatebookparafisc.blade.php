@@ -5,7 +5,8 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="">
-                <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité | {{ $entity->shortname }}</h2>
+                <h2 class="font-weight-bold">Grand livre Fiscalité & Parafiscalité des
+                    {{ $isminier ? 'sociétés minières' : 'sociétés non minières' }} | {{ $entity->shortname }}</h2>
                 <p class="lead small m-0">Grand Livre Fiscalité & Parafiscalité sur les ventes des produits pour
                     {{ $entity->shortname }}</p>
             </div>
@@ -30,6 +31,7 @@
                         @endphp
                         <form id="ffilter" class="filters-form pull-right" role="form">
                             <input type="hidden" name="type" value="greatbookfisc">
+                            <input type="hidden" name="minier" value="{{ (int) ($isminier == 1) }}">
                             <input type="hidden" name="entity_id" value="{{ $entity->id }}">
                             <div class="form-group mb-1">
                                 <label for="dv222" class="control-label d-block mb-0">Du</label>
@@ -63,7 +65,7 @@
                                 <label for="fuel" class="control-label d-block mb-0">Produit</label>
                                 <select name="fuel[]" id="fuel" class="form-control" multiple
                                     style="min-width:150px;">
-                                    @foreach (mainfuels() as $e)
+                                    @foreach (mainfuels($isminier) as $e)
                                         <option selected>{{ $e }}</option>
                                     @endforeach
                                 </select>

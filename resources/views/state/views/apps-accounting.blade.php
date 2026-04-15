@@ -95,8 +95,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="carte" style="cursor: pointer;min-height: 120px"
-                        onclick="location.assign('{{ state_route('accounting', ['item' => 'pf', 'entity' => $entity->id]) }}')">
+                    <div class="carte" style="min-height: 120px">
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
                             fill="#000000">
                             <path
@@ -104,6 +103,17 @@
                         </svg>
                         <div class="p-2">
                             <h4 class="font-weight-bold">Grand livre fiscalité</h4>
+                            <div class="text-center">
+                                <a class="text-primary"
+                                    href="{{ state_route('accounting', ['item' => 'pf', 'entity' => $entity->id]) }}">
+                                    Sociétés non minières
+                                </a>
+                                <span>|</span>
+                                <a class="text-primary"
+                                    href="{{ state_route('accounting', ['item' => 'pfm', 'entity' => $entity->id]) }}">
+                                    Sociétés minières
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

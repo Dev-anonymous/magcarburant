@@ -6,17 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\Fuel;
-use App\Models\Label;
-use App\Models\Purchase;
-use App\Models\Rate;
-use App\Models\Sale;
-use App\Models\Structureprice;
 use App\Models\User;
 use App\Models\Zone;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 
 class DataController extends Controller
 {
@@ -255,7 +248,7 @@ class DataController extends Controller
                 } else if (isEtaUser()) {
                     statecan();
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
                 return $this->greatBookCrData();
             }
@@ -266,7 +259,7 @@ class DataController extends Controller
                 } else if (isEtaUser()) {
                     statecan();
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
                 $minier = request('minier') == 1;
                 return $minier ? $this->greatBookFiscMiningData() :  $this->greatBookFiscData();
@@ -290,7 +283,7 @@ class DataController extends Controller
                 } else if (isEtaUser()) {
                     statecan();
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
 
                 $data = $this->greatBookData();
@@ -423,7 +416,7 @@ class DataController extends Controller
                     statecan();
                     $entity  = Entity::findOrFail(request('entity_id'));
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
 
                 $data = $this->greatBookData();
@@ -802,7 +795,7 @@ class DataController extends Controller
                 } else if (isEtaUser()) {
                     statecan();
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
 
                 $data = $this->greatBookFiscData();
@@ -1267,7 +1260,7 @@ class DataController extends Controller
                 } else if (isEtaUser()) {
                     statecan();
                 } else {
-                    abort('- no permission');
+                    abort(403, '- no permission');
                 }
 
                 $data = $this->greatBookLogData();
@@ -1664,14 +1657,11 @@ class DataController extends Controller
         $reqzone = (array) request('zone');
         $reqfuel = (array) request('fuel');
         $items = request('items');
-        $isState = false;
-        $mode = rmode();
-        $user = request()->user();
+
         if (isPetroUser()) {
             $entity = gentity();
         } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
-            $isState = true;
         } else {
             abort(403);
         }
@@ -1744,7 +1734,7 @@ class DataController extends Controller
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            if ($isState && $mode === 'edit') {
+            if (from_state()) {
                 $pmfc_reel = (float) AverageFuelPrice::whereYear('month', $saledate->year)
                     ->whereMonth('month', $saledate->month)
                     ->where('product', $fuel)
@@ -1890,13 +1880,12 @@ class DataController extends Controller
         $reqfuel = (array) request('fuel');
         $items = request('items');
 
-        $user = request()->user();
-        $isState = false;
+        $useStateData = isEtaUser() && rmode() === 'edit';
+
         if (isPetroUser()) {
             $entity = gentity();
         } else if (isEtaUser()) {
             $entity  = Entity::findOrFail(request('entity_id'));
-            $isState = true;
         } else {
             abort(403);
         }
@@ -1961,7 +1950,7 @@ class DataController extends Controller
             $startOfMonth = $saledate->copy()->startOfMonth();
             $endOfMonth   = $saledate->copy()->endOfMonth();
 
-            if ($isState) { // en mode view, etatique ici pmfc_reel uhm uhm  uhm
+            if ($useStateData) { // en mode view, etatique ici pmfc_reel uhm uhm  uhm
                 $pmfc_reel = (float) AverageFuelPrice::whereYear('month', $saledate->year)
                     ->whereMonth('month', $saledate->month)
                     ->where('product', $fuel)

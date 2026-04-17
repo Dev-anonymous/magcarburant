@@ -6,7 +6,6 @@ use App\Models\AverageFuelPrice;
 use App\Models\Entity;
 use App\Models\SecurityStock;
 use App\Models\StateStructureprice;
-use App\Models\Structureprice;
 use App\Models\User;
 
 class StateWebController extends Controller

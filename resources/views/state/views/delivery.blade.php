@@ -83,6 +83,7 @@
                                     </select>
                                 </div>
                                 @if ('edit' == $mode)
+                                    @canlocal('Mode écriture - Créer')
                                     <div class="form-group mb-1">
                                         <button type="button" class="btn btn-sm btn-primary mt-3" data-toggle="modal"
                                             data-target="#mdlChose">
@@ -90,6 +91,7 @@
                                             livraison excédentaire
                                         </button>
                                     </div>
+                                    @endcanlocal
                                 @endif
                             </form>
                         </div>

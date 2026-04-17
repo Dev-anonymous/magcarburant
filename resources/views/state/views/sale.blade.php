@@ -102,12 +102,14 @@
                                     </div>
                                 @endif
                                 @if ('edit' == $mode)
+                                    @canlocal('Mode écriture - Créer')
                                     <div class="form-group mb-1">
                                         <button type="button" class="btn btn-sm btn-primary mt-3" data-toggle="modal"
                                             data-target="#mdlChose">
                                             <i class="material-icons md-18">add_circle_outline</i> Nouvelle vente
                                         </button>
                                     </div>
+                                    @endcanlocal
                                 @endif
                             </form>
                         </div>

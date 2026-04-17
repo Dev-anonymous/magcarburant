@@ -18,13 +18,14 @@ class SecurityStockController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
+        $isState = false;
         if (isPetroUser() || isLogUser()) {
             can('Stock de sécurité collecté reversé - Lire', true);
             $entity = gentity();
         } elseif (isEtaUser()) {
-            statecan();
+            can('Mode écriture - Lire', true);
             $entity  = Entity::findOrFail(request('entity_id'));
+            $isState = true;
         } else {
             abort(403);
         }
@@ -53,9 +54,10 @@ class SecurityStockController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) use ($user) {
+            ->addColumn('action', function ($row) use ($isState) {
                 $t = '';
-                if (can('Stock de sécurité collecté reversé - Modifier')) {
+                $can = $isState ? can('Mode écriture - Modifier') : can('Stock de sécurité collecté reversé - Modifier');
+                if ($can) {
                     $date = $row->month;
                     $m = ucfirst($date->translatedFormat('F')) . ' ' . $date->format('Y');
                     $data = e(json_encode(array_merge($row->toArray(), ['monthname' => $m])));
@@ -83,8 +85,15 @@ class SecurityStockController extends Controller
     public function store(Request $request)
     {
         if (request('action') == 'update') {
-            $user = request()->user();
             abort_if(!isProLogEtaUser(), 403, "No permission");
+            $isState = isEtaUser();
+
+            if ($isState) {
+                can('Mode écriture - Modifier', true);
+            } else {
+                can('Stock de sécurité collecté reversé - Modifier', true);
+            }
+
             $validated = $request->validate([
                 'id' => 'required|exists:security_stock',
                 'amount' => 'required|numeric|min:0',

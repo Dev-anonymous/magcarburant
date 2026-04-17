@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
             Route::get('dash', 'dash')->name('provider.dash');
             Route::get('apps', 'apps')->name('provider.apps');
             Route::get('sale', 'sale')->name('provider.sale');
+            Route::get('delivery', 'delivery')->name('provider.delivery');
             Route::get('mining-sale', 'mining_sale')->name('provider.mining-sale');
             Route::get('purchase', 'purchase')->name('provider.purchase');
             Route::get('security-stock', 'security_stock')->name('provider.security-stock');
@@ -108,7 +109,6 @@ Route::middleware('auth')->group(function () {
                 Route::get('', 'accounting')->name('provider.accounting');
                 Route::get('analyse', 'analyse')->name('provider.analyse');
                 Route::get('claim', 'claim')->name('provider.claim');
-                Route::get('delivery', 'delivery')->name('provider.delivery');
                 Route::get('taxation', 'taxation')->name('provider.taxation');
             });
         });
@@ -144,12 +144,12 @@ Route::middleware('auth')->group(function () {
                 ->group(function () {
                     Route::get('', 'apps')->name('state.apps');
                     Route::get('sale', 'sale')->name('state.sale');
+                    Route::get('delivery', 'delivery')->name('state.delivery');
                     Route::get('purchase', 'purchase')->name('state.purchase');
                     Route::get('security-stock', 'security_stock')->name('state.security-stock');
                     Route::prefix('accounting')->group(function () {
                         Route::get('', 'accounting')->name('state.accounting');
                         Route::get('analyse', 'analyse')->name('state.analyse');
-                        Route::get('delivery', 'delivery')->name('state.delivery');
                         Route::get('claim', 'claim')->name('state.claim');
                         Route::get('taxation', 'taxation')->name('state.taxation');
                     });

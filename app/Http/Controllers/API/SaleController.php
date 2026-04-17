@@ -24,13 +24,14 @@ class SaleController extends Controller
      */
     public function index()
     {
-
+        $isState = false;
         if (isPetroUser() || isLogUser()) {
             can('Vente - Lire', true);
             $entity = gentity();
         } else if (isEtaUser()) {
             statecan();
             $entity  = Entity::findOrFail(request('entity_id'));
+            $isState = true;
         } else {
             abort(403);
         }
@@ -55,8 +56,10 @@ class SaleController extends Controller
 
         return DataTables::of($sales)
             ->addIndexColumn()
-            ->addColumn('selall', function ($row) {
-                if (!can('Vente - Supprimer')) return;
+            ->addColumn('selall', function ($row) use ($isState) {
+                $can = $isState ? can('Mode écriture - Supprimer') : can('Vente - Supprimer');
+
+                if (!$can) return;
                 return "
                 <div class='custom-control custom-checkbox mt-3'>
                     <input type='checkbox' value='$row->id' id='id$row->id' class='selall custom-control-input'>
@@ -80,7 +83,7 @@ class SaleController extends Controller
                 }
                 return "<div class=''>$f</div>";
             })
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($isState) {
                 $d = $row->toArray();
                 $d['date'] = $row->date?->format('Y-m-d');
                 $data = e(json_encode($d));
@@ -98,11 +101,20 @@ class SaleController extends Controller
                             <span class='align-middle'>Supprimer</span>
                         </a>";
 
-                if (can('Vente - Modifier')) {
-                    $btn .= $btn1;
-                }
-                if (can('Vente - Supprimer')) {
-                    $btn .= $btn2;
+                if ($isState) {
+                    if (can('Mode écriture - Modifier')) {
+                        $btn .= $btn1;
+                    }
+                    if (can('Mode écriture - Supprimer')) {
+                        $btn .= $btn2;
+                    }
+                } else {
+                    if (can('Vente - Modifier')) {
+                        $btn .= $btn1;
+                    }
+                    if (can('Vente - Supprimer')) {
+                        $btn .= $btn2;
+                    }
                 }
 
                 $t = <<<DATA
@@ -146,12 +158,16 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        $user = request()->user();
-
         if (request('action') == 'update') {
-            can('Vente - Modifier', true);
-
-            abort_if(!isProLogEtaUser(), 403, "No permission");
+            $isState = false;
+            if (isPetroUser() || isLogUser()) {
+                can('Vente - Modifier', true);
+            } else if (isEtaUser()) {
+                can('Mode écriture - Modifier', true);
+                $isState = true;
+            } else {
+                abort(403);
+            }
 
             $id = request('id');
             $sale = Sale::findOrFail($id);
@@ -215,19 +231,19 @@ class SaleController extends Controller
                 'message' => "Votre vente a été mise à jour avec succès !",
             ]);
         } elseif (request('action') == 'import') {
-            can('Vente - Créer', true);
-
-            $validated = $request->validate([
-                'file' => 'required|file|mimes:xlsx,xls'
-            ]);
-
             if (isPetroUser() || isLogUser()) {
+                can('Vente - Créer', true);
                 $entity = gentity();
             } else if (isEtaUser()) {
+                can('Mode écriture - Créer', true);
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
             }
+
+            $validated = $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls'
+            ]);
 
             $rows = Excel::toArray([], $request->file('file'));
             $sheet = (array) @$rows[0]; // première feuille EXCEL
@@ -429,11 +445,11 @@ class SaleController extends Controller
                 'message' => "Votre fichier a été importé avec succès.",
             ], 201);
         } else {
-            can('Vente - Créer', true);
-
             if (isPetroUser() || isLogUser()) {
+                can('Vente - Créer', true);
                 $entity = gentity();
             } elseif (isEtaUser()) {
+                can('Mode écriture - Créer', true);
                 $entity  = Entity::findOrFail(request('entity_id'));
             } else {
                 abort(403);
@@ -541,12 +557,11 @@ class SaleController extends Controller
      */
     public function destroy(Sale $sale)
     {
-        can('Vente - Supprimer', true);
-
         abort_if(!isProLogEtaUser(), 403, "No permission");
         if (isEtaUser()) {
-            //
+            can('Mode écriture - Supprimer', true);
         } else {
+            can('Vente - Supprimer', true);
             $entity = gentity();
             abort_if($entity->id != $sale->entity_id, 403, "Not permit");
         }

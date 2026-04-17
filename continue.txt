@@ -3,7 +3,11 @@
 livraison excedentaire : champ terminal crud
 
 
-====> etat mode ecriture
+====> etat mode ecriture :
+- les urls petro, log, etat
+- userstatedata -> comptabilite et Autres
+- ajouter ventes miniere cote etat
+
 
 
 
